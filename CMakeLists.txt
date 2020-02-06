@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(CCD)
+project(CCDWrapper)
 
 ################################################################################
 
@@ -30,7 +30,7 @@ option(LIBIGL_WITH_PREDICATES        "Use exact predicates"         OFF)
 ################################################################################
 
 ### Configuration
-set(${PROJECT_NAME}_EXTERNAL "${CMAKE_CURRENT_SOURCE_DIR}/external")
+set(CCD_WRAPPER_EXTERNAL "${CMAKE_CURRENT_SOURCE_DIR}/external")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(Warnings)
@@ -81,8 +81,8 @@ if(${PROJECT_NAME}_WITH_UNIT_TESTS)
   # Catch2
   if(NOT TARGET Catch2::Catch2)
       download_catch2()
-      add_subdirectory(${${PROJECT_NAME}_EXTERNAL}/Catch2 catch2)
-      list(APPEND CMAKE_MODULE_PATH ${${PROJECT_NAME}_EXTERNAL}/Catch2/contrib)
+      add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Catch2 catch2)
+      list(APPEND CMAKE_MODULE_PATH ${CCD_WRAPPER_EXTERNAL}/Catch2/contrib)
   endif()
 
   include(CTest)

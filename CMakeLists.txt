@@ -4,7 +4,7 @@ project(CCDWrapper)
 ################################################################################
 
 # project-options
-option(${PROJECT_NAME}_WITH_UNIT_TESTS   "Build unit tests using Catch2"  ON)
+option(CCD_WRAPPER_WITH_UNIT_TESTS   "Build unit tests using Catch2"  ON)
 
 # libigl
 option(LIBIGL_USE_STATIC_LIBRARY     "Use libigl as static library" OFF)
@@ -77,10 +77,10 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
 # Tests
 ################################################################################
 
-if(${PROJECT_NAME}_WITH_UNIT_TESTS)
+if(CCD_WRAPPER_WITH_UNIT_TESTS)
   # Catch2
   if(NOT TARGET Catch2::Catch2)
-      download_catch2()
+      ccd_wrapper_download_catch2()
       add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Catch2 catch2)
       list(APPEND CMAKE_MODULE_PATH ${CCD_WRAPPER_EXTERNAL}/Catch2/contrib)
   endif()

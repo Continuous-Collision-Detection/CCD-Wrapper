@@ -16,7 +16,7 @@ include(${PROJECT_NAME}DownloadExternal)
 
 # Eigen
 if(NOT TARGET Eigen3::Eigen)
-  download_eigen()
+  ccd_wrapper_download_eigen()
   add_library(${PROJECT_NAME}_eigen INTERFACE)
   target_include_directories(${PROJECT_NAME}_eigen SYSTEM INTERFACE
     $<BUILD_INTERFACE:${CCD_WRAPPER_EXTERNAL}/eigen>
@@ -30,7 +30,7 @@ endif()
 
 # Etienne Vouga's CTCD Library
 if(NOT TARGET EVCTCD)
-  download_evctcd()
+  ccd_wrapper_download_evctcd()
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/EVCTCD)
   # These includes are PRIVATE for some reason
   target_include_directories(collisiondetection PUBLIC "${CCD_WRAPPER_EXTERNAL}/EVCTCD/include")
@@ -42,13 +42,13 @@ endif()
 
 # Brochu et al. [2012] and Tang et al. [2014]
 if(NOT TARGET exact-ccd::exact-ccd)
-  download_exact_ccd()
+  ccd_wrapper_download_exact_ccd()
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/exact-ccd EXCLUDE_FROM_ALL)
   add_library(exact-ccd::exact-ccd ALIAS exact-ccd)
 endif()
 
 # Rational implmentation of Brochu et al. [2012]
 if(NOT TARGET RationalCCD)
-  download_rational_ccd()
+  ccd_wrapper_download_rational_ccd()
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/rational_ccd)
 endif()

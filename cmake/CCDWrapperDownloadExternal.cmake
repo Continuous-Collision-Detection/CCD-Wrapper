@@ -22,7 +22,7 @@ endfunction()
 ################################################################################
 
 # Eigen
-function(download_eigen)
+function(ccd_wrapper_download_eigen)
     ccd_wrapper_download_project(eigen
         URL           http://bitbucket.org/eigen/eigen/get/3.3.7.tar.bz2
         URL_MD5       05b1f7511c93980c385ebe11bd3c93fa
@@ -30,7 +30,7 @@ function(download_eigen)
 endfunction()
 
 # Etienne Vouga's CTCD Library
-function(download_evctcd)
+function(ccd_wrapper_download_evctcd)
   ccd_wrapper_download_project(EVCTCD
     GIT_REPOSITORY https://github.com/evouga/collisiondetection.git
     GIT_TAG        e5fe5c9767207df5047e375fb20180a665ae186f
@@ -38,7 +38,7 @@ function(download_evctcd)
 endfunction()
 
 # exact-ccd (clone of Brochu et al. [2012] and Tang et al. [2014])
-function(download_exact_ccd)
+function(ccd_wrapper_download_exact_ccd)
   ccd_wrapper_download_project(exact-ccd
     GIT_REPOSITORY https://github.com/jiangzhongshi/exact-ccd.git
     GIT_TAG        305bb6f0e57d399b283161dc3669c260f90fb7f5
@@ -46,7 +46,7 @@ function(download_exact_ccd)
 endfunction()
 
 # Rational CCD (rational version of Brochu et al. [2012])
-function(download_rational_ccd)
+function(ccd_wrapper_download_rational_ccd)
   ccd_wrapper_download_project(rational_ccd
     GIT_REPOSITORY https://github.com/teseoch/Exact-CDD.git
     GIT_TAG        94b05129efa2c33348622b2890bd464cc95f65a7
@@ -54,7 +54,7 @@ function(download_rational_ccd)
 endfunction()
 
 # Catch2 for testing
-function(download_catch2)
+function(ccd_wrapper_download_catch2)
   ccd_wrapper_download_project(Catch2
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
     GIT_TAG        v2.11.1

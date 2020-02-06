@@ -76,6 +76,8 @@ bool vertexFaceCCD(
             // Triangle at t = 1
             Vec3d(face_vertex0_end.data()), Vec3d(face_vertex1_end.data()),
             Vec3d(face_vertex2_end.data()));
+    default:
+        return false;
     }
 }
 
@@ -142,6 +144,8 @@ bool edgeEdgeCCD(
             Vec3d(edge0_vertex0_end.data()), Vec3d(edge0_vertex1_end.data()),
             // Edge 2 at t=1
             Vec3d(edge1_vertex0_end.data()), Vec3d(edge1_vertex1_end.data()));
+    default:
+        return false;
     }
 }
 

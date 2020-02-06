@@ -52,3 +52,9 @@ if(NOT TARGET RationalCCD)
   ccd_wrapper_download_rational_ccd()
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/rational_ccd)
 endif()
+
+# TightCCD implmentation of Wang et al. [2015]
+if(NOT TARGET TightCCD)
+  ccd_wrapper_download_tight_ccd()
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/TightCCD)
+endif()

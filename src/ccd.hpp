@@ -15,11 +15,13 @@ enum CCDMethod {
     /// Teseo's reimplementation of Brochu et al. [2012] using rationals
     RATIONAL_ROOT_PARITY,
     /// Bernstein sign classification method of Tang et al. [2014]
-    BSC
+    BSC,
+    /// TightCCD method of Wang et al. [2015]
+    TIGHT_CCD
 };
 
-static const char* method_names[4]
-    = { "Float", "RootParity", "RationalRootParity", "BSC" };
+static const char* method_names[5]
+    = { "Float", "RootParity", "RationalRootParity", "BSC", "TightCCD" };
 
 /**
  * @brief Detect collisions between a vertex and a triangular face.

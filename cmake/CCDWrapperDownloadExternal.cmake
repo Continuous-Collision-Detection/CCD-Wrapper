@@ -53,6 +53,14 @@ function(ccd_wrapper_download_rational_ccd)
   )
 endfunction()
 
+# TightCCD implmentation of Wang et al. [2015]
+function(ccd_wrapper_download_tight_ccd)
+  ccd_wrapper_download_project(TightCCD
+    GIT_REPOSITORY https://github.com/zfergus/TightCCD.git
+    GIT_TAG        1da1fd01fffabd2611707b0b3a1096928c0da98b
+  )
+endfunction()
+
 # Catch2 for testing
 function(ccd_wrapper_download_catch2)
   ccd_wrapper_download_project(Catch2

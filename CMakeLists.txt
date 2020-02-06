@@ -63,6 +63,9 @@ target_link_libraries(${PROJECT_NAME} PUBLIC exact-ccd::exact-ccd)
 # Rational implmentation of Brochu et al. [2012]
 target_link_libraries(${PROJECT_NAME} PUBLIC RationalCCD)
 
+# TightCCD implmentation of Wang et al. [2015]
+target_link_libraries(${PROJECT_NAME} PUBLIC TightCCD)
+
 # Extra warnings
 target_link_libraries(${PROJECT_NAME} PRIVATE warnings::all)
 

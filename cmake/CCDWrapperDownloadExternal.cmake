@@ -41,7 +41,7 @@ endfunction()
 function(ccd_wrapper_download_exact_ccd)
   ccd_wrapper_download_project(exact-ccd
     GIT_REPOSITORY https://github.com/jiangzhongshi/exact-ccd.git
-    GIT_TAG        305bb6f0e57d399b283161dc3669c260f90fb7f5
+    GIT_TAG        eb91cfb81f1e074412927496c7b3eca1778a0ce1
   )
 endfunction()
 

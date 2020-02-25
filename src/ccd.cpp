@@ -68,28 +68,28 @@ bool vertexFaceCCD(
             face_vertex0_end, face_vertex1_end, face_vertex2_end);
     case CCDMethod::BSC:
         return bsc::Intersect_VF_robust(
-            // Point at t=0
-            Vec3d(vertex_start.data()),
             // Triangle at t = 0
             Vec3d(face_vertex0_start.data()), Vec3d(face_vertex1_start.data()),
             Vec3d(face_vertex2_start.data()),
-            // Point at t=1
-            Vec3d(vertex_end.data()),
+            // Point at t=0
+            Vec3d(vertex_start.data()),
             // Triangle at t = 1
             Vec3d(face_vertex0_end.data()), Vec3d(face_vertex1_end.data()),
-            Vec3d(face_vertex2_end.data()));
+            Vec3d(face_vertex2_end.data()),
+            // Point at t=1
+            Vec3d(vertex_end.data()));
     case CCDMethod::TIGHT_CCD:
         return bsc_tightbound::Intersect_VF_robust(
-            // Point at t=0
-            Vec3d(vertex_start.data()),
             // Triangle at t = 0
             Vec3d(face_vertex0_start.data()), Vec3d(face_vertex1_start.data()),
             Vec3d(face_vertex2_start.data()),
-            // Point at t=1
-            Vec3d(vertex_end.data()),
+            // Point at t=0
+            Vec3d(vertex_start.data()),
             // Triangle at t = 1
             Vec3d(face_vertex0_end.data()), Vec3d(face_vertex1_end.data()),
-            Vec3d(face_vertex2_end.data()));
+            Vec3d(face_vertex2_end.data()),
+            // Point at t=1
+            Vec3d(vertex_end.data()));
     default:
         return false;
     }

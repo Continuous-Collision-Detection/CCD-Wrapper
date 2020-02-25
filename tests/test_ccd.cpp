@@ -11,9 +11,7 @@ TEST_CASE(
     using namespace ccd;
     CCDMethod method = GENERATE(
         CCDMethod::FLOAT, CCDMethod::ROOT_PARITY,
-        CCDMethod::RATIONAL_ROOT_PARITY, CCDMethod::BSC
-        //, CCDMethod::TIGHT_CCD
-    );
+        CCDMethod::RATIONAL_ROOT_PARITY, CCDMethod::BSC, CCDMethod::TIGHT_CCD);
 
     // point
     double v0z = GENERATE(0.0, -1.0);
@@ -42,7 +40,11 @@ TEST_CASE(
         v0, v1, v2, v3, v0 + u0, v1 + u1, v2 + u1, v3 + u1, method);
 
     CAPTURE(v0z, u0y, u1y, u0z, EPSILON, method_names[method]);
-    CHECK(hit == ((-u0y + u1y >= 1) && (v0z + u0z >= v3.z())));
+    // TightCCD can produce false positives, so only check if the hit value is
+    // negative.
+    if (method != CCDMethod::TIGHT_CCD || !hit) {
+        CHECK(hit == ((-u0y + u1y >= 1) && (v0z + u0z >= v3.z())));
+    }
 }
 
 TEST_CASE("Test Edge-Edge Continuous Collision Detection", "[ccd][edge-edge]")
@@ -50,9 +52,7 @@ TEST_CASE("Test Edge-Edge Continuous Collision Detection", "[ccd][edge-edge]")
     using namespace ccd;
     CCDMethod method = GENERATE(
         CCDMethod::FLOAT, CCDMethod::ROOT_PARITY,
-        CCDMethod::RATIONAL_ROOT_PARITY, CCDMethod::BSC
-        //, CCDMethod::TIGHT_CCD
-    );
+        CCDMethod::RATIONAL_ROOT_PARITY, CCDMethod::BSC, CCDMethod::TIGHT_CCD);
 
     // e0 = (v0, v1)
     Eigen::Vector3d v0(-1, -1, 0);
@@ -74,7 +74,11 @@ TEST_CASE("Test Edge-Edge Continuous Collision Detection", "[ccd][edge-edge]")
         v0, v1, v2, v3, v0 + u0, v1 + u0, v2 + u1, v3 + u1, method);
 
     CAPTURE(y_displacement, e1x, method_names[method]);
-    CHECK(hit == (y_displacement >= 1.0 && e1x >= -1 && e1x <= 1));
+    // TightCCD can produce false positives, so only check if the hit value is
+    // negative.
+    if (method != CCDMethod::TIGHT_CCD || !hit) {
+        CHECK(hit == (y_displacement >= 1.0 && e1x >= -1 && e1x <= 1));
+    }
 }
 
 TEST_CASE("Zhongshi test case", "[ccd][point-triangle][!mayfail]")
@@ -111,5 +115,9 @@ TEST_CASE("Zhongshi test case", "[ccd][point-triangle][!mayfail]")
     bool hit = vertexFaceCCD(q, b0, b1, b2, q1, t0, t1, t2, method);
 
     CAPTURE(qy, method_names[method]);
-    CHECK(hit == q.y() >= 0);
+    // TightCCD can produce false positives, so only check if the hit value is
+    // negative.
+    if (method != CCDMethod::TIGHT_CCD || !hit) {
+        CHECK(hit == q.y() >= 0);
+    }
 }

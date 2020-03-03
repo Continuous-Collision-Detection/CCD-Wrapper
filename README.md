@@ -7,7 +7,7 @@ Wrappers for various continuous collision detection algorithms.
 
 ## Adding CCD-Wrapper to you CMake Project
 
-You can simply add CCD-Wrapper using `DownloadProject.cmake` with these couple of line.
+You can simply add CCD-Wrapper using `DownloadProject.cmake` with these lines:
 
 ```cmake
 function(${PROJECT_NAME}_download_ccd_wrapper)

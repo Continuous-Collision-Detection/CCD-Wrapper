@@ -24,8 +24,7 @@ endfunction()
 # Eigen
 function(ccd_wrapper_download_eigen)
     ccd_wrapper_download_project(eigen
-        URL           http://bitbucket.org/eigen/eigen/get/3.3.7.tar.bz2
-        URL_MD5       05b1f7511c93980c385ebe11bd3c93fa
+        URL https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.zip
     )
 endfunction()
 
@@ -40,8 +39,8 @@ endfunction()
 # exact-ccd (clone of Brochu et al. [2012] and Tang et al. [2014])
 function(ccd_wrapper_download_exact_ccd)
   ccd_wrapper_download_project(exact-ccd
-    GIT_REPOSITORY https://github.com/jiangzhongshi/exact-ccd.git
-    GIT_TAG        eb91cfb81f1e074412927496c7b3eca1778a0ce1
+    GIT_REPOSITORY https://github.com/zfergus/exact-ccd.git
+    GIT_TAG        cf0bd9b3de14d9ae735d9b8db3b6a6e94e4f3dfe
   )
 endfunction()
 
@@ -66,5 +65,21 @@ function(ccd_wrapper_download_catch2)
   ccd_wrapper_download_project(Catch2
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
     GIT_TAG        v2.11.1
+  )
+endfunction()
+
+# libigl for timing
+function(ccd_wrapper_download_libigl)
+     ccd_wrapper_download_project(libigl
+       GIT_REPOSITORY https://github.com/libigl/libigl.git
+       GIT_TAG        aea868bd1fc64f71afecd2c51e51507a99d8e3e5
+    )
+endfunction()
+
+# HighFive - Header-only C++ HDF5 interface
+function(ccd_wrapper_download_high_five)
+  ccd_wrapper_download_project(HighFive
+    GIT_REPOSITORY https://github.com/BlueBrain/HighFive.git
+    GIT_TAG        v2.1.1
   )
 endfunction()

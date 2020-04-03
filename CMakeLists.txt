@@ -4,7 +4,8 @@ project(CCDWrapper)
 ################################################################################
 
 # project-options
-option(CCD_WRAPPER_WITH_UNIT_TESTS   "Build unit tests using Catch2"  ON)
+option(CCD_WRAPPER_WITH_UNIT_TESTS   "Build unit tests using Catch2"         ON)
+option(CCD_WRAPPER_WITH_BENCHMARK    "Build exectuable for timing methods"  OFF)
 
 # libigl
 option(LIBIGL_USE_STATIC_LIBRARY     "Use libigl as static library" OFF)
@@ -91,4 +92,22 @@ if(CCD_WRAPPER_WITH_UNIT_TESTS)
   include(CTest)
   enable_testing()
   add_subdirectory(tests)
+endif()
+
+################################################################################
+# Benchmark
+################################################################################
+
+if(CCD_WRAPPER_WITH_BENCHMARK)
+  add_executable(${PROJECT_NAME}_benchmark
+       src/benchmark.cpp
+  )
+  target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC ${PROJECT_NAME})
+  target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC igl::core)
+  target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC HighFive::HighFive)
+
+  # Boost
+  set(Boost_USE_MULTITHREADED TRUE)
+  find_package(Boost COMPONENTS filesystem REQUIRED)
+  target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC Boost::filesystem)
 endif()

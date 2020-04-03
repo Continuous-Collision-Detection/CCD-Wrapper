@@ -8,7 +8,7 @@ namespace ccd {
 
 /// Methods of continuous collision detection.
 enum CCDMethod {
-    /// Ettien Vouga's CCD using a root finder in floating points
+    /// Etienne Vouga's CCD using a root finder in floating points
     FLOAT,
     /// Root parity method of Brochu et al. [2012]
     ROOT_PARITY,

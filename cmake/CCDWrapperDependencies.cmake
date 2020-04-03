@@ -58,3 +58,21 @@ if(NOT TARGET TightCCD)
   ccd_wrapper_download_tight_ccd()
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/TightCCD)
 endif()
+
+if(CCD_WRAPPER_WITH_BENCHMARK)
+  # libigl for timing
+  if(NOT TARGET igl::core)
+      ccd_wrapper_download_libigl()
+      # Import libigl targets
+      list(APPEND CMAKE_MODULE_PATH "${CCD_WRAPPER_EXTERNAL}/libigl/cmake")
+      include(libigl)
+  endif()
+
+  # HDF5 Reader
+  if(NOT TARGET HighFive::HighFive)
+    set(USE_EIGEN TRUE CACHE BOOL "Enable Eigen testing" FORCE)
+    ccd_wrapper_download_high_five()
+    add_subdirectory(${CCD_WRAPPER_EXTERNAL}/HighFive EXCLUDE_FROM_ALL)
+    add_library(HighFive::HighFive ALIAS HighFive)
+  endif()
+endif()

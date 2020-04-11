@@ -48,7 +48,7 @@ endfunction()
 function(ccd_wrapper_download_rational_ccd)
   ccd_wrapper_download_project(rational_ccd
     GIT_REPOSITORY https://github.com/teseoch/Exact-CDD.git
-    GIT_TAG        94b05129efa2c33348622b2890bd464cc95f65a7
+    GIT_TAG        da32758718e011ee0a17e5ab66f03d990de0ea5c
   )
 endfunction()
 

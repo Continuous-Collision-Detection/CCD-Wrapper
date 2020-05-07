@@ -13,6 +13,11 @@ add_executable(${PROJECT_NAME}_tests
 target_link_libraries(${PROJECT_NAME}_tests PUBLIC ${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME}_tests PUBLIC Catch2::Catch2 warnings::all)
 
+if(CCD_WRAPPER_WITH_BENCHMARK)
+  target_link_libraries(${PROJECT_NAME}_tests PUBLIC HighFive::HighFive fmt::fmt)
+  # target_compile_definitions(${PROJECT_NAME}_tests PRIVATE EXPORT_CCD_QUERIES)
+endif()
+
 ################################################################################
 # Add Tests
 ################################################################################

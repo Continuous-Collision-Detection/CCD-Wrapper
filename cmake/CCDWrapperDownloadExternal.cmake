@@ -80,6 +80,22 @@ endfunction()
 function(ccd_wrapper_download_high_five)
   ccd_wrapper_download_project(HighFive
     GIT_REPOSITORY https://github.com/BlueBrain/HighFive.git
-    GIT_TAG        v2.1.1
+    GIT_TAG        v2.2.1
+  )
+endfunction()
+
+# A modern string formatting library
+function(ccd_wrapper_download_fmt)
+  ccd_wrapper_download_project(fmt
+    GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+    GIT_TAG        6.2.0
+  )
+endfunction()
+
+# JSON for Modern C++
+function(ccd_wrapper_download_json)
+  ccd_wrapper_download_project(json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG        v3.7.3
   )
 endfunction()

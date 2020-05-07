@@ -75,4 +75,18 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
     add_subdirectory(${CCD_WRAPPER_EXTERNAL}/HighFive EXCLUDE_FROM_ALL)
     add_library(HighFive::HighFive ALIAS HighFive)
   endif()
+
+  # String formatting
+  if(NOT TARGET fmt::fmt)
+      ccd_wrapper_download_fmt()
+      add_subdirectory(${CCD_WRAPPER_EXTERNAL}/fmt)
+  endif()
+
+  # json
+  if(NOT TARGET nlohmann_json::nlohmann_json)
+      ccd_wrapper_download_json()
+      option(JSON_BuildTests "" OFF)
+      option(JSON_MultipleHeaders "" ON)
+      add_subdirectory(${CCD_WRAPPER_EXTERNAL}/json json)
+  endif()
 endif()

@@ -229,3 +229,6 @@ docs
 external
 
 data
+
+credentials.json
+token*

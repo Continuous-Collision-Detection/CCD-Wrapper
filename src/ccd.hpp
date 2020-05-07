@@ -9,7 +9,7 @@ namespace ccd {
 /// Methods of continuous collision detection.
 enum CCDMethod {
     /// Etienne Vouga's CCD using a root finder in floating points
-    FLOAT,
+    FLOAT = 0,
     /// Root parity method of Brochu et al. [2012]
     ROOT_PARITY,
     /// Teseo's reimplementation of Brochu et al. [2012] using rationals
@@ -17,10 +17,12 @@ enum CCDMethod {
     /// Bernstein sign classification method of Tang et al. [2014]
     BSC,
     /// TightCCD method of Wang et al. [2015]
-    TIGHT_CCD
+    TIGHT_CCD,
+    /// WARNING: Not a method! Counts the number of methods.
+    NUM_CCD_METHODS
 };
 
-static const char* method_names[5]
+static const char* method_names[CCDMethod::NUM_CCD_METHODS]
     = { "Float", "RootParity", "RationalRootParity", "BSC", "TightCCD" };
 
 /**

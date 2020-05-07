@@ -101,10 +101,13 @@ endif()
 if(CCD_WRAPPER_WITH_BENCHMARK)
   add_executable(${PROJECT_NAME}_benchmark
        src/benchmark.cpp
+       src/utils/get_rss.cpp
   )
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC ${PROJECT_NAME})
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC igl::core)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC HighFive::HighFive)
+  target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC fmt::fmt)
+  target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC nlohmann_json::nlohmann_json)
 
   # Boost
   set(Boost_USE_MULTITHREADED TRUE)

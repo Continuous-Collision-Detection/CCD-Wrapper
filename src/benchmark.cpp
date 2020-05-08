@@ -12,16 +12,19 @@
 #include <ccd.hpp>
 #include <utils/get_rss.hpp>
 
+using namespace ccd;
+
 int parse_args(
     int argc,
     char* argv[],
     std::string& data_dir,
     bool& is_edge_edge,
-    ccd::CCDMethod& method)
+    CCDMethod& method)
 {
+
     const std::string usage = fmt::format(
         "usage: {} /path/to/data/ {{vf|ee}} {{0-{:d}}}", argv[0],
-        ccd::NUM_CCD_METHODS - 1);
+        NUM_CCD_METHODS - 1);
     if (argc < 2) {
         std::cerr << usage << std::endl
                   << "error: missing path to data" << std::endl;
@@ -43,20 +46,20 @@ int parse_args(
         return 3;
     }
     int method_number = atoi(argv[3]);
-    if (method_number < 0 || method_number >= ccd::NUM_CCD_METHODS) {
+    if (method_number < 0 || method_number >= NUM_CCD_METHODS) {
         std::cerr << usage << std::endl
                   << "error: invalid method of collision detection: " << argv[3]
                   << std::endl;
         std::cerr << "options:" << std::endl;
-        for (int i = 0; i < ccd::NUM_CCD_METHODS; i++) {
-            std::cout << i << ": " << ccd::method_names[i] << std::endl;
+        for (int i = 0; i < NUM_CCD_METHODS; i++) {
+            std::cout << i << ": " << method_names[i] << std::endl;
         }
         return 3;
     }
 
     data_dir = std::string(argv[1]);
     is_edge_edge = strcmp(argv[2], "ee") == 0;
-    method = ccd::CCDMethod(method_number);
+    method = CCDMethod(method_number);
     return 0;
 }
 
@@ -64,7 +67,8 @@ int main(int argc, char* argv[])
 {
     std::string data_dir;
     bool is_edge_edge;
-    ccd::CCDMethod method;
+    CCDMethod method;
+    bool use_shifted = true;
     int code = parse_args(argc, argv, data_dir, is_edge_edge, method);
     if (code) {
         return code;
@@ -95,11 +99,13 @@ int main(int argc, char* argv[])
         all_V.resize(8 * query_names.size(), 3);
         expected_results.resize(query_names.size());
         for (int i = 0; i < query_names.size(); i++) {
+            std::string dir = fmt::format(
+                "{}/{}", query_names[i], use_shifted ? "shifted/" : "");
             all_V.middleRows<8>(8 * i)
                 = H5Easy::load<Eigen::Matrix<double, 8, 3>>(
-                    file, fmt::format("{}/points", query_names[i]));
+                    file, fmt::format("{}points", dir));
             expected_results[i] = bool(H5Easy::load<unsigned char>(
-                file, fmt::format("{}/result", query_names[i])));
+                file, fmt::format("{}result", dir)));
         }
 
         // Measure jsut the memory of loading the queries
@@ -112,13 +118,13 @@ int main(int argc, char* argv[])
             bool result;
             timer.start();
             if (is_edge_edge) {
-                result = ccd::edgeEdgeCCD(
+                result = edgeEdgeCCD(
                     V.row(0), V.row(1), V.row(2), V.row(3), V.row(4), V.row(5),
-                    V.row(6), V.row(7), ccd::CCDMethod(method));
+                    V.row(6), V.row(7), method);
             } else {
-                result = ccd::vertexFaceCCD(
+                result = vertexFaceCCD(
                     V.row(0), V.row(1), V.row(2), V.row(3), V.row(4), V.row(5),
-                    V.row(6), V.row(7), ccd::CCDMethod(method));
+                    V.row(6), V.row(7), method);
             }
             timer.stop();
             timing += timer.getElapsedTimeInMicroSec();
@@ -129,6 +135,16 @@ int main(int argc, char* argv[])
                     false_positives++;
                 } else {
                     false_negatives++;
+                }
+                if (method == CCDMethod::EXACT_RATIONAL_MIN_DISTANCE
+                    || method == CCDMethod::EXACT_DOUBLE_MIN_DISTANCE
+                    || method == CCDMethod::RATIONAL_ROOT_PARITY) {
+                    std::cout
+                        << fmt::format(
+                               "method={} query_name={} {}",
+                               method_names[method], query_names[i],
+                               result ? "false_positives" : "false_negatives")
+                        << std::endl;
                 }
             }
             std::cout << num_queries++ << "\r" << std::flush;
@@ -153,7 +169,7 @@ int main(int argc, char* argv[])
 
     benchmark["collision_type"] = is_edge_edge ? "ee" : "vf";
     benchmark["num_queries"] = num_queries;
-    benchmark[ccd::method_names[method]] = {
+    benchmark[method_names[method]] = {
         { "avg_query_time", timing / num_queries },
         { "peak_memory", peak_memory },
         { "num_false_positives", false_positives },

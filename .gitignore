@@ -228,7 +228,7 @@ docs
 ## External dependancies
 external
 
-data
+data*
 
 credentials.json
 token*

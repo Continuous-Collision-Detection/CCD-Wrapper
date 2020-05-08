@@ -64,7 +64,7 @@ endfunction()
 function(ccd_wrapper_download_exact_min_dist_ccd)
      ccd_wrapper_download_project(exact_min_dist_ccd
         GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
-        GIT_TAG        42be925fe95cd6e6a523b5d7033adbf4d2897483
+        GIT_TAG        afcbb690ce3e1884f07ffcb0dffc9c2be515f284
     )
 endfunction()
 

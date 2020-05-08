@@ -85,6 +85,9 @@ def read_benchmark_data(collision_type, method_names):
     for dir in data_dir.iterdir():
         if not dir.is_dir():
             continue
+        benchmark_path = dir / collision_type / "benchmark.json"
+        if not benchmark_path.exists():
+            continue
         with open(dir / collision_type / "benchmark.json") as f:
             benchmarks[dir.name] = json.load(f)
 

@@ -59,6 +59,15 @@ if(NOT TARGET TightCCD)
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/TightCCD)
 endif()
 
+# Exact Minimum Distance CCD
+if(NOT (TARGET ExactMinDistCCD::CCD_rational AND TARGET ExactMinDistCCD::CCD_double))
+  ccd_wrapper_download_exact_min_dist_ccd()
+  set(CCD_WITH_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/exact_min_dist_ccd)
+  add_library(ExactMinDistCCD::CCD_double ALIAS CCD_double)
+  add_library(ExactMinDistCCD::CCD_rational ALIAS CCD_rational)
+endif()
+
 if(CCD_WRAPPER_WITH_BENCHMARK)
   # libigl for timing
   if(NOT TARGET igl::core)

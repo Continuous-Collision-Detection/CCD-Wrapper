@@ -18,12 +18,28 @@ enum CCDMethod {
     BSC,
     /// TightCCD method of Wang et al. [2015]
     TIGHT_CCD,
+    /// Exact Rational Minimum Distance CCD of Wang et al. [2020]
+    EXACT_RATIONAL_MIN_DISTANCE,
+    /// Exact Double Minimum Distance CCD of Wang et al. [2020]
+    EXACT_DOUBLE_MIN_DISTANCE,
+    /// Floating-point root-finder minimum distance CCD of Lu et al. [2018]
+    FLOAT_MIN_DISTANCE,
     /// WARNING: Not a method! Counts the number of methods.
     NUM_CCD_METHODS
 };
 
 static const char* method_names[CCDMethod::NUM_CCD_METHODS]
-    = { "Float", "RootParity", "RationalRootParity", "BSC", "TightCCD" };
+    = { "Float",
+        "RootParity",
+        "RationalRootParity",
+        "BSC",
+        "TightCCD",
+        "ExactRationalMinDistance",
+        "ExactDoubleMinDistance",
+        "FloatMinDistance" };
+
+/// Minimum distance used when looking for 0 distance collisions.
+static const double DEFAULT_MIN_DISTANCE = 1e-8;
 
 /**
  * @brief Detect collisions between a vertex and a triangular face.

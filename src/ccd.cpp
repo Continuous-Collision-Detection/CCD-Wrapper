@@ -1,5 +1,4 @@
 // Eigen wrappers for different CCD methods
-
 #include "ccd.hpp"
 
 // Etienne Vouga's CCD using a root finder in floating points
@@ -12,6 +11,9 @@
 #include <bsc.h>
 // TightCCD method of Wang et al. [2015]
 #include <bsc_tightbound.h>
+// Exact Minimum Distance CCD of Wang et al. [2020]
+#include <CCD/ccd.hpp>
+#include <doubleCCD/doubleccd.hpp>
 
 namespace ccd {
 
@@ -93,11 +95,41 @@ bool vertexFaceCCD(
                 Vec3d(face_vertex2_end.data()),
                 // Point at t=1
                 Vec3d(vertex_end.data()));
+        case CCDMethod::EXACT_RATIONAL_MIN_DISTANCE:
+            return ccd::vertexFaceCCD(
+                // Point at t=0
+                vertex_start,
+                // Triangle at t = 0
+                face_vertex0_start, face_vertex1_start, face_vertex2_start,
+                // Point at t=1
+                vertex_end,
+                // Triangle at t = 1
+                face_vertex0_end, face_vertex1_end, face_vertex2_end,
+                /*minimum_distance=*/DEFAULT_MIN_DISTANCE);
+        case CCDMethod::EXACT_DOUBLE_MIN_DISTANCE:
+            return doubleccd::vertexFaceCCD(
+                // Point at t=0
+                vertex_start,
+                // Triangle at t = 0
+                face_vertex0_start, face_vertex1_start, face_vertex2_start,
+                // Point at t=1
+                vertex_end,
+                // Triangle at t = 1
+                face_vertex0_end, face_vertex1_end, face_vertex2_end,
+                /*minimum_distance=*/DEFAULT_MIN_DISTANCE);
+        case CCDMethod::FLOAT_MIN_DISTANCE:
         default:
-            return false;
+            throw "Invalid CCDMethod";
         }
+    } catch (const char* err) {
+        // Conservative answer upon failure.
+        std::cerr << "Vertex-face CCD failed because \"" << err << "\" for "
+                  << method_names[method] << std::endl;
+        return true;
     } catch (...) {
         // Conservative answer upon failure.
+        std::cerr << "Vertex-face CCD failed for unknown reason when using "
+                  << method_names[method] << std::endl;
         return true;
     }
 }
@@ -182,11 +214,41 @@ bool edgeEdgeCCD(
                 // Edge 2 at t=1
                 Vec3d(edge1_vertex0_end.data()),
                 Vec3d(edge1_vertex1_end.data()));
+        case CCDMethod::EXACT_RATIONAL_MIN_DISTANCE:
+            return ccd::edgeEdgeCCD(
+                // Edge 1 at t=0
+                edge0_vertex0_start, edge0_vertex1_start,
+                // Edge 2 at t=0
+                edge1_vertex0_start, edge1_vertex1_start,
+                // Edge 1 at t=1
+                edge0_vertex0_end, edge0_vertex1_end,
+                // Edge 2 at t=1
+                edge1_vertex0_end, edge1_vertex1_end,
+                /*minimum_distance=*/DEFAULT_MIN_DISTANCE);
+        case CCDMethod::EXACT_DOUBLE_MIN_DISTANCE:
+            return doubleccd::edgeEdgeCCD(
+                // Edge 1 at t=0
+                edge0_vertex0_start, edge0_vertex1_start,
+                // Edge 2 at t=0
+                edge1_vertex0_start, edge1_vertex1_start,
+                // Edge 1 at t=1
+                edge0_vertex0_end, edge0_vertex1_end,
+                // Edge 2 at t=1
+                edge1_vertex0_end, edge1_vertex1_end,
+                /*minimum_distance=*/DEFAULT_MIN_DISTANCE);
+        case CCDMethod::FLOAT_MIN_DISTANCE:
         default:
-            return false;
+            throw "Invalid CCDMethod";
         }
+    } catch (const char* err) {
+        // Conservative answer upon failure.
+        std::cerr << "Edge-edge CCD failed because \"" << err << "\" for "
+                  << method_names[method] << std::endl;
+        return true;
     } catch (...) {
         // Conservative answer upon failure.
+        std::cerr << "Edge-edge CCD failed for unknown reason when using "
+                  << method_names[method] << std::endl;
         return true;
     }
 }

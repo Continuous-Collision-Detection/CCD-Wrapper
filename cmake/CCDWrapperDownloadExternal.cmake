@@ -60,6 +60,14 @@ function(ccd_wrapper_download_tight_ccd)
   )
 endfunction()
 
+# Exact Minimum Distance CCD
+function(ccd_wrapper_download_exact_min_dist_ccd)
+     ccd_wrapper_download_project(exact_min_dist_ccd
+        GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
+        GIT_TAG        42be925fe95cd6e6a523b5d7033adbf4d2897483
+    )
+endfunction()
+
 # Catch2 for testing
 function(ccd_wrapper_download_catch2)
   ccd_wrapper_download_project(Catch2

@@ -19,9 +19,7 @@ TEST_CASE(
     "[ccd][point-triangle]")
 {
     using namespace ccd;
-    CCDMethod method = GENERATE(
-        CCDMethod::FLOAT, CCDMethod::ROOT_PARITY,
-        CCDMethod::RATIONAL_ROOT_PARITY, CCDMethod::BSC, CCDMethod::TIGHT_CCD);
+    CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS) - 1)));
 
     // point
     double v0z = GENERATE(0.0, -1.0);
@@ -86,9 +84,10 @@ TEST_CASE(
 TEST_CASE("Test Edge-Edge Continuous Collision Detection", "[ccd][edge-edge]")
 {
     using namespace ccd;
-    CCDMethod method = GENERATE(
-        CCDMethod::FLOAT, CCDMethod::ROOT_PARITY,
-        CCDMethod::RATIONAL_ROOT_PARITY, CCDMethod::BSC, CCDMethod::TIGHT_CCD);
+    CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS) - 1)));
+    if (method == EXACT_RATIONAL_MIN_DISTANCE) {
+        return;
+    }
 
     // e0 = (v0, v1)
     Eigen::Vector3d v0(-1, -1, 0);
@@ -146,9 +145,7 @@ TEST_CASE("Test Edge-Edge Continuous Collision Detection", "[ccd][edge-edge]")
 TEST_CASE("Zhongshi test case", "[ccd][point-triangle][!mayfail]")
 {
     using namespace ccd;
-    CCDMethod method = GENERATE(
-        CCDMethod::FLOAT, CCDMethod::ROOT_PARITY,
-        CCDMethod::RATIONAL_ROOT_PARITY, CCDMethod::BSC, CCDMethod::TIGHT_CCD);
+    CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS) - 1)));
 
     double qy = GENERATE(-EPSILON, 0, EPSILON);
 

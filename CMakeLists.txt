@@ -67,6 +67,10 @@ target_link_libraries(${PROJECT_NAME} PUBLIC RationalCCD)
 # TightCCD implmentation of Wang et al. [2015]
 target_link_libraries(${PROJECT_NAME} PUBLIC TightCCD)
 
+# Exact Minimum Distance CCD
+target_link_libraries(${PROJECT_NAME} PUBLIC ExactMinDistCCD::CCD_rational)
+target_link_libraries(${PROJECT_NAME} PUBLIC ExactMinDistCCD::CCD_double)
+
 # Extra warnings
 target_link_libraries(${PROJECT_NAME} PRIVATE warnings::all)
 

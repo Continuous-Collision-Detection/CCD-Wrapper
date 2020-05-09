@@ -104,8 +104,8 @@ endif()
 
 if(CCD_WRAPPER_WITH_BENCHMARK)
   add_executable(${PROJECT_NAME}_benchmark
-       src/benchmark.cpp
-       src/utils/get_rss.cpp
+    src/benchmark.cpp
+    src/utils/get_rss.cpp
   )
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC ${PROJECT_NAME})
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC igl::core)
@@ -117,4 +117,32 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   set(Boost_USE_MULTITHREADED TRUE)
   find_package(Boost COMPONENTS filesystem REQUIRED)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC Boost::filesystem)
+
+
+  add_executable(generate_ground_truth
+    src/tools/generate_ground_truth.cpp
+  )
+
+  target_link_libraries(generate_ground_truth PUBLIC ${PROJECT_NAME})
+  target_link_libraries(generate_ground_truth PUBLIC HighFive::HighFive)
+  target_link_libraries(generate_ground_truth PUBLIC fmt::fmt)
+
+  # Boost
+  set(Boost_USE_MULTITHREADED TRUE)
+  find_package(Boost COMPONENTS filesystem REQUIRED)
+  target_link_libraries(generate_ground_truth PUBLIC Boost::filesystem)
+
+
+  add_executable(shift_queries
+    src/tools/shift_queries.cpp
+  )
+
+  target_link_libraries(shift_queries PUBLIC ${PROJECT_NAME})
+  target_link_libraries(shift_queries PUBLIC HighFive::HighFive)
+  target_link_libraries(shift_queries PUBLIC fmt::fmt)
+
+  # Boost
+  set(Boost_USE_MULTITHREADED TRUE)
+  find_package(Boost COMPONENTS filesystem REQUIRED)
+  target_link_libraries(shift_queries PUBLIC Boost::filesystem)
 endif()

@@ -88,6 +88,7 @@ int main(int argc, char* argv[])
             && boost::filesystem::extension(entry.path()) != ".h5") {
             continue;
         }
+        std::cout << entry.path().string() << std::endl;
         Eigen::Matrix<double, Eigen::Dynamic, 3> all_V;
         Eigen::Matrix<bool, Eigen::Dynamic, 1> expected_results;
 

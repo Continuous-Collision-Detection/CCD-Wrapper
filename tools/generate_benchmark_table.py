@@ -9,7 +9,8 @@ from google.auth.transport.requests import Request
 
 all_method_names = [
     "Float", "RootParity", "RationalRootParity", "BSC", "TightCCD",
-    "ExactRationalMinDistance", "ExactDoubleMinDistance", "FloatMinDistance"]
+    "FloatMinSeparation", "ExactRationalMinSeparation",
+    "ExactDoubleMinSeparation"]
 
 name_to_row = dict(zip(["unit-tests",
                         "erleben-spikes",
@@ -107,8 +108,10 @@ def read_benchmark_data(collision_type, method_names):
 
 
 def main():
-    vf_df = read_benchmark_data("vertex-face", all_method_names[:-1])
-    ee_df = read_benchmark_data("edge-edge", all_method_names[:-1])
+    vf_df = read_benchmark_data(
+        "vertex-face", all_method_names[:5] + all_method_names[6:])
+    ee_df = read_benchmark_data(
+        "edge-edge", all_method_names[:5] + all_method_names[6:])
 
     write_to_google_sheet(vf_df, "Vertex-Face")
     write_to_google_sheet(ee_df, "Edge-Edge")

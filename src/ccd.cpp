@@ -11,7 +11,7 @@
 #include <bsc.h>
 // TightCCD method of Wang et al. [2015]
 #include <bsc_tightbound.h>
-// Exact Minimum Distance CCD of Wang et al. [2020]
+// Exact Minimum Separation CCD of Wang et al. [2020]
 #include <CCD/ccd.hpp>
 #include <doubleCCD/doubleccd.hpp>
 
@@ -95,7 +95,7 @@ bool vertexFaceCCD(
                 Vec3d(face_vertex2_end.data()),
                 // Point at t=1
                 Vec3d(vertex_end.data()));
-        case CCDMethod::EXACT_RATIONAL_MIN_DISTANCE:
+        case CCDMethod::EXACT_RATIONAL_MIN_SEPARATION:
             return ccd::vertexFaceCCD(
                 // Point at t=0
                 vertex_start,
@@ -106,7 +106,7 @@ bool vertexFaceCCD(
                 // Triangle at t = 1
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
                 /*minimum_distance=*/DEFAULT_MIN_DISTANCE);
-        case CCDMethod::EXACT_DOUBLE_MIN_DISTANCE:
+        case CCDMethod::EXACT_DOUBLE_MIN_SEPARATION:
             return doubleccd::vertexFaceCCD(
                 // Point at t=0
                 vertex_start,
@@ -117,7 +117,7 @@ bool vertexFaceCCD(
                 // Triangle at t = 1
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
                 /*minimum_distance=*/DEFAULT_MIN_DISTANCE);
-        case CCDMethod::FLOAT_MIN_DISTANCE:
+        case CCDMethod::FLOAT_MIN_SEPARATION:
         default:
             throw "Invalid CCDMethod";
         }
@@ -214,7 +214,7 @@ bool edgeEdgeCCD(
                 // Edge 2 at t=1
                 Vec3d(edge1_vertex0_end.data()),
                 Vec3d(edge1_vertex1_end.data()));
-        case CCDMethod::EXACT_RATIONAL_MIN_DISTANCE:
+        case CCDMethod::EXACT_RATIONAL_MIN_SEPARATION:
             return ccd::edgeEdgeCCD(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
@@ -225,7 +225,7 @@ bool edgeEdgeCCD(
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end,
                 /*minimum_distance=*/DEFAULT_MIN_DISTANCE);
-        case CCDMethod::EXACT_DOUBLE_MIN_DISTANCE:
+        case CCDMethod::EXACT_DOUBLE_MIN_SEPARATION:
             return doubleccd::edgeEdgeCCD(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
@@ -236,7 +236,7 @@ bool edgeEdgeCCD(
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end,
                 /*minimum_distance=*/DEFAULT_MIN_DISTANCE);
-        case CCDMethod::FLOAT_MIN_DISTANCE:
+        case CCDMethod::FLOAT_MIN_SEPARATION:
         default:
             throw "Invalid CCDMethod";
         }

@@ -59,22 +59,22 @@ if(NOT TARGET TightCCD)
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/TightCCD)
 endif()
 
-# Exact Minimum Distance CCD
-if(NOT (TARGET ExactMinDistCCD::CCD_rational AND TARGET ExactMinDistCCD::CCD_double))
-  ccd_wrapper_download_exact_min_dist_ccd()
+# Exact Minimum Separation CCD
+if(NOT (TARGET ExactMSCCD::CCD_rational AND TARGET ExactMSCCD::CCD_double))
+  ccd_wrapper_download_exact_msccd()
   set(CCD_WITH_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/exact_min_dist_ccd)
-  add_library(ExactMinDistCCD::CCD_double ALIAS CCD_double)
-  add_library(ExactMinDistCCD::CCD_rational ALIAS CCD_rational)
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/exact_msccd)
+  add_library(ExactMSCCD::CCD_double ALIAS CCD_double)
+  add_library(ExactMSCCD::CCD_rational ALIAS CCD_rational)
 endif()
 
 if(CCD_WRAPPER_WITH_BENCHMARK)
   # libigl for timing
   if(NOT TARGET igl::core)
-      ccd_wrapper_download_libigl()
-      # Import libigl targets
-      list(APPEND CMAKE_MODULE_PATH "${CCD_WRAPPER_EXTERNAL}/libigl/cmake")
-      include(libigl)
+    ccd_wrapper_download_libigl()
+    # Import libigl targets
+    list(APPEND CMAKE_MODULE_PATH "${CCD_WRAPPER_EXTERNAL}/libigl/cmake")
+    include(libigl)
   endif()
 
   # HDF5 Reader
@@ -87,15 +87,15 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
 
   # String formatting
   if(NOT TARGET fmt::fmt)
-      ccd_wrapper_download_fmt()
-      add_subdirectory(${CCD_WRAPPER_EXTERNAL}/fmt)
+    ccd_wrapper_download_fmt()
+    add_subdirectory(${CCD_WRAPPER_EXTERNAL}/fmt)
   endif()
 
   # json
   if(NOT TARGET nlohmann_json::nlohmann_json)
-      ccd_wrapper_download_json()
-      option(JSON_BuildTests "" OFF)
-      option(JSON_MultipleHeaders "" ON)
-      add_subdirectory(${CCD_WRAPPER_EXTERNAL}/json json)
+    ccd_wrapper_download_json()
+    option(JSON_BuildTests "" OFF)
+    option(JSON_MultipleHeaders "" ON)
+    add_subdirectory(${CCD_WRAPPER_EXTERNAL}/json)
   endif()
 endif()

@@ -1,15 +1,12 @@
 #include <catch2/catch.hpp>
 
-#ifdef EXPORT_CCD_QUERIES
-#include <fmt/format.h>
-#include <highfive/H5Easy.hpp>
-#endif
-
 #include <ccd.hpp>
 
 static const double EPSILON = std::numeric_limits<float>::epsilon();
 
 #ifdef EXPORT_CCD_QUERIES
+#include "dump_queries.hpp"
+
 static int vf_counter = 0;
 static int ee_counter = 0;
 #endif
@@ -19,7 +16,10 @@ TEST_CASE(
     "[ccd][point-triangle]")
 {
     using namespace ccd;
-    CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS) - 1)));
+    CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
+    if (method == CCDMethod::FLOAT_MIN_SEPARATION) {
+        return;
+    }
 
     // point
     double v0z = GENERATE(0.0, -1.0);
@@ -51,25 +51,9 @@ TEST_CASE(
 
 #ifdef EXPORT_CCD_QUERIES
     if (method == CCDMethod::FLOAT) { // Only export one query
-        HighFive::File file(
-            fmt::format("vertex-face-collisions.hdf5"),
-            HighFive::File::OpenOrCreate);
-        Eigen::Matrix<double, 8, 3> points;
-        points.row(0) = v0;
-        points.row(1) = v1;
-        points.row(2) = v2;
-        points.row(3) = v3;
-        points.row(4) = v0 + u0;
-        points.row(5) = v1 + u1;
-        points.row(6) = v2 + u1;
-        points.row(7) = v3 + u1;
-        H5Easy::dump(
-            file, fmt::format("/vertex_face_{:07d}/points", vf_counter), points,
-            H5Easy::DumpMode::Overwrite);
-        H5Easy::dump(
-            file, fmt::format("/vertex_face_{:07d}/result", vf_counter),
-            (unsigned char)expected_hit, H5Easy::DumpMode::Overwrite);
-        vf_counter++;
+        dump_vf_query(
+            fmt::format("vertex_face_{:07d}", vf_counter++), v0, v1, v2, v3,
+            v0 + u0, v1 + u1, v2 + u1, v3 + u1, expected_hit);
     }
 #endif
 
@@ -84,8 +68,9 @@ TEST_CASE(
 TEST_CASE("Test Edge-Edge Continuous Collision Detection", "[ccd][edge-edge]")
 {
     using namespace ccd;
-    CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS) - 1)));
-    if (method == EXACT_RATIONAL_MIN_DISTANCE) {
+    CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
+    if (method == CCDMethod::FLOAT_MIN_SEPARATION
+        || method == CCDMethod::EXACT_RATIONAL_MIN_SEPARATION) {
         return;
     }
 
@@ -112,24 +97,9 @@ TEST_CASE("Test Edge-Edge Continuous Collision Detection", "[ccd][edge-edge]")
 
 #ifdef EXPORT_CCD_QUERIES
     if (method == CCDMethod::FLOAT) { // Only export one query
-        HighFive::File file(
-            fmt::format("edge-edge-collisions.hdf5"),
-            HighFive::File::OpenOrCreate);
-        Eigen::Matrix<double, 8, 3> points;
-        points.row(0) = v0;
-        points.row(1) = v1;
-        points.row(2) = v2;
-        points.row(3) = v3;
-        points.row(4) = v0 + u0;
-        points.row(5) = v1 + u0;
-        points.row(6) = v2 + u1;
-        points.row(7) = v3 + u1;
-        H5Easy::dump(
-            file, fmt::format("/edge_edge_{:07d}/points", ee_counter), points,
-            H5Easy::DumpMode::Overwrite);
-        H5Easy::dump(
-            file, fmt::format("/edge_edge_{:07d}/result", ee_counter),
-            (unsigned char)expected_hit, H5Easy::DumpMode::Overwrite);
+        dump_ee_query(
+            fmt::format("edge_edge_{:07d}", ee_counter++), v0, v1, v2, v3,
+            v0 + u0, v1 + u0, v2 + u1, v3 + u1, expected_hit);
         ee_counter++;
     }
 #endif
@@ -145,7 +115,10 @@ TEST_CASE("Test Edge-Edge Continuous Collision Detection", "[ccd][edge-edge]")
 TEST_CASE("Zhongshi test case", "[ccd][point-triangle][!mayfail]")
 {
     using namespace ccd;
-    CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS) - 1)));
+    CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
+    if (method == CCDMethod::FLOAT_MIN_SEPARATION) {
+        return;
+    }
 
     double qy = GENERATE(-EPSILON, 0, EPSILON);
 
@@ -175,25 +148,9 @@ TEST_CASE("Zhongshi test case", "[ccd][point-triangle][!mayfail]")
 
 #ifdef EXPORT_CCD_QUERIES
     if (method == CCDMethod::FLOAT) { // Only export one query
-        HighFive::File file(
-            fmt::format("vertex-face-collisions.hdf5"),
-            HighFive::File::OpenOrCreate);
-        Eigen::Matrix<double, 8, 3> points;
-        points.row(0) = q;
-        points.row(1) = b0;
-        points.row(2) = b1;
-        points.row(3) = b2;
-        points.row(4) = q1;
-        points.row(5) = t0;
-        points.row(6) = t1;
-        points.row(7) = t2;
-        H5Easy::dump(
-            file, fmt::format("/vertex_face_{:07d}/points", vf_counter), points,
-            H5Easy::DumpMode::Overwrite);
-        H5Easy::dump(
-            file, fmt::format("/vertex_face_{:07d}/result", vf_counter),
-            (unsigned char)expected_hit, H5Easy::DumpMode::Overwrite);
-        vf_counter++;
+        dump_vf_query(
+            fmt::format("vertex_face_{:07d}", vf_counter++), q, b0, b1, b2, q1,
+            t0, t1, t2, expected_hit);
     }
 #endif
 

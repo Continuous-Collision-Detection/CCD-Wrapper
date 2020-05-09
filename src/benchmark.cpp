@@ -21,7 +21,6 @@ int parse_args(
     bool& is_edge_edge,
     CCDMethod& method)
 {
-
     const std::string usage = fmt::format(
         "usage: {} /path/to/data/ {{vf|ee}} {{0-{:d}}}", argv[0],
         NUM_CCD_METHODS - 1);
@@ -136,8 +135,8 @@ int main(int argc, char* argv[])
                 } else {
                     false_negatives++;
                 }
-                if (method == CCDMethod::EXACT_RATIONAL_MIN_DISTANCE
-                    || method == CCDMethod::EXACT_DOUBLE_MIN_DISTANCE
+                if (method == CCDMethod::EXACT_RATIONAL_MIN_SEPARATION
+                    || method == CCDMethod::EXACT_DOUBLE_MIN_SEPARATION
                     || method == CCDMethod::RATIONAL_ROOT_PARITY) {
                     std::cout
                         << fmt::format(
@@ -147,7 +146,7 @@ int main(int argc, char* argv[])
                         << std::endl;
                 }
             }
-            std::cout << num_queries++ << "\r" << std::flush;
+            std::cout << ++num_queries << "\r" << std::flush;
         }
 
         peak_memory = std::max(peak_memory, long(getPeakRSS()) - load_memory);
@@ -163,9 +162,9 @@ int main(int argc, char* argv[])
         benchmark = nlohmann::json::parse(input);
     }
     input.close();
-    assert(
-        !benchmark.contains("num_queries")
-        || benchmark["num_queries"].get<int>() == num_queries);
+    // assert(
+    //     !benchmark.contains("num_queries")
+    //     || benchmark["num_queries"].get<int>() == num_queries);
 
     benchmark["collision_type"] = is_edge_edge ? "ee" : "vf";
     benchmark["num_queries"] = num_queries;

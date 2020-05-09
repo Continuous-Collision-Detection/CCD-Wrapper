@@ -48,7 +48,7 @@ endfunction()
 function(ccd_wrapper_download_rational_ccd)
   ccd_wrapper_download_project(rational_ccd
     GIT_REPOSITORY https://github.com/teseoch/Exact-CDD.git
-    GIT_TAG        da32758718e011ee0a17e5ab66f03d990de0ea5c
+    GIT_TAG        30d1ff24d48f3bef46396732cbf0228c64cdc254
   )
 endfunction()
 
@@ -60,11 +60,11 @@ function(ccd_wrapper_download_tight_ccd)
   )
 endfunction()
 
-# Exact Minimum Distance CCD
-function(ccd_wrapper_download_exact_min_dist_ccd)
-     ccd_wrapper_download_project(exact_min_dist_ccd
+# Exact Minimum Separation CCD
+function(ccd_wrapper_download_exact_msccd)
+     ccd_wrapper_download_project(exact_msccd
         GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
-        GIT_TAG        afcbb690ce3e1884f07ffcb0dffc9c2be515f284
+        GIT_TAG        f26ea6959561ee8e2fbeb1321ddae497159fd149
     )
 endfunction()
 

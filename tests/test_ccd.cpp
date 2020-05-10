@@ -66,9 +66,6 @@ TEST_CASE("Test Edge-Edge Continuous Collision Detection", "[ccd][edge-edge]")
 {
     using namespace ccd;
     CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
-    if (method == CCDMethod::EXACT_RATIONAL_MIN_SEPARATION) {
-        return;
-    }
 
     // e0 = (v0, v1)
     Eigen::Vector3d v0(-1, -1, 0);

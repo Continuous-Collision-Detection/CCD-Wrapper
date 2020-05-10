@@ -108,15 +108,23 @@ int main(int argc, char* argv[])
                     V.row(0), V.row(1), V.row(2), V.row(3), V.row(4), V.row(5),
                     V.row(6), V.row(7), CCDMethod::RATIONAL_ROOT_PARITY);
             }
-            H5Easy::dump(
-                file, fmt::format("{}/shifted/error", query_name), shift_err,
-                H5Easy::DumpMode::Overwrite);
-            H5Easy::dump(
-                file, fmt::format("/{}/shifted/points", query_name), V,
-                H5Easy::DumpMode::Overwrite);
-            H5Easy::dump(
-                file, fmt::format("{}/shifted/result", query_name),
-                (unsigned char)result, H5Easy::DumpMode::Overwrite);
+
+            HighFive::Group shifted_query
+                = file.getGroup(query_name).createGroup("shifted");
+            HighFive::DataSet dataset = shifted_query.createDataSet<double>(
+                "error", HighFive::DataSpace::From(shift_err));
+            dataset.write(shift_err);
+            dataset = shifted_query.createDataSet<unsigned char>(
+                "result", HighFive::DataSpace::From((unsigned char)result));
+            dataset.write((unsigned char)result);
+
+            dataset = shifted_query.createDataSet<double>(
+                "points", H5Easy::DataSpace(H5Easy::detail::eigen::shape(V)));
+            Eigen::Ref<
+                const Eigen::Array<double, 8, 3, Eigen::RowMajor>, 0,
+                Eigen::InnerStride<1>>
+                row_major(V);
+            dataset.write_raw(V.data());
 
             std::cout << i << "\r" << std::flush;
         }

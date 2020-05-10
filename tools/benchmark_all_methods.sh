@@ -17,9 +17,6 @@ for DATA_DIR in $DATA_DIRS/erleben*/ ; do
     dirs=("$DATA_DIR/vertex-face/" "$DATA_DIR/edge-edge/")
     for type in 0 1; do
         for i in $(seq 0 7); do
-            if [ $type == 1 ] && [ $i == 6 ]; then
-                continue
-            fi
             $CCD_WRAPPER_BENCHMARK ${dirs[$type]} ${COLLISON_TYPES[$type]} $i
             echo
         done

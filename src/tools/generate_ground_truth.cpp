@@ -72,9 +72,10 @@ int main(int argc, char* argv[])
                     V.row(6), V.row(7), CCDMethod::RATIONAL_ROOT_PARITY);
             }
 
-            H5Easy::dump(
-                file, fmt::format("{}/result", query_name),
-                (unsigned char)result, H5Easy::DumpMode::Overwrite);
+            HighFive::Group query = file.getGroup(query_name);
+            HighFive::DataSet dataset = query.createDataSet<unsigned char>(
+                "result", HighFive::DataSpace::From((unsigned char)result));
+            dataset.write((unsigned char)result);
 
             std::cout << i << "\r" << std::flush;
         }

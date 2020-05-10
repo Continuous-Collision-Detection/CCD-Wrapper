@@ -44,6 +44,8 @@ include(${PROJECT_NAME}Dependencies)
 
 add_library(${PROJECT_NAME}
   src/ccd.cpp
+
+  src/min_separation_ccd/min_separation_ccd.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC src)

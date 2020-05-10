@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
             continue;
         }
         std::cout << entry.path().string() << std::endl;
-        H5Easy::File file(entry.path().string(), HighFive::File::OpenOrCreate);
+        H5Easy::File file(entry.path().string(), HighFive::File::ReadWrite);
 
         const auto query_names = file.getGroup("/").listObjectNames();
 

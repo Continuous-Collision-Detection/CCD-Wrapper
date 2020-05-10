@@ -17,9 +17,6 @@ TEST_CASE(
 {
     using namespace ccd;
     CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
-    if (method == CCDMethod::FLOAT_MIN_SEPARATION) {
-        return;
-    }
 
     // point
     double v0z = GENERATE(0.0, -1.0);
@@ -69,8 +66,7 @@ TEST_CASE("Test Edge-Edge Continuous Collision Detection", "[ccd][edge-edge]")
 {
     using namespace ccd;
     CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
-    if (method == CCDMethod::FLOAT_MIN_SEPARATION
-        || method == CCDMethod::EXACT_RATIONAL_MIN_SEPARATION) {
+    if (method == CCDMethod::EXACT_RATIONAL_MIN_SEPARATION) {
         return;
     }
 
@@ -112,13 +108,10 @@ TEST_CASE("Test Edge-Edge Continuous Collision Detection", "[ccd][edge-edge]")
     }
 }
 
-TEST_CASE("Zhongshi test case", "[ccd][point-triangle][!mayfail]")
+TEST_CASE("Zhongshi test case", "[ccd][point-triangle]")
 {
     using namespace ccd;
     CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
-    if (method == CCDMethod::FLOAT_MIN_SEPARATION) {
-        return;
-    }
 
     double qy = GENERATE(-EPSILON, 0, EPSILON);
 

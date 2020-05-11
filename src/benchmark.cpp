@@ -80,39 +80,23 @@ int main(int argc, char* argv[])
     int false_positives = 0;
     int false_negatives = 0;
 
-    long peak_memory = 0;
-
-    Eigen::Matrix<double, 8, 3> V;
     for (auto& entry : boost::filesystem::directory_iterator(data_dir)) {
         if (boost::filesystem::extension(entry.path()) != ".hdf5"
             && boost::filesystem::extension(entry.path()) != ".h5") {
             continue;
         }
-        std::cout << entry.path().string() << std::endl;
-        Eigen::Matrix<double, Eigen::Dynamic, 3> all_V;
-        Eigen::Matrix<bool, Eigen::Dynamic, 1> expected_results;
-
-        // Load all the data into memory so we can get an accurate measure of
-        // memory usage.
         H5Easy::File file(entry.path().string());
+
         const auto query_names = file.getGroup("/").listObjectNames();
-        all_V.resize(8 * query_names.size(), 3);
-        expected_results.resize(query_names.size());
-        for (int i = 0; i < query_names.size(); i++) {
-            std::string dir = fmt::format(
-                "{}/{}", query_names[i], use_shifted ? "shifted/" : "");
-            all_V.middleRows<8>(8 * i)
+
+        for (size_t i = 0; i < query_names.size(); i++) {
+            std::string query_name = fmt::format(
+                "{}{}", query_names[i], use_shifted ? "/shifted" : "");
+            Eigen::Matrix<double, 8, 3> V
                 = H5Easy::load<Eigen::Matrix<double, 8, 3>>(
-                    file, fmt::format("{}points", dir));
-            expected_results[i] = bool(H5Easy::load<unsigned char>(
-                file, fmt::format("{}result", dir)));
-        }
-
-        // Measure jsut the memory of loading the queries
-        long load_memory = getPeakRSS();
-
-        for (int i = 0; i < expected_results.size(); i++) {
-            V = all_V.middleRows<8>(8 * i);
+                    file, fmt::format("{}/points", query_name));
+            bool expected_results = H5Easy::load<unsigned char>(
+                file, fmt::format("{}/result", query_name));
 
             // Time the methods
             bool result;
@@ -130,7 +114,7 @@ int main(int argc, char* argv[])
             timing += timer.getElapsedTimeInMicroSec();
 
             // Count the inaccuracies
-            if (result != expected_results[i]) {
+            if (result != expected_results) {
                 if (result) {
                     false_positives++;
                 } else {
@@ -141,37 +125,27 @@ int main(int argc, char* argv[])
                     || method == CCDMethod::RATIONAL_ROOT_PARITY) {
                     std::cout
                         << fmt::format(
-                               "method={} query_name={} {}",
-                               method_names[method], query_names[i],
+                               "file={} query_name={} method={} {}",
+                               basename(entry.path()), method_names[method],
+                               query_names[i],
                                result ? "false_positives" : "false_negatives")
                         << std::endl;
                 }
             }
             std::cout << ++num_queries << "\r" << std::flush;
         }
-
-        peak_memory = std::max(peak_memory, long(getPeakRSS()) - load_memory);
     }
-
-    assert(peak_memory >= 0);
 
     std::string benchmark_file
         = (boost::filesystem::path(data_dir) / "benchmark.json").string();
     std::ifstream input(benchmark_file);
-    nlohmann::json benchmark;
-    if (input.good()) {
-        benchmark = nlohmann::json::parse(input);
-    }
+    nlohmann::json benchmark = nlohmann::json::parse(input);
     input.close();
-    // assert(
-    //     !benchmark.contains("num_queries")
-    //     || benchmark["num_queries"].get<int>() == num_queries);
 
     benchmark["collision_type"] = is_edge_edge ? "ee" : "vf";
     benchmark["num_queries"] = num_queries;
     benchmark[method_names[method]] = {
         { "avg_query_time", timing / num_queries },
-        { "peak_memory", peak_memory },
         { "num_false_positives", false_positives },
         { "num_false_negatives", false_negatives },
     };

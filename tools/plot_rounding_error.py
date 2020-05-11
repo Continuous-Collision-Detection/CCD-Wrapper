@@ -2,7 +2,7 @@ import pathlib
 
 import numpy
 import h5py
-import plotly
+import plotly.graph_objects as go
 
 root_dir = pathlib.Path(__file__).parents[1].resolve()
 data_dir = root_dir / "data"
@@ -34,9 +34,24 @@ def read_shifting_error_data(collision_type):
 
 def main():
     scene_to_rounding_data = read_shifting_error_data("vertex-face")
-    for name, errors in scene_to_rounding_data.items():
-        print("{}: ||err||∞={:g} average_err={:g}".format(
-            name, numpy.linalg.norm(errors, numpy.inf), numpy.average(errors)))
+    all_errors = numpy.concatenate(
+        [abs(errors) for name, errors in scene_to_rounding_data.items()])
+    fig = go.Figure(data=[go.Histogram(
+        x=all_errors, histnorm="percent", nbinsx=50, marker_color='#8E3B65')])
+    fig.update_layout(
+        title="Error Induced by Rounding Vertices",
+        xaxis_title="Error",
+        yaxis_title="Percentage of Queries",
+        yaxis={"ticksuffix": "%"},
+        xaxis={
+            "showexponent": "all",
+            "exponentformat": "e",
+            # "rangemode": "tozero",
+            "ticks": "outside"
+        },
+        bargap=0.1
+    )
+    fig.show()
 
 
 if __name__ == "__main__":

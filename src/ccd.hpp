@@ -40,7 +40,7 @@ static const char* method_names[CCDMethod::NUM_CCD_METHODS] = {
 };
 
 /// Minimum separation distance used when looking for 0 distance collisions.
-static const double DEFAULT_MIN_DISTANCE = 1e-300;
+static const double DEFAULT_MIN_DISTANCE = 1e-30;
 
 /**
  * @brief Detect collisions between a vertex and a triangular face.

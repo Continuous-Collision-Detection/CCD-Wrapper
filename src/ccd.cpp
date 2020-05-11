@@ -129,7 +129,7 @@ bool vertexFaceCCD(
                 vertex_end,
                 // Triangle at t = 1
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
-                /*minimum_distance=*/1e-12, toi);
+                /*minimum_distance=*/DEFAULT_MIN_DISTANCE, toi);
             if (hit && (toi < 0 || toi > 1)) {
                 std::cout << toi << std::endl;
                 throw "toi out of range";

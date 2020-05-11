@@ -66,7 +66,6 @@ def colnum_string(n):
 
 
 def write_to_google_sheet(df, sheet_name):
-    # SPREADSHEET_ID = "1j8fkwq36Lknni3tEu1_4ahiedF38q0FyluHH4cooWo8"
     SPREADSHEET_ID = "1CFZOTkemt4_D5MZiBlS2L3MJcTtFMS6jS1qumrNfjR8"
     sheet = open_google_sheet()
     last_col = colnum_string(df.shape[1] + 1)
@@ -92,15 +91,14 @@ def read_benchmark_data(collision_type, method_names):
         with open(dir / collision_type / "benchmark.json") as f:
             benchmarks[dir.name] = json.load(f)
 
-    data_labels = ["Avg. Query Time", "Peak Memory",
-                   "# of False Positives", "# of False Negatives"]
+    data_labels = [
+        "Avg. Query Time", "# of False Positives", "# of False Negatives"]
     df = pandas.DataFrame(index=benchmarks.keys(), columns=(
         ["# of Queries"] + data_labels * len(method_names)))
     for name, benchmark in benchmarks.items():
         row = [benchmark["num_queries"]]
         for method_name in method_names:
             row.append(benchmark[method_name]["avg_query_time"])
-            row.append(benchmark[method_name]["peak_memory"])
             row.append(benchmark[method_name]["num_false_positives"])
             row.append(benchmark[method_name]["num_false_negatives"])
         df.loc[name] = row
@@ -108,10 +106,8 @@ def read_benchmark_data(collision_type, method_names):
 
 
 def main():
-    vf_df = read_benchmark_data(
-        "vertex-face", all_method_names[:5] + all_method_names[6:])
-    ee_df = read_benchmark_data(
-        "edge-edge", all_method_names[:5] + all_method_names[6:])
+    vf_df = read_benchmark_data("vertex-face", all_method_names)
+    ee_df = read_benchmark_data("edge-edge", all_method_names)
 
     write_to_google_sheet(vf_df, "Vertex-Face")
     write_to_google_sheet(ee_df, "Edge-Edge")

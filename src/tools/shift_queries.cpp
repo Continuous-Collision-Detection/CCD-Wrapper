@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
                     V.row(6), V.row(7));
 
                 doubleccd::ee_pair shifted_ee_pair;
-                double shift_err = doubleccd::shift_edge_edge(
+                shift_err = doubleccd::shift_edge_edge(
                     input_ee_pair, shifted_ee_pair);
 
                 V.row(0) = shifted_ee_pair.a0;
@@ -109,22 +109,38 @@ int main(int argc, char* argv[])
                     V.row(6), V.row(7), CCDMethod::RATIONAL_ROOT_PARITY);
             }
 
-            HighFive::Group shifted_query
-                = file.getGroup(query_name).createGroup("shifted");
-            HighFive::DataSet dataset = shifted_query.createDataSet<double>(
-                "error", HighFive::DataSpace::From(shift_err));
-            dataset.write(shift_err);
-            dataset = shifted_query.createDataSet<unsigned char>(
-                "result", HighFive::DataSpace::From((unsigned char)result));
-            dataset.write((unsigned char)result);
+            HighFive::Group query = file.getGroup(query_name), shifted_query;
+            if (query.exist("shifted")) {
+                shifted_query = query.getGroup("shifted");
+            } else {
+                shifted_query = query.createGroup("shifted");
+            }
 
-            dataset = shifted_query.createDataSet<double>(
-                "points", H5Easy::DataSpace(H5Easy::detail::eigen::shape(V)));
+            if (shifted_query.exist("error")) {
+                shifted_query.getDataSet("error").write(shift_err);
+            } else {
+                shifted_query.createDataSet("error", shift_err);
+            }
+
+            if (shifted_query.exist("result")) {
+                shifted_query.getDataSet("result").write((unsigned char)result);
+            } else {
+                shifted_query.createDataSet("result", (unsigned char)result);
+            }
+
             Eigen::Ref<
                 const Eigen::Array<double, 8, 3, Eigen::RowMajor>, 0,
                 Eigen::InnerStride<1>>
                 row_major(V);
-            dataset.write_raw(V.data());
+            if (shifted_query.exist("points")) {
+                shifted_query.getDataSet("points").write_raw(row_major.data());
+            } else {
+                shifted_query
+                    .createDataSet<double>(
+                        "points",
+                        H5Easy::DataSpace(H5Easy::detail::eigen::shape(V)))
+                    .write_raw(row_major.data());
+            }
 
             std::cout << i << "\r" << std::flush;
         }

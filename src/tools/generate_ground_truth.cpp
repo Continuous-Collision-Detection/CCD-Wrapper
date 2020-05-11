@@ -73,9 +73,11 @@ int main(int argc, char* argv[])
             }
 
             HighFive::Group query = file.getGroup(query_name);
-            HighFive::DataSet dataset = query.createDataSet<unsigned char>(
-                "result", HighFive::DataSpace::From((unsigned char)result));
-            dataset.write((unsigned char)result);
+            if (query.exist("result")) {
+                query.getDataSet("result").write((unsigned char)result);
+            } else {
+                query.createDataSet("result", (unsigned char)result);
+            }
 
             std::cout << i << "\r" << std::flush;
         }

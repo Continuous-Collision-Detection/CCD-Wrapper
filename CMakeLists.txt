@@ -124,27 +124,39 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   add_executable(generate_ground_truth
     src/tools/generate_ground_truth.cpp
   )
-
   target_link_libraries(generate_ground_truth PUBLIC ${PROJECT_NAME})
   target_link_libraries(generate_ground_truth PUBLIC HighFive::HighFive)
   target_link_libraries(generate_ground_truth PUBLIC fmt::fmt)
-
-  # Boost
-  set(Boost_USE_MULTITHREADED TRUE)
-  find_package(Boost COMPONENTS filesystem REQUIRED)
   target_link_libraries(generate_ground_truth PUBLIC Boost::filesystem)
 
 
   add_executable(shift_queries
     src/tools/shift_queries.cpp
   )
-
   target_link_libraries(shift_queries PUBLIC ${PROJECT_NAME})
   target_link_libraries(shift_queries PUBLIC HighFive::HighFive)
   target_link_libraries(shift_queries PUBLIC fmt::fmt)
-
-  # Boost
-  set(Boost_USE_MULTITHREADED TRUE)
-  find_package(Boost COMPONENTS filesystem REQUIRED)
   target_link_libraries(shift_queries PUBLIC Boost::filesystem)
+
+  add_executable(time_min_distances
+    src/tools/time_min_distances.cpp
+  )
+
+  target_link_libraries(time_min_distances PUBLIC ${PROJECT_NAME})
+  target_link_libraries(time_min_distances PUBLIC HighFive::HighFive)
+  target_link_libraries(time_min_distances PUBLIC fmt::fmt)
+  target_link_libraries(time_min_distances PUBLIC igl::core)
+  target_link_libraries(time_min_distances PUBLIC nlohmann_json::nlohmann_json)
+  target_link_libraries(time_min_distances PUBLIC Boost::filesystem)
+
+  add_executable(benchmark_min_separation
+    src/tools/benchmark_min_separation.cpp
+  )
+
+  target_link_libraries(benchmark_min_separation PUBLIC ${PROJECT_NAME})
+  target_link_libraries(benchmark_min_separation PUBLIC HighFive::HighFive)
+  target_link_libraries(benchmark_min_separation PUBLIC fmt::fmt)
+  target_link_libraries(benchmark_min_separation PUBLIC igl::core)
+  target_link_libraries(benchmark_min_separation PUBLIC nlohmann_json::nlohmann_json)
+  target_link_libraries(benchmark_min_separation PUBLIC Boost::filesystem)
 endif()

@@ -19,7 +19,8 @@ int parse_args(
     char* argv[],
     std::string& data_dir,
     bool& is_edge_edge,
-    CCDMethod& method)
+    CCDMethod& method,
+    double& min_distance)
 {
     const std::string usage = fmt::format(
         "usage: {} /path/to/data/ {{vf|ee}} {{0-{:d}}}", argv[0],
@@ -56,6 +57,12 @@ int parse_args(
         return 3;
     }
 
+    if (argc >= 5) {
+        min_distance = atof(argv[4]);
+    } else {
+        min_distance = DEFAULT_MIN_DISTANCE;
+    }
+
     data_dir = std::string(argv[1]);
     is_edge_edge = strcmp(argv[2], "ee") == 0;
     method = CCDMethod(method_number);
@@ -67,8 +74,10 @@ int main(int argc, char* argv[])
     std::string data_dir;
     bool is_edge_edge;
     CCDMethod method;
+    double min_distance;
     bool use_shifted = true;
-    int code = parse_args(argc, argv, data_dir, is_edge_edge, method);
+    int code
+        = parse_args(argc, argv, data_dir, is_edge_edge, method, min_distance);
     if (code) {
         return code;
     }
@@ -102,13 +111,13 @@ int main(int argc, char* argv[])
             bool result;
             timer.start();
             if (is_edge_edge) {
-                result = edgeEdgeCCD(
+                result = edgeEdgeMSCCD(
                     V.row(0), V.row(1), V.row(2), V.row(3), V.row(4), V.row(5),
-                    V.row(6), V.row(7), method);
+                    V.row(6), V.row(7), min_distance, method);
             } else {
-                result = vertexFaceCCD(
+                result = vertexFaceMSCCD(
                     V.row(0), V.row(1), V.row(2), V.row(3), V.row(4), V.row(5),
-                    V.row(6), V.row(7), method);
+                    V.row(6), V.row(7), min_distance, method);
             }
             timer.stop();
             timing += timer.getElapsedTimeInMicroSec();
@@ -119,39 +128,46 @@ int main(int argc, char* argv[])
                     false_positives++;
                 } else {
                     false_negatives++;
-                }
-                if (method == CCDMethod::EXACT_RATIONAL_MIN_SEPARATION
-                    || method == CCDMethod::EXACT_DOUBLE_MIN_SEPARATION
-                    || method == CCDMethod::RATIONAL_ROOT_PARITY) {
-                    std::cout
-                        << fmt::format(
-                               "file={} query_name={} method={} {}",
-                               basename(entry.path()), query_names[i],
-                               method_names[method],
-                               result ? "false_positives" : "false_negatives")
-                        << std::endl;
+                    if (method == CCDMethod::EXACT_RATIONAL_MIN_SEPARATION
+                        || method == CCDMethod::EXACT_DOUBLE_MIN_SEPARATION
+                        || method == CCDMethod::RATIONAL_ROOT_PARITY) {
+                        std::cout << fmt::format(
+                                         "file={} query_name={} method={} {}",
+                                         basename(entry.path()), query_names[i],
+                                         method_names[method],
+                                         result ? "false_positives"
+                                                : "false_negatives")
+                                  << std::endl;
+                    }
                 }
             }
             std::cout << ++num_queries << "\r" << std::flush;
         }
     }
 
-    std::string benchmark_file
-        = (boost::filesystem::path(data_dir) / "benchmark.json").string();
-    std::ifstream input(benchmark_file);
     nlohmann::json benchmark;
-    if (input.good()) {
-        benchmark = nlohmann::json::parse(input);
-    }
-    input.close();
-
     benchmark["collision_type"] = is_edge_edge ? "ee" : "vf";
     benchmark["num_queries"] = num_queries;
-    benchmark[method_names[method]] = {
-        { "avg_query_time", timing / num_queries },
-        { "num_false_positives", false_positives },
-        { "num_false_negatives", false_negatives },
-    };
+    std::string str_min_distane = fmt::format("{:g}", min_distance);
+    benchmark[str_min_distane]
+        = { { method_names[method],
+              {
+                  { "avg_query_time", timing / num_queries },
+                  { "num_false_positives", false_positives },
+                  { "num_false_negatives", false_negatives },
+              } } };
 
-    std::ofstream(benchmark_file) << benchmark.dump(4);
+    std::string fname
+        = (boost::filesystem::path(data_dir) / "min-separation-benchmark.json")
+              .string();
+    {
+        std::ifstream file(fname);
+        if (file.good()) {
+            nlohmann::json full_benchmark = nlohmann::json::parse(file);
+            full_benchmark.merge_patch(benchmark);
+            benchmark = full_benchmark;
+        }
+    }
+
+    std::ofstream(fname) << benchmark.dump(4);
 }

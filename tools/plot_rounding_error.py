@@ -33,25 +33,41 @@ def read_shifting_error_data(collision_type):
 
 
 def main():
-    scene_to_rounding_data = read_shifting_error_data("vertex-face")
-    all_errors = numpy.concatenate(
-        [abs(errors) for name, errors in scene_to_rounding_data.items()])
-    fig = go.Figure(data=[go.Histogram(
-        x=all_errors, histnorm="percent", nbinsx=50, marker_color='#8E3B65')])
-    fig.update_layout(
-        title="Error Induced by Rounding Vertices",
-        xaxis_title="Error",
-        yaxis_title="Percentage of Queries",
-        yaxis={"ticksuffix": "%"},
-        xaxis={
-            "showexponent": "all",
-            "exponentformat": "e",
-            # "rangemode": "tozero",
-            "ticks": "outside"
-        },
-        bargap=0.1
-    )
-    fig.show()
+    for collision_type in ("vertex-face", "edge-edge",):
+        scene_to_rounding_data = read_shifting_error_data(collision_type)
+        all_errors = numpy.concatenate(
+            [abs(errors) for name, errors in scene_to_rounding_data.items()])
+        fig = go.Figure(data=[go.Histogram(
+            x=all_errors, histnorm="percent", nbinsx=50, marker_color='#8E3B65')])
+        fig.update_layout(
+            # title="Error Induced by Rounding Vertices",
+            # xaxis_title="Error",
+            # yaxis_title="Percentage of Queries",
+            yaxis={
+                "ticksuffix": "%",
+                "gridcolor": "rgba(0,0,0,0.4)",
+                "linecolor": "black",
+                "ticks": "outside",
+            },
+            xaxis={
+                "showexponent": "all",
+                "exponentformat": "e",
+                "linecolor": "black",
+                "ticks": "outside"
+            },
+            bargap=0.1,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(
+                color="black",
+                family="Times New Roman",
+                size=20
+            ),
+            margin=dict(l=0, r=0, t=0, b=0),
+            width=600,
+            height=355
+        )
+        fig.write_image(f"{collision_type}-rounding-error.pdf")
 
 
 if __name__ == "__main__":

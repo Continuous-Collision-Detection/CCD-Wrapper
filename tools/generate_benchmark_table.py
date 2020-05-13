@@ -11,6 +11,9 @@ all_method_names = [
     "Float", "RootParity", "RationalRootParity", "BSC", "TightCCD",
     "FloatMinSeparation", "ExactRationalMinSeparation",
     "ExactDoubleMinSeparation"]
+all_method_abbrev = [
+    "FPRF", "RP", "RRP", "BSC", "TCCD", "MS-FPRF", "Ours (Rational)", "Ours (Double)"]
+method_names_to_abbrev = dict(zip(all_method_names, all_method_abbrev))
 
 name_to_row = dict(zip(["unit-tests",
                         "erleben-spikes",
@@ -67,6 +70,7 @@ def colnum_string(n):
 
 def write_to_google_sheet(df, sheet_name):
     SPREADSHEET_ID = "1CFZOTkemt4_D5MZiBlS2L3MJcTtFMS6jS1qumrNfjR8"
+    # SPREADSHEET_ID = "1U1xQsmc4w_AbC_d_mWuTswoOOXO1MQOSyqRXDHuOIcM"
     sheet = open_google_sheet()
     last_col = colnum_string(df.shape[1] + 1)
     for name, row in name_to_row.items():
@@ -78,6 +82,25 @@ def write_to_google_sheet(df, sheet_name):
                 "majorDimension": "ROWS",
                 "values": [df.loc[name].tolist()]
             }).execute()
+
+
+def print_latex_table(df):
+    row_labels = [
+        "Avg. Query Time", "# of False Positives", "# of False Negatives"]
+    condensed_df = pandas.DataFrame(
+        index=row_labels, columns=all_method_abbrev)
+    num_queries = df["# of Queries"].to_numpy()
+    for row_label in row_labels:
+        if "Avg" in row_label:
+            # Weight the averages by the number of queries and reaverage
+            condensed_df.loc[row_label] = (
+                df[row_label].to_numpy() * num_queries.reshape(-1, 1)
+            ).sum(axis=0) / num_queries.sum()
+        else:
+            condensed_df.loc[row_label] = df[row_label].sum(
+            ).to_numpy().astype(int)
+    print(condensed_df.to_latex(
+        float_format=(lambda x: f"{x:.2f}"), column_format=('l' + 'c' * (condensed_df.shape[1]))))
 
 
 def read_benchmark_data(collision_type, method_names):
@@ -109,8 +132,12 @@ def main():
     vf_df = read_benchmark_data("vertex-face", all_method_names)
     ee_df = read_benchmark_data("edge-edge", all_method_names)
 
-    write_to_google_sheet(vf_df, "Vertex-Face")
-    write_to_google_sheet(ee_df, "Edge-Edge")
+    print_latex_table(vf_df)
+    print("\\\\")
+    print_latex_table(ee_df)
+
+    # write_to_google_sheet(vf_df, "Vertex-Face")
+    # write_to_google_sheet(ee_df, "Edge-Edge")
 
     # TODO: Read and write minimum distance benchmark data
     # vf_df = read_benchmark_data(

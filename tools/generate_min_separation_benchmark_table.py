@@ -3,40 +3,28 @@ import pathlib
 
 import pandas
 
-method_names = ["FloatMinSeparation", "ExactDoubleMinSeparation"]
-method_abbreviations = ["MS-FPRF", "Ours"]
-method_names_to_abbrev = dict(zip(method_names, method_abbreviations))
+from generate_benchmark_table import (
+    method_names, method_abbreviations, datasets, root_dir, data_dir)
 
-benchmarks = {
-    "handcrafted": [
-        "unit-tests", "erleben-spikes", "erleben-spike-wedge", "erleben-wedges",
-        "erleben-spike-hole", "erleben-spike-crack", "erleben-wedge-crack",
-        "erleben-sliding-spike", "erleben-sliding-wedge",
-        "erleben-cube-internal-edges", "erleben-cube-cliff-edges"
-    ],
-    "simulation": ["golf-ball", "twisting-mat", "cow-heads", "chain"]
-}
-
-root_dir = pathlib.Path(__file__).parents[1].resolve()
-data_dir = root_dir / "data"
+method_names = [method_names[5], method_names[7]]
+method_abbreviations = [method_abbreviations[5], method_abbreviations[7]]
 
 
-def load_benchmark_data(collision_type, benchmark):
-    benchmark_data = {}
+def load_benchmark_data(collision_type, dataset):
+    data = {}
     for dir in data_dir.iterdir():
-        if not dir.is_dir() or dir.name not in benchmark:
+        if not dir.is_dir() or dir.name not in dataset:
             continue
         benchmark_path = dir / collision_type / "min-separation-benchmark.json"
         if benchmark_path.exists():
             with open(benchmark_path) as f:
-                benchmark_data[dir.name] = json.load(f)
-    return benchmark_data
+                data[dir.name] = json.load(f)
+    return data
 
 
 def create_benchmark_data_frame(data):
     dfs = {}
-    data_labels = [
-        "Avg. Query Time", "# of False Positives", "# of False Negatives"]
+    data_labels = ["t", "FP", "FN"]
     indices = None
     for scene_name, scene_data in data.items():
         if indices is None:
@@ -44,7 +32,7 @@ def create_benchmark_data_frame(data):
                        "num_queries" and key != "collision_type"]
         dfs[scene_name] = pandas.DataFrame(
             index=[float(index) for index in indices], columns=(
-                ["# of Queries"] + data_labels * len(method_names)))
+                ["n"] + data_labels * len(method_names)))
         for index in indices:
             row = [scene_data["num_queries"]]
             for method_name in method_names:
@@ -57,35 +45,36 @@ def create_benchmark_data_frame(data):
 
     cumulative_df = None
     for scene_name, df in dfs.items():
-        df["Avg. Query Time"] = (
-            df["Avg. Query Time"].to_numpy() * df["# of Queries"].to_numpy().reshape(-1, 1))
+        df["t"] = (df["t"].to_numpy() * df["n"].to_numpy().reshape(-1, 1))
         if(cumulative_df is None):
             cumulative_df = df.copy()
         else:
             cumulative_df += df
-    cumulative_df["Avg. Query Time"] = (
-        cumulative_df["Avg. Query Time"].to_numpy()
-        / cumulative_df["# of Queries"].to_numpy().reshape(-1, 1))
+    cumulative_df["t"] = (cumulative_df["t"].to_numpy()
+                          / cumulative_df["n"].to_numpy().reshape(-1, 1))
 
-    cumulative_df = cumulative_df.drop("# of Queries", axis=1)
+    cumulative_df = cumulative_df.drop("n", axis=1)
     cumulative_df = cumulative_df.sort_index(ascending=False)
+    cumulative_df.index = cumulative_df.index.map(lambda x: f"{x:.0e}")
     return cumulative_df
 
 
 def print_latex_table(df):
     print(df.to_latex(
         float_format=(lambda x: f"{x:.2f}"),
-        column_format=('l' + 'c' * (df.shape[1]))))
+        column_format=('l|' + 'c' * (df.shape[1] - 1) + '|c')))
 
 
 def main():
-    for collision_type in "vertex-face", "edge-edge":
-        benchmark_data = load_benchmark_data(
-            collision_type, benchmarks["handcrafted"])
-        df = create_benchmark_data_frame(benchmark_data)
-
-        print_latex_table(df)
-        print("\\\\")
+    for dataset in ("handcrafted", ):  # , "simulation":
+        for collision_type in "vertex-face", "edge-edge":
+            benchmark_data = load_benchmark_data(
+                collision_type, datasets[dataset])
+            df = create_benchmark_data_frame(benchmark_data)
+            print("{} Dataset -- {} CCD/MSCCD".format(
+                dataset.title(), collision_type.title()))
+            print_latex_table(df)
+            print("\\\\[1.5em]")
 
 
 if __name__ == "__main__":

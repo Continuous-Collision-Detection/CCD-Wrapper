@@ -1,36 +1,32 @@
 import json
 import pathlib
 import pickle
+import itertools
 
 import pandas
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
-all_method_names = [
+method_names = [
     "Float", "RootParity", "RationalRootParity", "BSC", "TightCCD",
     "FloatMinSeparation", "ExactRationalMinSeparation",
     "ExactDoubleMinSeparation"]
-all_method_abbrev = [
+method_abbreviations = [
     "FPRF", "RP", "RRP", "BSC", "TCCD", "MS-FPRF", "Ours R", "Ours"]
-method_names_to_abbrev = dict(zip(all_method_names, all_method_abbrev))
 
-name_to_row = dict(zip(["unit-tests",
-                        "erleben-spikes",
-                        "erleben-spike-wedge",
-                        "erleben-wedges",
-                        "erleben-spike-hole",
-                        "erleben-spike-crack",
-                        "erleben-wedge-crack",
-                        "erleben-sliding-spike",
-                        "erleben-sliding-wedge",
-                        "erleben-cube-internal-edges",
-                        "erleben-cube-cliff-edges",
-                        "mat-twist", 
-                        "golf-ball",
-                        "cow-heads",
-                        "chain"
-                        ], range(3, 14)))
+datasets = {
+    "handcrafted": [
+        "unit-tests", "erleben-spikes", "erleben-spike-wedge", "erleben-wedges",
+        "erleben-spike-hole", "erleben-spike-crack", "erleben-wedge-crack",
+        "erleben-sliding-spike", "erleben-sliding-wedge",
+        "erleben-cube-internal-edges", "erleben-cube-cliff-edges"
+    ],
+    "simulation": ["golf-ball", "twisting-mat", "cow-heads", "chain"]
+}
+
+name_to_row = dict(
+    zip(itertools.chain.from_iterable(datasets.values()), range(3, 18)))
 
 root_dir = pathlib.Path(__file__).parents[1].resolve()
 data_dir = root_dir / "data"
@@ -84,28 +80,10 @@ def write_to_google_sheet(df, sheet_name):
             }).execute()
 
 
-def print_latex_table(df):
-    row_labels = ["t", "FP", "FN"]
-    condensed_df = pandas.DataFrame(
-        index=row_labels, columns=all_method_abbrev)
-    num_queries = df["# of Queries"].to_numpy()
-    for row_label in row_labels:
-        if row_label == "t":
-            # Weight the averages by the number of queries and reaverage
-            condensed_df.loc[row_label] = (
-                df[row_label].to_numpy() * num_queries.reshape(-1, 1)
-            ).sum(axis=0) / num_queries.sum()
-        else:
-            condensed_df.loc[row_label] = df[row_label].sum(
-            ).to_numpy().astype(int)
-    print(condensed_df.to_latex(
-        float_format=(lambda x: f"{x:.2f}"), column_format=('l|' + 'c' * (condensed_df.shape[1] - 1) + '|c')))
-
-
-def read_benchmark_data(collision_type, method_names):
+def read_benchmark_data(collision_type, dataset):
     benchmarks = {}
     for dir in data_dir.iterdir():
-        if not dir.is_dir() or dir.name == "mat-twist":
+        if not dir.is_dir() or dir.name not in dataset:
             continue
         benchmark_path = dir / collision_type / "benchmark.json"
         if not benchmark_path.exists():
@@ -127,25 +105,36 @@ def read_benchmark_data(collision_type, method_names):
     return df
 
 
+def print_latex_table(df):
+    row_labels = ["t", "FP", "FN"]
+    condensed_df = pandas.DataFrame(
+        index=row_labels, columns=method_abbreviations)
+    num_queries = df["# of Queries"].to_numpy()
+    for row_label in row_labels:
+        if row_label == "t":
+            # Weight the averages by the number of queries and reaverage
+            condensed_df.loc[row_label] = (
+                df[row_label].to_numpy() * num_queries.reshape(-1, 1)
+            ).sum(axis=0) / num_queries.sum()
+        else:
+            condensed_df.loc[row_label] = df[row_label].sum(
+            ).to_numpy().astype(int)
+
+    condensed_df["RRP"].loc["FP"] = condensed_df["RRP"].loc["FN"] = "-"
+    print(condensed_df.to_latex(
+        float_format=(lambda x: f"{x:.2f}"), column_format=('l|' + 'c' * (condensed_df.shape[1] - 1) + '|c')))
+
+
 def main():
-    vf_df = read_benchmark_data("vertex-face", all_method_names)
-    ee_df = read_benchmark_data("edge-edge", all_method_names)
+    for dataset in ("handcrafted", ):  # , "simulation":
+        for collision_type in "vertex-face", "edge-edge":
+            df = read_benchmark_data(collision_type, datasets[dataset])
+            print("{} Dataset -- {} CCD/MSCCD".format(
+                dataset.title(), collision_type.title()))
+            print_latex_table(df)
+            print("\\\\[1.5em]")
 
-    print_latex_table(vf_df)
-    print("\\\\")
-    print_latex_table(ee_df)
-
-    # write_to_google_sheet(vf_df, "Vertex-Face")
-    # write_to_google_sheet(ee_df, "Edge-Edge")
-
-    # TODO: Read and write minimum distance benchmark data
-    # vf_df = read_benchmark_data(
-    #     "vertex-face", [all_method_names[-1]] + all_method_names[-3:-1])
-    # ee_df = read_benchmark_data(
-    #     "edge-edge", [all_method_names[-1]] + all_method_names[-3:-1])
-    #
-    # write_to_google_sheet(vf_df, "Min Distance Vertex-Face")
-    # write_to_google_sheet(ee_df, "Min Distance Edge-Edge")
+            # write_to_google_sheet(df, collision_type.title(), dataset.title())
 
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@ all_method_names = [
     "FloatMinSeparation", "ExactRationalMinSeparation",
     "ExactDoubleMinSeparation"]
 all_method_abbrev = [
-    "FPRF", "RP", "RRP", "BSC", "TCCD", "MS-FPRF", "Ours (Rational)", "Ours (Double)"]
+    "FPRF", "RP", "RRP", "BSC", "TCCD", "MS-FPRF", "Ours R", "Ours"]
 method_names_to_abbrev = dict(zip(all_method_names, all_method_abbrev))
 
 name_to_row = dict(zip(["unit-tests",
@@ -30,7 +30,7 @@ name_to_row = dict(zip(["unit-tests",
                         "golf-ball",
                         "cow-heads",
                         "chain"
-                        ], range(3, 15)))
+                        ], range(3, 14)))
 
 root_dir = pathlib.Path(__file__).parents[1].resolve()
 data_dir = root_dir / "data"
@@ -85,13 +85,12 @@ def write_to_google_sheet(df, sheet_name):
 
 
 def print_latex_table(df):
-    row_labels = [
-        "Avg. Query Time", "# of False Positives", "# of False Negatives"]
+    row_labels = ["t", "FP", "FN"]
     condensed_df = pandas.DataFrame(
         index=row_labels, columns=all_method_abbrev)
     num_queries = df["# of Queries"].to_numpy()
     for row_label in row_labels:
-        if "Avg" in row_label:
+        if row_label == "t":
             # Weight the averages by the number of queries and reaverage
             condensed_df.loc[row_label] = (
                 df[row_label].to_numpy() * num_queries.reshape(-1, 1)
@@ -100,13 +99,13 @@ def print_latex_table(df):
             condensed_df.loc[row_label] = df[row_label].sum(
             ).to_numpy().astype(int)
     print(condensed_df.to_latex(
-        float_format=(lambda x: f"{x:.2f}"), column_format=('l' + 'c' * (condensed_df.shape[1]))))
+        float_format=(lambda x: f"{x:.2f}"), column_format=('l|' + 'c' * (condensed_df.shape[1] - 1) + '|c')))
 
 
 def read_benchmark_data(collision_type, method_names):
     benchmarks = {}
     for dir in data_dir.iterdir():
-        if not dir.is_dir():
+        if not dir.is_dir() or dir.name == "mat-twist":
             continue
         benchmark_path = dir / collision_type / "benchmark.json"
         if not benchmark_path.exists():
@@ -115,7 +114,7 @@ def read_benchmark_data(collision_type, method_names):
             benchmarks[dir.name] = json.load(f)
 
     data_labels = [
-        "Avg. Query Time", "# of False Positives", "# of False Negatives"]
+        "t", "FP", "FN"]
     df = pandas.DataFrame(index=benchmarks.keys(), columns=(
         ["# of Queries"] + data_labels * len(method_names)))
     for name, benchmark in benchmarks.items():

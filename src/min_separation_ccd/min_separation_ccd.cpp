@@ -1,5 +1,6 @@
 #include "min_separation_ccd.hpp"
 
+#include <iostream>
 #include <vector>
 
 #include <Eigen/Geometry>
@@ -82,10 +83,10 @@ namespace root_finder {
             Eigen::Vector3d n = (p1 - p0).cross(p2 - p0);
             double Vn = relVel.dot(n);
             // double epsilon = Vn * Vn * 1e-8;
-            double epsilon = h * 1e-8;
+            double epsilon = h * 1e-1;
             // double epsilon = 1e-12;
 
-            if (abs(distance - h * h) < epsilon) {
+            if (abs(distance) <= h * h + epsilon) {
                 if (t < toi) {
                     toi = t;
                 }
@@ -145,10 +146,10 @@ namespace root_finder {
 
             double Vn = relVel.dot(n);
             // double epsilon = Vn * Vn * 1e-8;
-            double epsilon = h * 1e-8;
+            double epsilon = h * 1e-1;
             // double epsilon = 1e-12;
 
-            if (std::fabs(distance - h * h) < epsilon) {
+            if (abs(distance) <= h * h + epsilon) {
                 if (t[k] < toi) {
                     toi = t[k];
                 }

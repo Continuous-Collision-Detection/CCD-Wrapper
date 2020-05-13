@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
     igl::Timer timer;
 
     Eigen::ArrayXd min_distances
-        = Eigen::VectorXd::LinSpaced(100, 2, -200).unaryExpr([](double x) {
+        = Eigen::VectorXd::LinSpaced(100, 2, -100).unaryExpr([](double x) {
               return pow(10, x);
           });
     Eigen::ArrayXd timings = Eigen::VectorXd::Zero(min_distances.size());

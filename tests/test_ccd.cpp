@@ -57,7 +57,9 @@ TEST_CASE(
     CAPTURE(v0z, u0y, u1y, u0z, EPSILON, method_names[method]);
     // TightCCD can produce false positives, so only check if the hit value is
     // negative.
-    if (method != CCDMethod::TIGHT_CCD || !hit) {
+    if ((method != CCDMethod::TIGHT_CCD
+         && method != CCDMethod::FLOAT_MIN_SEPARATION)
+        || !hit) {
         CHECK(hit == expected_hit);
     }
 }
@@ -100,7 +102,9 @@ TEST_CASE("Test Edge-Edge Continuous Collision Detection", "[ccd][edge-edge]")
     CAPTURE(y_displacement, e1x, method_names[method]);
     // TightCCD can produce false positives, so only check if the hit value is
     // negative.
-    if (method != CCDMethod::TIGHT_CCD || !hit) {
+    if ((method != CCDMethod::TIGHT_CCD
+         && method != CCDMethod::FLOAT_MIN_SEPARATION)
+        || !hit) {
         CHECK(hit == expected_hit);
     }
 }
@@ -147,7 +151,39 @@ TEST_CASE("Zhongshi test case", "[ccd][point-triangle]")
     CAPTURE(qy, method_names[method]);
     // TightCCD can produce false positives, so only check if the hit value is
     // negative.
-    if (method != CCDMethod::TIGHT_CCD || !hit) {
+    if ((method != CCDMethod::TIGHT_CCD
+         && method != CCDMethod::FLOAT_MIN_SEPARATION)
+        || !hit) {
+        CHECK(hit == expected_hit);
+    }
+}
+
+TEST_CASE("Bolun test case", "[ccd][point-triangle]")
+{
+    using namespace ccd;
+    CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
+
+    Eigen::Vector3d x0(0.1, 0.1, 0.1), x1(0, 0, 1), x2(1, 0, 1), x3(0, 1, 1),
+        x0b(0.1, 0.1, 0.1), x1b(0, 0, 0), x2b(0, 1, 0), x3b(1, 0, 0);
+
+    bool expected_hit = true;
+
+    bool hit = vertexFaceCCD(x0, x1, x2, x3, x0b, x1b, x2b, x3b, method);
+
+#ifdef EXPORT_CCD_QUERIES
+    if (method == CCDMethod::FLOAT) { // Only export one query
+        dump_vf_query(
+            fmt::format("vertex_face_{:07d}", vf_counter++), x0, x1, x2, x3,
+            x0b, x1b, x2b, x3b, expected_hit);
+    }
+#endif
+
+    CAPTURE(method_names[method]);
+    // TightCCD can produce false positives, so only check if the hit value is
+    // negative.
+    if ((method != CCDMethod::TIGHT_CCD
+         && method != CCDMethod::FLOAT_MIN_SEPARATION)
+        || !hit) {
         CHECK(hit == expected_hit);
     }
 }

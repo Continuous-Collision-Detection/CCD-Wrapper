@@ -60,9 +60,10 @@ def create_benchmark_data_frame(data):
 
 
 def print_latex_table(df):
+    # {} & {} & MS-FPRF & {} &  & Ours &  \\ \midrule
     print(df.to_latex(
         float_format=(lambda x: f"{x:.2f}"),
-        column_format=('l|' + 'c' * (df.shape[1] - 1) + '|c')))
+        column_format=('l|ccc|ccc')))
 
 
 def main():

@@ -48,7 +48,7 @@ endfunction()
 function(ccd_wrapper_download_rational_ccd)
   ccd_wrapper_download_project(rational_ccd
     GIT_REPOSITORY https://github.com/teseoch/Exact-CDD.git
-    GIT_TAG        30d1ff24d48f3bef46396732cbf0228c64cdc254
+    GIT_TAG        01d933b1a7d215fa8cdcc6998f9e60d9804b7354
   )
 endfunction()
 
@@ -64,7 +64,7 @@ endfunction()
 function(ccd_wrapper_download_exact_msccd)
      ccd_wrapper_download_project(exact_msccd
         GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
-        GIT_TAG        af20eb25dc957fd911d126f7968d05de4be64a1b
+        GIT_TAG        36f3fbdb0012c8b2ef8e667c8f77426b6e8959af
     )
 endfunction()
 

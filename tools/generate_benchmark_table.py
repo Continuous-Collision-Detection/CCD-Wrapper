@@ -26,11 +26,11 @@ name_to_row = dict(zip(["unit-tests",
                         "erleben-sliding-wedge",
                         "erleben-cube-internal-edges",
                         "erleben-cube-cliff-edges",
+                        "mat-twist", 
                         "golf-ball",
-                        "twisting-mat",
                         "cow-heads",
                         "chain"
-                        ], range(3, 14)))
+                        ], range(3, 15)))
 
 root_dir = pathlib.Path(__file__).parents[1].resolve()
 data_dir = root_dir / "data"

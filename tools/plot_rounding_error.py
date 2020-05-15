@@ -14,20 +14,20 @@ def read_shifting_error_data(collision_type, dataset):
             continue
         if dir.name not in dataset:
             continue
+        print(dir)
         for fname in (dir / collision_type).iterdir():
             if fname.suffix != ".hdf5" and fname.suffix != ".h5":
                 continue
             if dir.name not in scene_to_rounding_data:
                 scene_to_rounding_data[dir.name] = []
             with h5py.File(fname, 'r') as f:
-                for key in f.keys():
-                    try:
-                        scene_to_rounding_data[dir.name].append(
-                            f[f"{key}/shifted/error"][()])
-                    except:
-                        breakpoint()
+                errors = numpy.empty(len(f.keys()))
+                for i, key in enumerate(f.keys()):
+                    errors[i] = f[f"{key}/shifted/error"][()]
+                scene_to_rounding_data[dir.name].append(errors)
     for key in scene_to_rounding_data.keys():
-        scene_to_rounding_data[key] = numpy.array(scene_to_rounding_data[key])
+        scene_to_rounding_data[key] = numpy.concatenate(
+            scene_to_rounding_data[key])
     return scene_to_rounding_data
 
 
@@ -39,6 +39,7 @@ def main():
 
             scene_to_rounding_data = read_shifting_error_data(
                 collision_type, datasets[dataset])
+            breakpoint()
             all_errors = numpy.concatenate(
                 [abs(errors) for name, errors in scene_to_rounding_data.items()])
             numpy.savez(

@@ -15,18 +15,18 @@ COLLISON_TYPES=("vf" "ee")
 function run_all_methods
 {
     for i in $(seq 7 7); do
-        $CCD_WRAPPER_BENCHMARK $1 $2 $i
+        $CCD_WRAPPER_BENCHMARK $1 $2 $i > /dev/null
         echo
     done
 }
 
-for DATA_DIR in $DATA_DIRS/unit*/ $DATA_DIRS/erleben*/; do
+for DATA_DIR in $DATA_DIRS/*/; do
     echo $DATA_DIR
     dirs=("$DATA_DIR/vertex-face/" "$DATA_DIR/edge-edge/")
     for type in 0 1; do
-	# run processes and store pids in array
+        # run processes and store pids in array
         run_all_methods ${dirs[$type]} ${COLLISON_TYPES[$type]} &
-	pids[${i}]=$!
+        pids[${i}]=$!
     done
 done
 

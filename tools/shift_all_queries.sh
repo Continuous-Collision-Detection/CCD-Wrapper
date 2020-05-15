@@ -19,7 +19,8 @@ for DATA_DIR in $DATA_DIRS/*/ ; do
     echo $DATA_DIR
     dirs=("$DATA_DIR/vertex-face/" "$DATA_DIR/edge-edge/")
     for type in 0 1; do
-	screen -dmS "$(basename $DATA_DIR)-${COLLISON_TYPES[$type]}" $SHIFT_QUERIES_BIN ${dirs[$type]} ${COLLISON_TYPES[$type]}
+        screen -dmS "$(basename $DATA_DIR)-${COLLISON_TYPES[$type]}" \
+            $SHIFT_QUERIES_BIN ${dirs[$type]} ${COLLISON_TYPES[$type]}
         echo
     done
 done

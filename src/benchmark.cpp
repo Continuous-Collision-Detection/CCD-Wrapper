@@ -51,7 +51,7 @@ int parse_args(
                   << std::endl;
         std::cerr << "options:" << std::endl;
         for (int i = 0; i < NUM_CCD_METHODS; i++) {
-            std::cout << i << ": " << method_names[i] << std::endl;
+            std::cerr << i << ": " << method_names[i] << std::endl;
         }
         return 3;
     }
@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
                     false_negatives++;
                     if (method == CCDMethod::EXACT_RATIONAL_MIN_SEPARATION
                         || method == CCDMethod::EXACT_DOUBLE_MIN_SEPARATION) {
-                        std::cout << fmt::format(
+                        std::cerr << fmt::format(
                                          "file={} query_name={} method={} "
                                          "false_negative",
                                          basename(entry.path()), query_names[i],
@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
                     }
                 }
                 if (method == CCDMethod::RATIONAL_ROOT_PARITY) {
-                    std::cout
+                    std::cerr
                         << fmt::format(
                                "file={} query_name={} method={} {}",
                                basename(entry.path()), query_names[i],

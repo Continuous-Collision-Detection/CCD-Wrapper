@@ -15,18 +15,18 @@ COLLISON_TYPES=("vf" "ee")
 function run_benchmark(){
    for method in 5 7; do
        for d in "1e-2" "1e-8" "1e-16" "1e-30" "1e-100"; do
-           $CCD_WRAPPER_BENCHMARK $1 $2 $method $d
+           $CCD_WRAPPER_BENCHMARK $1 $2 $method $d > /dev/null
            echo
        done
    done
 }
 
-for DATA_DIR in $DATA_DIRS/mat*/ $DATA_DIRS/golf*/ ; do
+for DATA_DIR in $DATA_DIRS/*/; do
     echo $DATA_DIR
     dirs=("$DATA_DIR/vertex-face/" "$DATA_DIR/edge-edge/")
     for type in 0 1; do
-	run_benchmark ${dirs[$type]} ${COLLISON_TYPES[$type]} &
-	pids[${i}]=$!
+        run_benchmark ${dirs[$type]} ${COLLISON_TYPES[$type]} &
+        pids[${i}]=$!
     done
 done
 

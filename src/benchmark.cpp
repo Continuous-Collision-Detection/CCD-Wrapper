@@ -119,10 +119,17 @@ int main(int argc, char* argv[])
                     false_positives++;
                 } else {
                     false_negatives++;
+                    if (method == CCDMethod::EXACT_RATIONAL_MIN_SEPARATION
+                        || method == CCDMethod::EXACT_DOUBLE_MIN_SEPARATION) {
+                        std::cout << fmt::format(
+                                         "file={} query_name={} method={} "
+                                         "false_negative",
+                                         basename(entry.path()), query_names[i],
+                                         method_names[method])
+                                  << std::endl;
+                    }
                 }
-                if (method == CCDMethod::EXACT_RATIONAL_MIN_SEPARATION
-                    || method == CCDMethod::EXACT_DOUBLE_MIN_SEPARATION
-                    || method == CCDMethod::RATIONAL_ROOT_PARITY) {
+                if (method == CCDMethod::RATIONAL_ROOT_PARITY) {
                     std::cout
                         << fmt::format(
                                "file={} query_name={} method={} {}",

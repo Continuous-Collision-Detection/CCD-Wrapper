@@ -16,7 +16,7 @@ for DATA_DIR in $DATA_DIRS/erleben*/ ; do
     echo $DATA_DIR
     dirs=("$DATA_DIR/vertex-face/" "$DATA_DIR/edge-edge/")
     for type in 0 1; do
-        $SHIFT_QUERIES_BIN ${dirs[$type]} ${COLLISON_TYPES[$type]} $i
+        $SHIFT_QUERIES_BIN ${dirs[$type]} ${COLLISON_TYPES[$type]}
         echo
     done
 done

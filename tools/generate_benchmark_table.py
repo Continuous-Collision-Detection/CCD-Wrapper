@@ -22,7 +22,7 @@ datasets = {
         "erleben-sliding-spike", "erleben-sliding-wedge",
         "erleben-cube-internal-edges", "erleben-cube-cliff-edges"
     ],
-    "simulation": ["golf-ball", "twisting-mat", "cow-heads", "chain"]
+    "simulation": ["golf-ball", "mat-twist", "cow-heads", "chain"]
 }
 
 name_to_row = dict(
@@ -122,7 +122,7 @@ def print_latex_table(df):
 
     condensed_df["RRP"].loc["FP"] = condensed_df["RRP"].loc["FN"] = "-"
     print(condensed_df.to_latex(
-        float_format=(lambda x: f"{x:.2f}"), column_format=('l|' + 'c' * (condensed_df.shape[1] - 1) + '|c')))
+        float_format=(lambda x: f"{x:.2f}"), column_format=("l|cccccc|cc")))
 
 
 def main():

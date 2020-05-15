@@ -19,7 +19,7 @@ for DATA_DIR in $DATA_DIRS/erleben*/ ; do
     echo $DATA_DIR
     dirs=("$DATA_DIR/vertex-face/" "$DATA_DIR/edge-edge/")
     for type in 0 1; do
-        $GROUND_TRUTH_BIN ${dirs[$type]} ${COLLISON_TYPES[$type]} $i
+        screen -dmS "$(basename $DATA_DIR)-${COLLISON_TYPES[$type]}" $GROUND_TRUTH_BIN ${dirs[$type]} ${COLLISON_TYPES[$type]} $i
         echo
     done
 done

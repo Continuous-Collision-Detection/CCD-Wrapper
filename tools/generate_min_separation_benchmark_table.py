@@ -67,7 +67,7 @@ def print_latex_table(df):
 
 
 def main():
-    for dataset in ("handcrafted", ):  # , "simulation":
+    for dataset in "handcrafted", "simulation":
         for collision_type in "vertex-face", "edge-edge":
             benchmark_data = load_benchmark_data(
                 collision_type, datasets[dataset])

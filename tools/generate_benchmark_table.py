@@ -22,7 +22,7 @@ datasets = {
         "erleben-sliding-spike", "erleben-sliding-wedge",
         "erleben-cube-internal-edges", "erleben-cube-cliff-edges"
     ],
-    "simulation": ["golf-ball", "mat-twist", "cow-heads", "chain"]
+    "simulation": ["golf-ball", "mat-twist"]#, "cow-heads", "chain"]
 }
 
 name_to_row = dict(
@@ -126,7 +126,7 @@ def print_latex_table(df):
 
 
 def main():
-    for dataset in ("handcrafted", ):  # , "simulation":
+    for dataset in "handcrafted", "simulation":
         for collision_type in "vertex-face", "edge-edge":
             df = read_benchmark_data(collision_type, datasets[dataset])
             print("{} Dataset -- {} CCD/MSCCD".format(

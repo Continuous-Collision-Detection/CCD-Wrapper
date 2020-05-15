@@ -12,15 +12,25 @@ DATA_DIRS="$CCD_WRAPPER_ROOT/data"
 
 COLLISON_TYPES=("vf" "ee")
 
-for DATA_DIR in $DATA_DIRS/unit-tests/ $DATA_DIRS/erleben*/ ; do
+function run_benchmark(){
+   for method in 5 7; do
+       for d in "1e-2" "1e-8" "1e-16" "1e-30" "1e-100"; do
+           $CCD_WRAPPER_BENCHMARK $1 $2 $method $d
+           echo
+       done
+   done
+}
+
+for DATA_DIR in $DATA_DIRS/mat*/ $DATA_DIRS/golf*/ ; do
     echo $DATA_DIR
     dirs=("$DATA_DIR/vertex-face/" "$DATA_DIR/edge-edge/")
     for type in 0 1; do
-        for method in 5 7; do
-            for d in "1e-2" "1e-8" "1e-16" "1e-30" "1e-100"; do
-                $CCD_WRAPPER_BENCHMARK ${dirs[$type]} ${COLLISON_TYPES[$type]} $method $d
-                echo
-            done
-        done
+	run_benchmark ${dirs[$type]} ${COLLISON_TYPES[$type]} &
+	pids[${i}]=$!
     done
+done
+
+# wait for all pids
+for pid in ${pids[*]}; do
+    wait $pid
 done

@@ -23,9 +23,9 @@ endfunction()
 
 # Eigen
 function(ccd_wrapper_download_eigen)
-    ccd_wrapper_download_project(eigen
-        URL https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.zip
-    )
+  ccd_wrapper_download_project(eigen
+    URL https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.zip
+  )
 endfunction()
 
 # Etienne Vouga's CTCD Library
@@ -62,10 +62,10 @@ endfunction()
 
 # Exact Minimum Separation CCD
 function(ccd_wrapper_download_exact_msccd)
-     ccd_wrapper_download_project(exact_msccd
-        GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
-        GIT_TAG        7fab07894f99644c0086589dd072b410fe64439d
-    )
+   ccd_wrapper_download_project(exact_msccd
+    GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
+    GIT_TAG        7ed03c79c2c4e69b4e90743fa15046ed925d1c88
+  )
 endfunction()
 
 # Catch2 for testing
@@ -78,10 +78,10 @@ endfunction()
 
 # libigl for timing
 function(ccd_wrapper_download_libigl)
-     ccd_wrapper_download_project(libigl
-       GIT_REPOSITORY https://github.com/libigl/libigl.git
-       GIT_TAG        aea868bd1fc64f71afecd2c51e51507a99d8e3e5
-    )
+   ccd_wrapper_download_project(libigl
+   GIT_REPOSITORY https://github.com/libigl/libigl.git
+   GIT_TAG        aea868bd1fc64f71afecd2c51e51507a99d8e3e5
+  )
 endfunction()
 
 # HighFive - Header-only C++ HDF5 interface

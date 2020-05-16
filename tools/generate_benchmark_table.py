@@ -129,7 +129,7 @@ def main():
     for dataset in "handcrafted", "simulation":
         for collision_type in "vertex-face", "edge-edge":
             df = read_benchmark_data(collision_type, datasets[dataset])
-            print("{} Dataset -- {} CCD/MSCCD".format(
+            print("{} Dataset -- {} CCD/MSCCD ($d=10^{{-8}}$)".format(
                 dataset.title(), collision_type.title()))
             print_latex_table(df)
             print("\\\\[1.5em]")

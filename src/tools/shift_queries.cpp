@@ -3,7 +3,6 @@
 #include <string>
 
 #include <Eigen/Core>
-#include <boost/filesystem.hpp>
 #include <fmt/format.h>
 #include <highfive/H5Easy.hpp>
 
@@ -14,10 +13,10 @@
 using namespace ccd;
 
 int parse_args(
-    int argc, char* argv[], std::string& data_dir, bool& is_edge_edge)
+    int argc, char* argv[], std::string& filename, bool& is_edge_edge)
 {
     const std::string usage
-        = fmt::format("usage: {} /path/to/data/ {{vf|ee}}", argv[0]);
+        = fmt::format("usage: {} /path/to/data/file.hdf5 {{vf|ee}}", argv[0]);
     if (argc < 2) {
         std::cerr << usage << std::endl
                   << "error: missing path to data" << std::endl;
@@ -33,117 +32,107 @@ int parse_args(
         return 2;
     }
 
-    data_dir = std::string(argv[1]);
+    filename = std::string(argv[1]);
     is_edge_edge = strcmp(argv[2], "ee") == 0;
     return 0;
 }
 
 int main(int argc, char* argv[])
 {
-    std::string data_dir;
+    std::string filename;
     bool is_edge_edge;
-    int code = parse_args(argc, argv, data_dir, is_edge_edge);
+    int code = parse_args(argc, argv, filename, is_edge_edge);
     if (code) {
         return code;
     }
 
-    for (auto& entry : boost::filesystem::directory_iterator(data_dir)) {
-        if (boost::filesystem::extension(entry.path()) != ".hdf5"
-            && boost::filesystem::extension(entry.path()) != ".h5") {
-            continue;
+    H5Easy::File file(filename, HighFive::File::OpenOrCreate);
+
+    const auto query_names = file.getGroup("/").listObjectNames();
+
+    for (size_t i = 0; i < query_names.size(); i++) {
+        const auto& query_name = query_names[i];
+        Eigen::Matrix<double, 8, 3> V
+            = H5Easy::load<Eigen::Matrix<double, 8, 3>>(
+                file, fmt::format("{}/points", query_name));
+
+        double shift_err;
+        bool result;
+        if (is_edge_edge) {
+            doubleccd::ee_pair input_ee_pair(
+                V.row(0), V.row(1), V.row(2), V.row(3), V.row(4), V.row(5),
+                V.row(6), V.row(7));
+
+            doubleccd::ee_pair shifted_ee_pair;
+            shift_err
+                = doubleccd::shift_edge_edge(input_ee_pair, shifted_ee_pair);
+
+            V.row(0) = shifted_ee_pair.a0;
+            V.row(1) = shifted_ee_pair.a1;
+            V.row(2) = shifted_ee_pair.b0;
+            V.row(3) = shifted_ee_pair.b1;
+            V.row(4) = shifted_ee_pair.a0b;
+            V.row(5) = shifted_ee_pair.a1b;
+            V.row(6) = shifted_ee_pair.b0b;
+            V.row(7) = shifted_ee_pair.b1b;
+
+            result = edgeEdgeCCD(
+                V.row(0), V.row(1), V.row(2), V.row(3), V.row(4), V.row(5),
+                V.row(6), V.row(7), CCDMethod::RATIONAL_ROOT_PARITY);
+        } else {
+            doubleccd::vf_pair input_vf_pair(
+                V.row(0), V.row(1), V.row(2), V.row(3), V.row(4), V.row(5),
+                V.row(6), V.row(7));
+
+            doubleccd::vf_pair shifted_vf_pair;
+            shift_err
+                = doubleccd::shift_vertex_face(input_vf_pair, shifted_vf_pair);
+
+            V.row(0) = shifted_vf_pair.x0;
+            V.row(1) = shifted_vf_pair.x1;
+            V.row(2) = shifted_vf_pair.x2;
+            V.row(3) = shifted_vf_pair.x3;
+            V.row(4) = shifted_vf_pair.x0b;
+            V.row(5) = shifted_vf_pair.x1b;
+            V.row(6) = shifted_vf_pair.x2b;
+            V.row(7) = shifted_vf_pair.x3b;
+
+            result = vertexFaceCCD(
+                V.row(0), V.row(1), V.row(2), V.row(3), V.row(4), V.row(5),
+                V.row(6), V.row(7), CCDMethod::RATIONAL_ROOT_PARITY);
         }
-        std::cout << entry.path().string() << std::endl;
-        H5Easy::File file(entry.path().string(), HighFive::File::OpenOrCreate);
 
-        const auto query_names = file.getGroup("/").listObjectNames();
-
-        for (size_t i = 0; i < query_names.size(); i++) {
-            const auto& query_name = query_names[i];
-            Eigen::Matrix<double, 8, 3> V
-                = H5Easy::load<Eigen::Matrix<double, 8, 3>>(
-                    file, fmt::format("{}/points", query_name));
-
-            double shift_err;
-            bool result;
-            if (is_edge_edge) {
-                doubleccd::ee_pair input_ee_pair(
-                    V.row(0), V.row(1), V.row(2), V.row(3), V.row(4), V.row(5),
-                    V.row(6), V.row(7));
-
-                doubleccd::ee_pair shifted_ee_pair;
-                shift_err = doubleccd::shift_edge_edge(
-                    input_ee_pair, shifted_ee_pair);
-
-                V.row(0) = shifted_ee_pair.a0;
-                V.row(1) = shifted_ee_pair.a1;
-                V.row(2) = shifted_ee_pair.b0;
-                V.row(3) = shifted_ee_pair.b1;
-                V.row(4) = shifted_ee_pair.a0b;
-                V.row(5) = shifted_ee_pair.a1b;
-                V.row(6) = shifted_ee_pair.b0b;
-                V.row(7) = shifted_ee_pair.b1b;
-
-                result = edgeEdgeCCD(
-                    V.row(0), V.row(1), V.row(2), V.row(3), V.row(4), V.row(5),
-                    V.row(6), V.row(7), CCDMethod::RATIONAL_ROOT_PARITY);
-            } else {
-                doubleccd::vf_pair input_vf_pair(
-                    V.row(0), V.row(1), V.row(2), V.row(3), V.row(4), V.row(5),
-                    V.row(6), V.row(7));
-
-                doubleccd::vf_pair shifted_vf_pair;
-                shift_err = doubleccd::shift_vertex_face(
-                    input_vf_pair, shifted_vf_pair);
-
-                V.row(0) = shifted_vf_pair.x0;
-                V.row(1) = shifted_vf_pair.x1;
-                V.row(2) = shifted_vf_pair.x2;
-                V.row(3) = shifted_vf_pair.x3;
-                V.row(4) = shifted_vf_pair.x0b;
-                V.row(5) = shifted_vf_pair.x1b;
-                V.row(6) = shifted_vf_pair.x2b;
-                V.row(7) = shifted_vf_pair.x3b;
-
-                result = vertexFaceCCD(
-                    V.row(0), V.row(1), V.row(2), V.row(3), V.row(4), V.row(5),
-                    V.row(6), V.row(7), CCDMethod::RATIONAL_ROOT_PARITY);
-            }
-
-            HighFive::Group query = file.getGroup(query_name), shifted_query;
-            if (query.exist("shifted")) {
-                shifted_query = query.getGroup("shifted");
-            } else {
-                shifted_query = query.createGroup("shifted");
-            }
-
-            if (shifted_query.exist("error")) {
-                shifted_query.getDataSet("error").write(shift_err);
-            } else {
-                shifted_query.createDataSet("error", shift_err);
-            }
-
-            if (shifted_query.exist("result")) {
-                shifted_query.getDataSet("result").write((unsigned char)result);
-            } else {
-                shifted_query.createDataSet("result", (unsigned char)result);
-            }
-
-            Eigen::Ref<
-                const Eigen::Array<double, 8, 3, Eigen::RowMajor>, 0,
-                Eigen::InnerStride<1>>
-                row_major(V);
-            if (shifted_query.exist("points")) {
-                shifted_query.getDataSet("points").write_raw(row_major.data());
-            } else {
-                shifted_query
-                    .createDataSet<double>(
-                        "points",
-                        H5Easy::DataSpace(H5Easy::detail::eigen::shape(V)))
-                    .write_raw(row_major.data());
-            }
-
-            std::cout << i << "\r" << std::flush;
+        HighFive::Group query = file.getGroup(query_name), shifted_query;
+        if (query.exist("shifted")) {
+            shifted_query = query.getGroup("shifted");
+        } else {
+            shifted_query = query.createGroup("shifted");
         }
-        std::cout << std::endl;
+
+        if (shifted_query.exist("error")) {
+            shifted_query.getDataSet("error").write(shift_err);
+        } else {
+            shifted_query.createDataSet("error", shift_err);
+        }
+
+        if (shifted_query.exist("result")) {
+            shifted_query.getDataSet("result").write((unsigned char)result);
+        } else {
+            shifted_query.createDataSet("result", (unsigned char)result);
+        }
+
+        Eigen::Ref<
+            const Eigen::Array<double, 8, 3, Eigen::RowMajor>, 0,
+            Eigen::InnerStride<1>>
+            row_major(V);
+        if (shifted_query.exist("points")) {
+            shifted_query.getDataSet("points").write_raw(row_major.data());
+        } else {
+            shifted_query
+                .createDataSet<double>(
+                    "points",
+                    H5Easy::DataSpace(H5Easy::detail::eigen::shape(V)))
+                .write_raw(row_major.data());
+        }
     }
 }

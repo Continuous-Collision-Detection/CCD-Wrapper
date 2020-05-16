@@ -135,7 +135,7 @@ int main(int argc, char* argv[])
                                "file={} query_name={} method={} {}",
                                basename(entry.path()), query_names[i],
                                method_names[method],
-                               result ? "false_positives" : "false_negatives")
+                               result ? "false_positive" : "false_negative")
                         << std::endl;
                 }
             }

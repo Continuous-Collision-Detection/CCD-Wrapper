@@ -34,17 +34,20 @@ def read_shifting_error_data(collision_type, dataset):
 def main():
     for dataset in "handcrafted", "simulation":
         for collision_type in "vertex-face", "edge-edge":
-            # with numpy.load(f"rounding-error-{dataset}-{collision_type}.npz") as npf:
-            #     all_errors = npf.f.arr_0
+            try:
+                with numpy.load(data_dir / f"rounding-error-{dataset}-{collision_type}.npz") as npf:
+                    all_errors = npf.f.arr_0
+            except:
+                scene_to_rounding_data = read_shifting_error_data(
+                    collision_type, datasets[dataset])
+                breakpoint()
+                all_errors = numpy.concatenate(
+                    [abs(errors) for name, errors in scene_to_rounding_data.items()])
+                numpy.savez(
+                    f"rounding-error-{dataset}-{collision_type}.npz", all_errors)
+                continue
 
-            scene_to_rounding_data = read_shifting_error_data(
-                collision_type, datasets[dataset])
-            breakpoint()
-            all_errors = numpy.concatenate(
-                [abs(errors) for name, errors in scene_to_rounding_data.items()])
-            numpy.savez(
-                f"rounding-error-{dataset}-{collision_type}.npz", all_errors)
-            continue
+            print(all_errors.min(), all_errors.max())
 
             fig = go.Figure(data=[go.Histogram(
                 x=all_errors, histnorm="percent", nbinsx=50,

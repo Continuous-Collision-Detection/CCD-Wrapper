@@ -64,7 +64,7 @@ endfunction()
 function(ccd_wrapper_download_exact_msccd)
    ccd_wrapper_download_project(exact_msccd
     GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
-    GIT_TAG        7ed03c79c2c4e69b4e90743fa15046ed925d1c88
+    GIT_TAG        1d2ffc33172a28f7274adaaf840f7bdd64e0b955
   )
 endfunction()
 

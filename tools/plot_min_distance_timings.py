@@ -29,7 +29,7 @@ def main():
                 "ticks": "outside",
                 "gridcolor": "rgba(0,0,0,0.4)",
                 "linecolor": "black",
-                "range": [0, max(timings)]
+                "range": [0, 16]
             },
             xaxis={
                 "showexponent": "all",

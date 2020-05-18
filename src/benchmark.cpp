@@ -9,6 +9,9 @@
 #include <igl/Timer.h>
 #include <nlohmann/json.hpp>
 
+#include <doubleCCD/double_Utils.hpp>
+#include <doubleCCD/double_subfunctions.h>
+
 #include <ccd.hpp>
 #include <utils/get_rss.hpp>
 
@@ -159,6 +162,12 @@ int main(int argc, char* argv[])
         { "num_false_positives", false_positives },
         { "num_false_negatives", false_negatives },
     };
+    if (method == CCDMethod::EXACT_DOUBLE_MIN_SEPARATION) {
+        benchmark[method_names[method]]["root_finder_percent"]
+            = doubleccd::root_finder_time() / timing;
+        benchmark[method_names[method]]["phi_percent"]
+            = doubleccd::print_phi_time() / timing;
+    }
 
     std::ofstream(benchmark_file) << benchmark.dump(4);
 }

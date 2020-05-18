@@ -1,3 +1,4 @@
+#!/bin/bash
 # Run the benchmark for a directory
 
 CCD_WRAPPER_ROOT=$(dirname "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )")

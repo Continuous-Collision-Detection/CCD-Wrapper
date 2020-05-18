@@ -21,7 +21,7 @@ function run_benchmark(){
    done
 }
 
-for DATA_DIR in $DATA_DIRS/erleben*/ $DATA_DIR/unit*/; do
+for DATA_DIR in $DATA_DIRS/*/; do
     echo $DATA_DIR
     dirs=("$DATA_DIR/vertex-face/" "$DATA_DIR/edge-edge/")
     for type in 0 1; do

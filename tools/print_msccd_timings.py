@@ -18,28 +18,36 @@ def read_benchmark_data(collision_type, dataset):
 
     timings = {}
     for name, benchmark in benchmarks.items():
-        double_msccd = benchmark[method_names[7]]
-        timings[name] = dict(
-            num_queries=benchmark["num_queries"],
-            root_finder_percent=double_msccd["root_finder_percent"],
-            phi_percent=double_msccd["phi_percent"]
-        )
+        timings[name] = {"num_queries": benchmark["num_queries"]}
+        for d, data in benchmark["d"].items():
+            double_msccd = benchmark[method_names[7]] = {float(d): {
+                "root_finder_percent": double_msccd["root_finder_percent"],
+                "phi_percent": double_msccd["phi_percent"]
+            }}
     return timings
 
 
 def print_average_timing(timings):
     num_queries = 0
-    total_root_finder_percent = 0
-    total_phi_percent = 0
+    d_to_timing = {}
     for timing in timings.values():
         num_queries += timing["num_queries"]
-        total_root_finder_percent += (timing["num_queries"]
-                                      * timing["root_finder_percent"])
-        total_phi_percent += timing["num_queries"] * timing["phi_percent"]
-    print("Avg. root finder time percentage: {:g}%".format(
-        total_root_finder_percent / num_queries))
-    print("Avg. ϕ time percentage: {:g}%".format(
-        total_phi_percent / num_queries))
+        for d, data in timing.items():
+            if(d not in d_to_timing.keys()):
+                d_to_timing[d] = {
+                    "total_root_finder_percent": 0,
+                    "total_phi_percent": 0
+                }
+            d_to_timing[d]["total_root_finder_percent"] += (
+                timing["num_queries"] * data["root_finder_percent"])
+            d_to_timing[d]["total_phi_percent"] += (
+                timing["num_queries"] * data["phi_percent"])
+    for d, timing in d_to_timing.items():
+        print(f"d={d:g}:")
+        print("\tAvg. root finder time percentage: {:g}%".format(
+            total_root_finder_percent / num_queries * 100))
+        print("\tAvg. ϕ time percentage: {:g}%".format(
+            total_phi_percent / num_queries * 100))
 
 
 def main():

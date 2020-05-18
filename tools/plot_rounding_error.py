@@ -48,6 +48,10 @@ def main():
                 continue
 
             print(all_errors.min(), all_errors.max())
+            if all_errors.shape[0] > 1e7:
+                all_errors = numpy.random.choice(
+                    all_errors, (all_errors.shape[0] // 10,), False)
+                print(all_errors.min(), all_errors.max())
 
             fig = go.Figure(data=[go.Histogram(
                 x=all_errors, histnorm="percent", nbinsx=50,
@@ -81,6 +85,7 @@ def main():
                 height=355
             )
             fig.write_image(f"{dataset}-{collision_type}-rounding-error.pdf")
+            # fig.show()
 
 
 if __name__ == "__main__":

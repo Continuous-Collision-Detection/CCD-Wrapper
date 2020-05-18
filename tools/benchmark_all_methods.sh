@@ -14,7 +14,7 @@ COLLISON_TYPES=("vf" "ee")
 
 function run_all_methods
 {
-    for i in $(seq 7 7); do
+    for i in $(seq 0 7); do
         $CCD_WRAPPER_BENCHMARK $1 $2 $i > /dev/null
     done
 }

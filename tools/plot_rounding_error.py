@@ -40,11 +40,10 @@ def main():
             except:
                 scene_to_rounding_data = read_shifting_error_data(
                     collision_type, datasets[dataset])
-                breakpoint()
                 all_errors = numpy.concatenate(
                     [abs(errors) for name, errors in scene_to_rounding_data.items()])
                 numpy.savez(
-                    f"rounding-error-{dataset}-{collision_type}.npz", all_errors)
+                    data_dir / f"rounding-error-{dataset}-{collision_type}.npz", all_errors)
                 continue
 
             print(all_errors.min(), all_errors.max())
@@ -52,7 +51,6 @@ def main():
                 all_errors = numpy.random.choice(
                     all_errors, (all_errors.shape[0] // 10,), False)
                 print(all_errors.min(), all_errors.max())
-
             fig = go.Figure(data=[go.Histogram(
                 x=all_errors, histnorm="percent", nbinsx=50,
                 marker_color='#8E3B65')])

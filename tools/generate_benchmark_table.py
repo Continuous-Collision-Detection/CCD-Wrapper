@@ -22,7 +22,7 @@ datasets = {
         "erleben-sliding-spike", "erleben-sliding-wedge",
         "erleben-cube-internal-edges", "erleben-cube-cliff-edges"
     ],
-    "simulation": ["golf-ball", "mat-twist"]#, "cow-heads", "chain"]
+    "simulation": ["mat-twist", "golf-ball", "cow-heads", "chain"]
 }
 
 name_to_row = dict(
@@ -70,6 +70,8 @@ def write_to_google_sheet(df, sheet_name):
     sheet = open_google_sheet()
     last_col = colnum_string(df.shape[1] + 1)
     for name, row in name_to_row.items():
+        if name not in df.index:
+            continue
         sheet.values().update(
             spreadsheetId=SPREADSHEET_ID,
             range=f"{sheet_name}!B{row:d}:{last_col}{row:d}",

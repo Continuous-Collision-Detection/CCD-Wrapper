@@ -51,12 +51,6 @@ def main():
                 all_errors = numpy.random.choice(
                     all_errors, (all_errors.shape[0] // 10,), False)
                 print(all_errors.min(), all_errors.max())
-<<<<<<< HEAD
-            fig = go.Figure(data=[go.Histogram(
-                x=all_errors, histnorm="percent", nbinsx=50,
-                marker_color='#8E3B65')])
-=======
-
             fig = go.Figure(data=go.Histogram(
                 x=all_errors, histnorm="percent",  # nbinsx=50,
                 xbins=dict(
@@ -64,7 +58,6 @@ def main():
                     end=1.7763568394002505e-15,
                     size=1.7763568394002505e-15 / 50), autobinx=False,
                 marker_color='#8E3B65'))
->>>>>>> Added root_finder and phi timing
             fig.update_layout(
                 # title="Error Induced by Rounding Vertices",
                 # xaxis_title="Error",

@@ -149,20 +149,22 @@ int main(int argc, char* argv[])
     nlohmann::json benchmark;
     benchmark["collision_type"] = is_edge_edge ? "ee" : "vf";
     benchmark["num_queries"] = num_queries;
-    benchmark[method_names[method]] = {
+    std::string method_name = method_names[method];
+    benchmark[method_name] = {
         { "avg_query_time", timing / num_queries },
         { "num_false_positives", false_positives },
         { "num_false_negatives", false_negatives },
     };
-    if (method == CCDMethod::EXACT_DOUBLE_MIN_SEPARATION) {
-        benchmark[method_names[method]]["d"]
-            = { { fmt::format("{:g}", DEFAULT_MIN_DISTANCE),
-                  {
-                      { "root_finder_percent",
-                        doubleccd::root_finder_time() / timing },
-                      { "phi_percent", doubleccd::print_phi_time() / timing },
-                  } } };
-    }
+    // if (method == CCDMethod::EXACT_DOUBLE_MIN_SEPARATION) {
+    //     benchmark[method_names[method]]["d"]
+    //         = { { fmt::format("{:g}", DEFAULT_MIN_DISTANCE),
+    //               {
+    //                   { "root_finder_percent",
+    //                     doubleccd::root_finder_time() / timing },
+    //                   { "phi_percent", doubleccd::print_phi_time() / timing
+    //                   },
+    //               } } };
+    // }
 
     std::string fname
         = (boost::filesystem::path(data_dir) / "benchmark.json").string();

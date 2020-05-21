@@ -73,7 +73,11 @@ def main():
             benchmark_data = load_benchmark_data(
                 collision_type, datasets[dataset])
             dfs.append(create_benchmark_data_frame(benchmark_data))
+<<<<<<< Updated upstream
     pd.concat(dfs, axis=1, sort=False)
+=======
+    df = pandas.concat(dfs, axis=1, sort=False)
+>>>>>>> Stashed changes
     print_latex_table(df)
 
 

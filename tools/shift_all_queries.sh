@@ -13,7 +13,7 @@ DATA_DIRS="$CCD_WRAPPER_ROOT/data"
 
 COLLISON_TYPES=("vf" "ee")
 
-for DATA_DIR in $DATA_DIRS/chain/ ; do
+for DATA_DIR in $DATA_DIRS/*/; do
     if [ $(basename $DATA_DIR) == "unit-tests" ]; then
         continue
     fi

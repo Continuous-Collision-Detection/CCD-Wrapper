@@ -1,16 +1,14 @@
 // Time the different CCD methods
 
+#include <filesystem>
+#include <fstream>
 #include <string>
 
 #include <Eigen/Core>
-#include <boost/filesystem.hpp>
 #include <fmt/format.h>
 #include <highfive/H5Easy.hpp>
 #include <igl/Timer.h>
 #include <nlohmann/json.hpp>
-
-#include <doubleCCD/double_Utils.hpp>
-#include <doubleCCD/double_subfunctions.h>
 
 #include <ccd.hpp>
 #include <utils/get_rss.hpp>
@@ -83,9 +81,9 @@ int main(int argc, char* argv[])
     int false_positives = 0;
     int false_negatives = 0;
 
-    for (auto& entry : boost::filesystem::directory_iterator(data_dir)) {
-        if (boost::filesystem::extension(entry.path()) != ".hdf5"
-            && boost::filesystem::extension(entry.path()) != ".h5") {
+    for (auto& entry : std::filesystem::directory_iterator(data_dir)) {
+        if (entry.path().extension() != ".hdf5"
+            && entry.path().extension() != ".h5") {
             continue;
         }
         H5Easy::File file(entry.path().string());
@@ -127,8 +125,8 @@ int main(int argc, char* argv[])
                         std::cerr << fmt::format(
                                          "file={} query_name={} method={} "
                                          "false_negative",
-                                         basename(entry.path()), query_names[i],
-                                         method_names[method])
+                                         entry.path().filename().string(),
+                                         query_names[i], method_names[method])
                                   << std::endl;
                     }
                 }
@@ -136,7 +134,7 @@ int main(int argc, char* argv[])
                     std::cerr
                         << fmt::format(
                                "file={} query_name={} method={} {}",
-                               basename(entry.path()), query_names[i],
+                               entry.path().filename().string(), query_names[i],
                                method_names[method],
                                result ? "false_positive" : "false_negative")
                         << std::endl;
@@ -155,19 +153,9 @@ int main(int argc, char* argv[])
         { "num_false_positives", false_positives },
         { "num_false_negatives", false_negatives },
     };
-    // if (method == CCDMethod::EXACT_DOUBLE_MIN_SEPARATION) {
-    //     benchmark[method_names[method]]["d"]
-    //         = { { fmt::format("{:g}", DEFAULT_MIN_DISTANCE),
-    //               {
-    //                   { "root_finder_percent",
-    //                     doubleccd::root_finder_time() / timing },
-    //                   { "phi_percent", doubleccd::print_phi_time() / timing
-    //                   },
-    //               } } };
-    // }
 
     std::string fname
-        = (boost::filesystem::path(data_dir) / "benchmark.json").string();
+        = (std::filesystem::path(data_dir) / "benchmark.json").string();
     {
         std::ifstream file(fname);
         if (file.good()) {

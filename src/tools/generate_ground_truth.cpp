@@ -1,9 +1,9 @@
 // Time the different CCD methods
 
+#include <filesystem>
 #include <string>
 
 #include <Eigen/Core>
-#include <boost/filesystem.hpp>
 #include <fmt/format.h>
 #include <highfive/H5Easy.hpp>
 
@@ -45,9 +45,9 @@ int main(int argc, char* argv[])
         return code;
     }
 
-    for (auto& entry : boost::filesystem::directory_iterator(data_dir)) {
-        if (boost::filesystem::extension(entry.path()) != ".hdf5"
-            && boost::filesystem::extension(entry.path()) != ".h5") {
+    for (auto& entry : std::filesystem::directory_iterator(data_dir)) {
+        if (entry.path().extension() != ".hdf5"
+            && entry.path().extension() != ".h5") {
             continue;
         }
         std::cout << entry.path().string() << std::endl;

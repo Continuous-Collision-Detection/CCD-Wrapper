@@ -1,9 +1,10 @@
 // Time the different CCD methods
 
+#include <filesystem>
+#include <fstream>
 #include <string>
 
 #include <Eigen/Core>
-#include <boost/filesystem.hpp>
 #include <fmt/format.h>
 #include <highfive/H5Easy.hpp>
 #include <igl/Timer.h>
@@ -60,9 +61,9 @@ int main(int argc, char* argv[])
     Eigen::ArrayXd timings = Eigen::VectorXd::Zero(min_distances.size());
 
     size_t num_queries = 0;
-    for (auto& entry : boost::filesystem::directory_iterator(data_dir)) {
-        if (boost::filesystem::extension(entry.path()) != ".hdf5"
-            && boost::filesystem::extension(entry.path()) != ".h5") {
+    for (auto& entry : std::filesystem::directory_iterator(data_dir)) {
+        if (entry.path().extension() != ".hdf5"
+            && entry.path().extension() != ".h5") {
             continue;
         }
         std::cout << entry.path().string() << std::endl;
@@ -100,8 +101,8 @@ int main(int argc, char* argv[])
                 if (result == false && expected_results == true) {
                     std::cout << fmt::format(
                                      "file={} query_name={} d={:g} {}",
-                                     basename(entry.path()), query_names[i], d,
-                                     "false_negatives")
+                                     entry.path().filename().string(),
+                                     query_names[i], d, "false_negatives")
                               << std::endl;
                 }
             }
@@ -120,7 +121,7 @@ int main(int argc, char* argv[])
         = std::vector<double>(timings.data(), timings.data() + timings.size());
 
     std::string benchmark_file
-        = (boost::filesystem::path(data_dir) / "min_distance_timings.json")
+        = (std::filesystem::path(data_dir) / "min_distance_timings.json")
               .string();
     std::ofstream(benchmark_file) << timings_json.dump(4);
 }

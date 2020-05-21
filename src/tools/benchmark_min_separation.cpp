@@ -1,9 +1,10 @@
 // Time the different CCD methods
 
+#include <filesystem>
+#include <fstream>
 #include <string>
 
 #include <Eigen/Core>
-#include <boost/filesystem.hpp>
 #include <fmt/format.h>
 #include <highfive/H5Easy.hpp>
 #include <igl/Timer.h>
@@ -89,9 +90,9 @@ int main(int argc, char* argv[])
     int false_positives = 0;
     int false_negatives = 0;
 
-    for (auto& entry : boost::filesystem::directory_iterator(data_dir)) {
-        if (boost::filesystem::extension(entry.path()) != ".hdf5"
-            && boost::filesystem::extension(entry.path()) != ".h5") {
+    for (auto& entry : std::filesystem::directory_iterator(data_dir)) {
+        if (entry.path().extension() != ".hdf5"
+            && entry.path().extension() != ".h5") {
             continue;
         }
         H5Easy::File file(entry.path().string());
@@ -133,8 +134,8 @@ int main(int argc, char* argv[])
                         || method == CCDMethod::RATIONAL_ROOT_PARITY) {
                         std::cout << fmt::format(
                                          "file={} query_name={} method={} {}",
-                                         basename(entry.path()), query_names[i],
-                                         method_names[method],
+                                         entry.path().filename().string(),
+                                         query_names[i], method_names[method],
                                          result ? "false_positives"
                                                 : "false_negatives")
                                   << std::endl;
@@ -158,7 +159,7 @@ int main(int argc, char* argv[])
               } } };
 
     std::string fname
-        = (boost::filesystem::path(data_dir) / "min-separation-benchmark.json")
+        = (std::filesystem::path(data_dir) / "min-separation-benchmark.json")
               .string();
     {
         std::ifstream file(fname);

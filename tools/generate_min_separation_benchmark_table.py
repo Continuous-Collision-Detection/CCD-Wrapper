@@ -67,15 +67,14 @@ def print_latex_table(df):
 
 
 def main():
+    dfs = []
     for dataset in "handcrafted", "simulation":
         for collision_type in "vertex-face", "edge-edge":
             benchmark_data = load_benchmark_data(
                 collision_type, datasets[dataset])
-            df = create_benchmark_data_frame(benchmark_data)
-            print("{} Dataset -- {} CCD/MSCCD".format(
-                dataset.title(), collision_type.title()))
-            print_latex_table(df)
-            print("\\\\[1.5em]")
+            dfs.append(create_benchmark_data_frame(benchmark_data))
+    pd.concat(dfs, axis=1, sort=False)
+    print_latex_table(df)
 
 
 if __name__ == "__main__":

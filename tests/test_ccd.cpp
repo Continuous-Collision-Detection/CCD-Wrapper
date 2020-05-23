@@ -187,3 +187,33 @@ TEST_CASE("Bolun test case", "[ccd][point-triangle]")
         CHECK(hit == expected_hit);
     }
 }
+
+TEST_CASE("BSC False Negative", "[ccd][point-triangle][bsc][!shouldfail]")
+{
+    // Eigen::Vector3d v0_t0(1.0, 0.5, 1.0);
+    // Eigen::Vector3d v1_t0(2.220446049250313E-16, 0.5718259037844386, 1.0);
+    // Eigen::Vector3d v2_t0(1.0, 0.5718259037844384, 1.0);
+    // Eigen::Vector3d v3_t0(1.0, 1.5718259037844384, 1.0);
+    // Eigen::Vector3d v0_t1(1.0, 0.5, 1.0);
+    // Eigen::Vector3d v1_t1(2.220446049250313E-16, 0.2776264037844385, 1.0);
+    // Eigen::Vector3d v2_t1(1.0, 0.2776264037844385, 1.0);
+    // Eigen::Vector3d v3_t1(1.0, 1.2776264037844385, 1.0);
+    Eigen::Vector3d v0_t0(1.0, 0.5, 1.0);
+    Eigen::Vector3d v1_t0(0, 0.57, 1.0);
+    Eigen::Vector3d v2_t0(1.0, 0.57, 1.0);
+    Eigen::Vector3d v3_t0(1.0, 1.57, 1.0);
+    Eigen::Vector3d v0_t1(1.0, 0.5, 1.0);
+    Eigen::Vector3d v1_t1(0, 0.28, 1.0);
+    Eigen::Vector3d v2_t1(1.0, 0.28, 1.0);
+    Eigen::Vector3d v3_t1(1.0, 1.28, 1.0);
+
+    bool expected_hit = vertexFaceCCD(
+        v0_t0, v1_t0, v2_t0, v3_t0, v0_t1, v1_t1, v2_t1, v3_t1,
+        ccd::CCDMethod::RATIONAL_ROOT_PARITY);
+
+    bool hit = vertexFaceCCD(
+        v0_t0, v1_t0, v2_t0, v3_t0, v0_t1, v1_t1, v2_t1, v3_t1,
+        ccd::CCDMethod::BSC);
+
+    CHECK(hit == expected_hit);
+}

@@ -21,10 +21,8 @@ def read_shifting_error_data(collision_type, dataset):
             if dir.name not in scene_to_rounding_data:
                 scene_to_rounding_data[dir.name] = []
             with h5py.File(fname, 'r') as f:
-                errors = numpy.empty(len(f.keys()))
-                for i, key in enumerate(f.keys()):
-                    errors[i] = f[f"{key}/shifted/error"][()]
-                scene_to_rounding_data[dir.name].append(errors)
+                scene_to_rounding_data[dir.name].append(
+                    f["/rounded/error"][()])
     for key in scene_to_rounding_data.keys():
         scene_to_rounding_data[key] = numpy.concatenate(
             scene_to_rounding_data[key])

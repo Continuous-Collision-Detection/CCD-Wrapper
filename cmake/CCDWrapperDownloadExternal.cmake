@@ -64,7 +64,7 @@ endfunction()
 function(ccd_wrapper_download_exact_msccd)
    ccd_wrapper_download_project(exact_msccd
     GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
-    GIT_TAG        d826e05b35bca84f43bbcf8c24e7bcb1d8bb86b0
+    GIT_TAG        57513b187e9d853b1d7178280751b097aa6f544a
   )
 endfunction()
 
@@ -105,5 +105,13 @@ function(ccd_wrapper_download_json)
   ccd_wrapper_download_project(json
     GIT_REPOSITORY https://github.com/nlohmann/json.git
     GIT_TAG        v3.7.3
+  )
+endfunction()
+
+# Command line parser
+function(ccd_wrapper_download_cli11)
+  ccd_wrapper_download_project(CLI11
+    GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
+    GIT_TAG        v1.9.0
   )
 endfunction()

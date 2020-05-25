@@ -114,6 +114,7 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC HighFive::HighFive)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC fmt::fmt)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC nlohmann_json::nlohmann_json)
+  target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC CLI11::CLI11)
 
 
   add_executable(generate_ground_truth
@@ -130,24 +131,4 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   target_link_libraries(shift_queries PUBLIC ${PROJECT_NAME})
   target_link_libraries(shift_queries PUBLIC HighFive::HighFive)
   target_link_libraries(shift_queries PUBLIC fmt::fmt)
-
-  add_executable(time_min_distances
-    src/tools/time_min_distances.cpp
-  )
-
-  target_link_libraries(time_min_distances PUBLIC ${PROJECT_NAME})
-  target_link_libraries(time_min_distances PUBLIC HighFive::HighFive)
-  target_link_libraries(time_min_distances PUBLIC fmt::fmt)
-  target_link_libraries(time_min_distances PUBLIC igl::core)
-  target_link_libraries(time_min_distances PUBLIC nlohmann_json::nlohmann_json)
-
-  add_executable(benchmark_min_separation
-    src/tools/benchmark_min_separation.cpp
-  )
-
-  target_link_libraries(benchmark_min_separation PUBLIC ${PROJECT_NAME})
-  target_link_libraries(benchmark_min_separation PUBLIC HighFive::HighFive)
-  target_link_libraries(benchmark_min_separation PUBLIC fmt::fmt)
-  target_link_libraries(benchmark_min_separation PUBLIC igl::core)
-  target_link_libraries(benchmark_min_separation PUBLIC nlohmann_json::nlohmann_json)
 endif()

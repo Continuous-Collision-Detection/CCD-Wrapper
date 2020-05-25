@@ -96,13 +96,21 @@ def read_benchmark_data(collision_type, dataset):
     data_labels = [
         "t", "FP", "FN"]
     df = pandas.DataFrame(index=benchmarks.keys(), columns=(
-        ["# of Queries"] + data_labels * len(method_names)))
+        ["# of Queries"] + data_labels * (len(method_names) + 1)))
     for name, benchmark in benchmarks.items():
         row = [benchmark["num_queries"]]
         for method_name in method_names:
-            row.append(benchmark[method_name]["avg_query_time"])
-            row.append(benchmark[method_name]["num_false_positives"])
-            row.append(benchmark[method_name]["num_false_negatives"])
+            if "1e-08" in benchmark[method_name]:
+                data = benchmark[method_name]["1e-08"]
+            else:
+                data = benchmark[method_name]
+            row.append(data["avg_query_time"])
+            row.append(data["num_false_positives"])
+            row.append(data["num_false_negatives"])
+            if method_name == "ExactDoubleMinSeparation":
+                row.append(benchmark[method_name]["0"]["avg_query_time"])
+                row.append(benchmark[method_name]["0"]["num_false_positives"])
+                row.append(benchmark[method_name]["0"]["num_false_negatives"])
         df.loc[name] = row
     return df
 
@@ -110,7 +118,7 @@ def read_benchmark_data(collision_type, dataset):
 def print_latex_table(df):
     row_labels = ["t", "FP", "FN"]
     condensed_df = pandas.DataFrame(
-        index=row_labels, columns=method_abbreviations)
+        index=row_labels, columns=method_abbreviations + ["Our dagger"])
     num_queries = df["# of Queries"].to_numpy()
     for row_label in row_labels:
         if row_label == "t":
@@ -124,7 +132,7 @@ def print_latex_table(df):
 
     condensed_df["RRP"].loc["FP"] = condensed_df["RRP"].loc["FN"] = "-"
     print(condensed_df.to_latex(
-        float_format=(lambda x: f"{x:.2f}"), column_format=("l|cccccc|cc")))
+        float_format=(lambda x: f"{x:.2f}"), column_format=("l|cccccc|ccc")))
 
 
 def main():

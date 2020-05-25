@@ -17,11 +17,10 @@ for DATA_DIR in $DATA_DIRS/*/ ; do
     if [ $(basename $DATA_DIR) == "unit-tests" ]; then
         continue
     fi
-    echo $DATA_DIR
     dirs=("$DATA_DIR/vertex-face/" "$DATA_DIR/edge-edge/")
     for type in 0 1; do
-        screen -dmS "$(basename $DATA_DIR)-${COLLISON_TYPES[$type]}" \
-            $GROUND_TRUTH_BIN ${dirs[$type]} ${COLLISON_TYPES[$type]} $i
-        echo
+        for file in ${dirs[$type]}/*.hdf5; do
+            screen -dmS "$(basename $DATA_DIR)-${COLLISON_TYPES[$type]}" $GROUND_TRUTH_BIN ${file} ${COLLISON_TYPES[$type]}
+        done
     done
 done

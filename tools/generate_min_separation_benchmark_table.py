@@ -4,10 +4,12 @@ import pathlib
 import pandas
 
 from generate_benchmark_table import (
-    method_names, method_abbreviations, datasets, root_dir, data_dir)
+    method_names, method_abbreviations, datasets, data_dir)
 
 method_names = [method_names[5], method_names[7]]
 method_abbreviations = [method_abbreviations[5], method_abbreviations[7]]
+
+min_distances = ["0.01", "1e-08", "1e-16", "1e-30", "1e-100"]
 
 
 def load_benchmark_data(collision_type, dataset):
@@ -15,7 +17,7 @@ def load_benchmark_data(collision_type, dataset):
     for dir in data_dir.iterdir():
         if not dir.is_dir() or dir.name not in dataset:
             continue
-        benchmark_path = dir / collision_type / "min-separation-benchmark.json"
+        benchmark_path = dir / collision_type / "benchmark.json"
         if benchmark_path.exists():
             with open(benchmark_path) as f:
                 data[dir.name] = json.load(f)
@@ -25,23 +27,17 @@ def load_benchmark_data(collision_type, dataset):
 def create_benchmark_data_frame(data):
     dfs = {}
     data_labels = ["t", "FP", "FN"]
-    indices = None
     for scene_name, scene_data in data.items():
-        if indices is None:
-            indices = [key for key in scene_data if key !=
-                       "num_queries" and key != "collision_type"]
         dfs[scene_name] = pandas.DataFrame(
-            index=[float(index) for index in indices], columns=(
+            index=[float(d) for d in min_distances], columns=(
                 ["n"] + data_labels * len(method_names)))
-        for index in indices:
+        for d in min_distances:
             row = [scene_data["num_queries"]]
             for method_name in method_names:
-                row.append(scene_data[index][method_name]["avg_query_time"])
-                row.append(
-                    scene_data[index][method_name]["num_false_positives"])
-                row.append(
-                    scene_data[index][method_name]["num_false_negatives"])
-            dfs[scene_name].loc[float(index)] = row
+                row.append(scene_data[method_name][d]["avg_query_time"])
+                row.append(scene_data[method_name][d]["num_false_positives"])
+                row.append(scene_data[method_name][d]["num_false_negatives"])
+            dfs[scene_name].loc[float(d)] = row
 
     cumulative_df = None
     for scene_name, df in dfs.items():
@@ -63,7 +59,7 @@ def print_latex_table(df):
     # {} & {} & MS-FPRF & {} &  & Ours &  \\ \midrule
     print(df.to_latex(
         float_format=(lambda x: f"{x:.2f}"),
-        column_format=('l|ccc|ccc')))
+        column_format=('l|ccc|ccc|ccc|ccc|ccc|ccc|ccc|ccc')))
 
 
 def main():
@@ -73,11 +69,7 @@ def main():
             benchmark_data = load_benchmark_data(
                 collision_type, datasets[dataset])
             dfs.append(create_benchmark_data_frame(benchmark_data))
-<<<<<<< Updated upstream
-    pd.concat(dfs, axis=1, sort=False)
-=======
     df = pandas.concat(dfs, axis=1, sort=False)
->>>>>>> Stashed changes
     print_latex_table(df)
 
 

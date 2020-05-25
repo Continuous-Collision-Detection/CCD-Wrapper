@@ -2,8 +2,10 @@
 
 #include <filesystem>
 #include <fstream>
+#include <regex>
 #include <string>
 
+#include <CLI/CLI.hpp>
 #include <Eigen/Core>
 #include <fmt/format.h>
 #include <highfive/H5Easy.hpp>
@@ -15,64 +17,58 @@
 
 using namespace ccd;
 
-int parse_args(
-    int argc,
-    char* argv[],
-    std::string& data_dir,
-    bool& is_edge_edge,
-    CCDMethod& method)
+struct Args {
+    std::string data_dir;
+    bool is_edge_edge;
+    CCDMethod method;
+    double min_distance = DEFAULT_MIN_DISTANCE;
+};
+
+Args parse_args(int argc, char* argv[])
 {
-    const std::string usage = fmt::format(
-        "usage: {} /path/to/data/ {{vf|ee}} {{0-{:d}}}", argv[0],
-        NUM_CCD_METHODS - 1);
-    if (argc < 2) {
-        std::cerr << usage << std::endl
-                  << "error: missing path to data" << std::endl;
-        return 1;
+    Args args;
+
+    CLI::App app { "CCD Wrapper Benchmark" };
+
+    app.add_option("data_directory", args.data_dir, "/path/to/data/")
+        ->required();
+
+    std::string col_type;
+    app.add_set("collision_type", col_type, { "vf", "ee" }, "type of collision")
+        ->required();
+
+    std::stringstream method_options;
+    method_options << "CCD method\noptions:" << std::endl;
+    for (int i = 0; i < NUM_CCD_METHODS; i++) {
+        method_options << i << ": " << method_names[i] << std::endl;
     }
-    if (argc < 3) {
-        std::cerr << usage << std::endl
-                  << "error: missing type of collisions" << std::endl;
-        return 2;
-    } else if (strcmp(argv[2], "vf") != 0 && strcmp(argv[2], "ee") != 0) {
-        std::cerr << usage << std::endl
-                  << "invalid type of collisions: " << argv[2] << std::endl;
-        return 2;
-    }
-    if (argc < 4) {
-        std::cerr << usage << std::endl
-                  << "error: missing method of collision detection"
-                  << std::endl;
-        return 3;
-    }
-    int method_number = atoi(argv[3]);
-    if (method_number < 0 || method_number >= NUM_CCD_METHODS) {
-        std::cerr << usage << std::endl
-                  << "error: invalid method of collision detection: " << argv[3]
-                  << std::endl;
-        std::cerr << "options:" << std::endl;
-        for (int i = 0; i < NUM_CCD_METHODS; i++) {
-            std::cerr << i << ": " << method_names[i] << std::endl;
-        }
-        return 3;
+    app.add_option("CCD_method", args.method, method_options.str())->required();
+
+    app.add_option("min_distance,-d", args.min_distance, "minimum distance");
+
+    try {
+        app.parse(argc, argv);
+    } catch (const CLI::ParseError& e) {
+        exit(app.exit(e));
     }
 
-    data_dir = std::string(argv[1]);
-    is_edge_edge = strcmp(argv[2], "ee") == 0;
-    method = CCDMethod(method_number);
-    return 0;
+    args.is_edge_edge = col_type == "ee";
+
+    if (args.method < 0 || args.method >= NUM_CCD_METHODS) {
+        exit(app.exit(CLI::Error(
+            "",
+            fmt::format(
+                "invalid method of collision detection: {:d}", args.method))));
+    }
+
+    return args;
 }
 
 int main(int argc, char* argv[])
 {
-    std::string data_dir;
-    bool is_edge_edge;
-    CCDMethod method;
-    bool use_shifted = true;
-    int code = parse_args(argc, argv, data_dir, is_edge_edge, method);
-    if (code) {
-        return code;
-    }
+    Args args = parse_args(argc, argv);
+
+    bool use_msccd = isMinSeparationMethod(args.method);
 
     igl::Timer timer;
 
@@ -81,61 +77,77 @@ int main(int argc, char* argv[])
     int false_positives = 0;
     int false_negatives = 0;
 
-    for (auto& entry : std::filesystem::directory_iterator(data_dir)) {
-        if (entry.path().extension() != ".hdf5"
-            && entry.path().extension() != ".h5") {
+    for (auto& entry : std::filesystem::directory_iterator(args.data_dir)) {
+        if (!std::regex_match(
+                entry.path().string(), std::regex("(.*)-packed.hdf5"))) {
             continue;
         }
         H5Easy::File file(entry.path().string());
 
-        const auto query_names = file.getGroup("/").listObjectNames();
+        Eigen::MatrixXd all_V
+            = H5Easy::load<Eigen::MatrixXd>(file, "/rounded/points");
+        assert(V.rows() % 8 == 0 && V.cols() == 3);
+        Eigen::Matrix<unsigned char, Eigen::Dynamic, 1> expected_results
+            = H5Easy::load<Eigen::Matrix<unsigned char, Eigen::Dynamic, 1>>(
+                file, "/rounded/result");
+        assert(V.rows() / 8 == expected_results.rows());
 
-        for (size_t i = 0; i < query_names.size(); i++) {
-            std::string query_name = fmt::format(
-                "{}{}", query_names[i], use_shifted ? "/shifted" : "");
-            Eigen::Matrix<double, 8, 3> V
-                = H5Easy::load<Eigen::Matrix<double, 8, 3>>(
-                    file, fmt::format("{}/points", query_name));
-            bool expected_results = H5Easy::load<unsigned char>(
-                file, fmt::format("{}/result", query_name));
+        for (size_t i = 0; i < expected_results.rows(); i++) {
+            Eigen::Matrix<double, 8, 3> V = all_V.middleRows<8>(8 * i);
+            bool expected_result = bool(expected_results(i));
 
             // Time the methods
             bool result;
             timer.start();
-            if (is_edge_edge) {
-                result = edgeEdgeCCD(
-                    V.row(0), V.row(1), V.row(2), V.row(3), V.row(4), V.row(5),
-                    V.row(6), V.row(7), method);
+            if (use_msccd) {
+                if (args.is_edge_edge) {
+                    result = edgeEdgeMSCCD(
+                        V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
+                        V.row(5), V.row(6), V.row(7), args.min_distance,
+                        args.method);
+                } else {
+                    result = vertexFaceMSCCD(
+                        V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
+                        V.row(5), V.row(6), V.row(7), args.min_distance,
+                        args.method);
+                }
             } else {
-                result = vertexFaceCCD(
-                    V.row(0), V.row(1), V.row(2), V.row(3), V.row(4), V.row(5),
-                    V.row(6), V.row(7), method);
+                if (args.is_edge_edge) {
+                    result = edgeEdgeCCD(
+                        V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
+                        V.row(5), V.row(6), V.row(7), args.method);
+                } else {
+                    result = vertexFaceCCD(
+                        V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
+                        V.row(5), V.row(6), V.row(7), args.method);
+                }
             }
             timer.stop();
             timing += timer.getElapsedTimeInMicroSec();
 
             // Count the inaccuracies
-            if (result != expected_results) {
+            if (result != expected_result) {
                 if (result) {
                     false_positives++;
                 } else {
                     false_negatives++;
-                    if (method == CCDMethod::EXACT_RATIONAL_MIN_SEPARATION
-                        || method == CCDMethod::EXACT_DOUBLE_MIN_SEPARATION) {
+                    if (args.method == CCDMethod::EXACT_RATIONAL_MIN_SEPARATION
+                        || args.method
+                            == CCDMethod::EXACT_DOUBLE_MIN_SEPARATION) {
                         std::cerr << fmt::format(
-                                         "file={} query_name={} method={} "
+                                         "file={} index={:d} method={} "
                                          "false_negative",
-                                         entry.path().filename().string(),
-                                         query_names[i], method_names[method])
+                                         entry.path().string(), 8 * i,
+                                         method_names[args.method])
                                   << std::endl;
                     }
                 }
-                if (method == CCDMethod::RATIONAL_ROOT_PARITY) {
+                if (args.method == CCDMethod::RATIONAL_ROOT_PARITY) {
                     std::cerr
                         << fmt::format(
-                               "file={} query_name={} method={} {}",
-                               entry.path().filename().string(), query_names[i],
-                               method_names[method],
+                               "file={} index={:d} method={} {}",
+                               entry.path().string(), 8 * i,
+                               method_names[args.method],
                                result ? "false_positive" : "false_negative")
                         << std::endl;
                 }
@@ -145,17 +157,29 @@ int main(int argc, char* argv[])
     }
 
     nlohmann::json benchmark;
-    benchmark["collision_type"] = is_edge_edge ? "ee" : "vf";
+    benchmark["collision_type"] = args.is_edge_edge ? "ee" : "vf";
     benchmark["num_queries"] = num_queries;
-    std::string method_name = method_names[method];
-    benchmark[method_name] = {
-        { "avg_query_time", timing / num_queries },
-        { "num_false_positives", false_positives },
-        { "num_false_negatives", false_negatives },
-    };
+    std::string method_name = method_names[args.method];
+
+    if (use_msccd) {
+        std::string str_min_distane = fmt::format("{:g}", args.min_distance);
+        benchmark[method_name]
+            = { { str_min_distane,
+                  {
+                      { "avg_query_time", timing / num_queries },
+                      { "num_false_positives", false_positives },
+                      { "num_false_negatives", false_negatives },
+                  } } };
+    } else {
+        benchmark[method_name] = {
+            { "avg_query_time", timing / num_queries },
+            { "num_false_positives", false_positives },
+            { "num_false_negatives", false_negatives },
+        };
+    }
 
     std::string fname
-        = (std::filesystem::path(data_dir) / "benchmark.json").string();
+        = (std::filesystem::path(args.data_dir) / "benchmark.json").string();
     {
         std::ifstream file(fname);
         if (file.good()) {

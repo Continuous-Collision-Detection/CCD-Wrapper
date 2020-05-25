@@ -188,4 +188,16 @@ bool edgeEdgeMSCCD(
     const double min_distance,
     const CCDMethod method);
 
+inline bool isMinSeparationMethod(const CCDMethod& method)
+{
+    switch (method) {
+    case CCDMethod::FLOAT_MIN_SEPARATION:
+    case CCDMethod::EXACT_RATIONAL_MIN_SEPARATION:
+    case CCDMethod::EXACT_DOUBLE_MIN_SEPARATION:
+        return true;
+    default:
+        return false;
+    }
+}
+
 } // namespace ccd

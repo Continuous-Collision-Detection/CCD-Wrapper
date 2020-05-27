@@ -9,6 +9,6 @@ else
 fi
 echo "Using $CCD_WRAPPER_BENCHMARK"
 
-for d in $(seq -100 2); do
-    $CCD_WRAPPER_BENCHMARK $1 $2 7 -d $(python3 -c "import math; print(math.pow(10, $d))")
+for d in $(python3 -c "import numpy; print(str(numpy.logspace(-100, 2, 103))[1:-1])"); do
+    $CCD_WRAPPER_BENCHMARK $1 $2 7 -d $d > /dev/null
 done

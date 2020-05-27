@@ -86,11 +86,11 @@ int main(int argc, char* argv[])
 
         Eigen::MatrixXd all_V
             = H5Easy::load<Eigen::MatrixXd>(file, "/rounded/points");
-        assert(V.rows() % 8 == 0 && V.cols() == 3);
+        assert(all_V.rows() % 8 == 0 && all_V.cols() == 3);
         Eigen::Matrix<unsigned char, Eigen::Dynamic, 1> expected_results
             = H5Easy::load<Eigen::Matrix<unsigned char, Eigen::Dynamic, 1>>(
                 file, "/rounded/result");
-        assert(V.rows() / 8 == expected_results.rows());
+        assert(all_V.rows() / 8 == expected_results.rows());
 
         for (size_t i = 0; i < expected_results.rows(); i++) {
             Eigen::Matrix<double, 8, 3> V = all_V.middleRows<8>(8 * i);
@@ -135,21 +135,18 @@ int main(int argc, char* argv[])
                         || args.method
                             == CCDMethod::EXACT_DOUBLE_MIN_SEPARATION) {
                         std::cerr << fmt::format(
-                                         "file={} index={:d} method={} "
-                                         "false_negative",
-                                         entry.path().string(), 8 * i,
-                                         method_names[args.method])
+                            "file={} index={:d} method={} false_negative",
+                            entry.path().string(), 8 * i,
+                            method_names[args.method])
                                   << std::endl;
                     }
                 }
                 if (args.method == CCDMethod::RATIONAL_ROOT_PARITY) {
-                    std::cerr
-                        << fmt::format(
-                               "file={} index={:d} method={} {}",
-                               entry.path().string(), 8 * i,
-                               method_names[args.method],
-                               result ? "false_positive" : "false_negative")
-                        << std::endl;
+                    std::cerr << fmt::format(
+                        "file={} index={:d} method={} {}",
+                        entry.path().string(), 8 * i, method_names[args.method],
+                        result ? "false_positive" : "false_negative")
+                              << std::endl;
                 }
             }
             std::cout << ++num_queries << "\r" << std::flush;

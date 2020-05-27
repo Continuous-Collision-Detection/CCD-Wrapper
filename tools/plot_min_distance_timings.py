@@ -7,12 +7,20 @@ import plotly.graph_objects as go
 from generate_benchmark_table import method_names, data_dir
 
 
+def is_float(string):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+
 def read_timing_data(collision_type):
     timing_path = (data_dir / "erleben-cube-cliff-edges" /
                    collision_type / "benchmark.json")
     with open(timing_path) as f:
         data = json.load(f)[method_names[7]]
-        min_distance = [float(d) for d in data.keys()]
+        min_distance = [float(d) for d in data.keys() if is_float(d)]
         min_distance.sort()
         timings = [data[f"{d:g}"]["avg_query_time"] for d in min_distance]
         print(min_distance)

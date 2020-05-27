@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
     H5Easy::File file(filename, HighFive::File::OpenOrCreate);
 
     Eigen::MatrixXd all_V = H5Easy::load<Eigen::MatrixXd>(file, "/points");
-    assert(V.rows() % 8 == 0 && V.cols() == 3);
+    assert(all_V.rows() % 8 == 0 && all_V.cols() == 3);
     size_t num_queries = all_V.rows() / 8;
 
     Eigen::MatrixXd all_rounded_V(all_V.rows(), all_V.cols());

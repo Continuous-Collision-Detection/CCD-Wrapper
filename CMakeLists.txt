@@ -125,10 +125,10 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   target_link_libraries(generate_ground_truth PUBLIC fmt::fmt)
 
 
-  add_executable(shift_queries
-    src/tools/shift_queries.cpp
+  add_executable(round_queries
+    src/tools/round_queries.cpp
   )
-  target_link_libraries(shift_queries PUBLIC ${PROJECT_NAME})
-  target_link_libraries(shift_queries PUBLIC HighFive::HighFive)
-  target_link_libraries(shift_queries PUBLIC fmt::fmt)
+  target_link_libraries(round_queries PUBLIC ${PROJECT_NAME})
+  target_link_libraries(round_queries PUBLIC HighFive::HighFive)
+  target_link_libraries(round_queries PUBLIC fmt::fmt)
 endif()

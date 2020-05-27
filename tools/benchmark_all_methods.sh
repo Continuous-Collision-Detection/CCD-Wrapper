@@ -15,9 +15,9 @@ COLLISON_TYPES=("vf" "ee")
 
 function run_benchmark {
     for i in $(seq 0 7); do
-        $CCD_WRAPPER_BENCHMARK $1 $2 $i # > /dev/null
+        $CCD_WRAPPER_BENCHMARK $1 $2 $i > /dev/null
     done
-    $CCD_WRAPPER_BENCHMARK $1 $2 7 -d 0 # > /dev/null
+    $CCD_WRAPPER_BENCHMARK $1 $2 7 -d 0 > /dev/null
 }
 
 for DATA_DIR in $DATA_DIRS/*/; do
@@ -25,7 +25,7 @@ for DATA_DIR in $DATA_DIRS/*/; do
     dirs=("$DATA_DIR/vertex-face/" "$DATA_DIR/edge-edge/")
     for type in 0 1; do
         # run processes and store pids in array
-        run_benchmark ${dirs[$type]} ${COLLISON_TYPES[$type]} #&
+        run_benchmark ${dirs[$type]} ${COLLISON_TYPES[$type]} &
         pids[${i}]=$!
     done
 done

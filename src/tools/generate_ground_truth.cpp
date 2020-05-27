@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
     H5Easy::File file(filename, HighFive::File::ReadWrite);
 
     Eigen::MatrixXd all_V = H5Easy::load<Eigen::MatrixXd>(file, "/points");
-    assert(V.rows() % 8 == 0 && V.cols() == 3);
+    assert(all_V.rows() % 8 == 0 && all_V.cols() == 3);
     size_t num_queries = all_V.rows() / 8;
 
     Eigen::Matrix<unsigned char, Eigen::Dynamic, 1> expected_results(

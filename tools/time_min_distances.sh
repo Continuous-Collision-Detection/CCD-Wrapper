@@ -10,5 +10,5 @@ fi
 echo "Using $CCD_WRAPPER_BENCHMARK"
 
 for d in $(seq -100 2); do
-    $CCD_WRAPPER_BENCHMARK $1 $2 7 -d $(python -c "import math; print(math.pow(10, $d))") > /dev/null
+    $CCD_WRAPPER_BENCHMARK $1 $2 7 -d $(python3 -c "import math; print(math.pow(10, $d))")
 done

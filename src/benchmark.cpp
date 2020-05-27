@@ -78,8 +78,8 @@ int main(int argc, char* argv[])
     int false_negatives = 0;
 
     for (auto& entry : std::filesystem::directory_iterator(args.data_dir)) {
-        if (!std::regex_match(
-                entry.path().string(), std::regex("(.*)-packed.hdf5"))) {
+        if (entry.path().extension() != ".hdf5"
+            && entry.path().extension() != ".h5") {
             continue;
         }
         H5Easy::File file(entry.path().string());

@@ -109,6 +109,51 @@ TEST_CASE("Test Edge-Edge Continuous Collision Detection", "[ccd][edge-edge]")
     }
 }
 
+TEST_CASE("Test Fixed Edge Edge-Edge Case", "[ccd][edge-edge]")
+{
+    using namespace ccd;
+    CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
+
+    // e0 = (v0, v1)
+    Eigen::Vector3d v0(-1, -1, 0);
+    Eigen::Vector3d v1(1, -1, 0);
+    // e2 = (v2, v3)
+    double e1x = GENERATE(
+        -1 - EPSILON, -1, -1 + EPSILON, -0.5, 0, 0.5, 1 - EPSILON, 1,
+        1 + EPSILON);
+    Eigen::Vector3d v2(e1x, 1, -1);
+    Eigen::Vector3d v3(e1x, 1, 1);
+
+    // displacements
+    double y_displacement
+        = 2 * GENERATE(-1.0, 0.0, 1 - EPSILON, 1.0, 1 + EPSILON, 2.0);
+    Eigen::Vector3d u0(0, y_displacement, 0);
+    Eigen::Vector3d u1(0, 0, 0);
+
+    bool expected_hit = y_displacement >= 2.0 && e1x >= -1 && e1x <= 1;
+
+    bool hit = edgeEdgeCCD(
+        v0, v1, v2, v3, v0 + u0, v1 + u0, v2 + u1, v3 + u1, method);
+
+#ifdef EXPORT_CCD_QUERIES
+    if (method == CCDMethod::FLOAT) { // Only export one query
+        dump_ee_query(
+            fmt::format("edge_edge_{:07d}", ee_counter++), v0, v1, v2, v3,
+            v0 + u0, v1 + u0, v2 + u1, v3 + u1, expected_hit);
+        ee_counter++;
+    }
+#endif
+
+    CAPTURE(y_displacement, method_names[method]);
+    // TightCCD can produce false positives, so only check if the hit value is
+    // negative.
+    if ((method != CCDMethod::TIGHT_CCD
+         && method != CCDMethod::FLOAT_MIN_SEPARATION)
+        || !hit) {
+        CHECK(hit == expected_hit);
+    }
+}
+
 TEST_CASE("Zhongshi test case", "[ccd][point-triangle]")
 {
     using namespace ccd;
@@ -216,4 +261,76 @@ TEST_CASE("BSC False Negative", "[ccd][point-triangle][bsc][!shouldfail]")
         ccd::CCDMethod::BSC);
 
     CHECK(hit == expected_hit);
+}
+
+TEST_CASE("Teseo test case", "[!mayfail][ccd][edge-edge]")
+{
+    using namespace ccd;
+    CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
+
+    const Eigen::Vector3d a0s(-30022200, 2362580, 165247);
+    const Eigen::Vector3d a1s(-32347850, 8312380, -1151003);
+    const Eigen::Vector3d a0e(-28995600, 345838, 638580);
+    const Eigen::Vector3d a1e(-31716930, 6104858, -713340);
+    const Eigen::Vector3d b0(-30319900, 3148750, 0);
+    const Eigen::Vector3d b1(-28548800, 900349, 0);
+
+    bool expected_hit = true;
+
+    bool hit = edgeEdgeCCD(a0s, a1s, b0, b1, a0e, a1e, b0, b1, method);
+
+#ifdef EXPORT_CCD_QUERIES
+    if (method == CCDMethod::FLOAT) { // Only export one query
+        dump_vf_query(
+            fmt::format("edge_edge_{:07d}", ee_counter++), x0, x1, x2, x3, x0b,
+            x1b, x2b, x3b, expected_hit);
+    }
+#endif
+
+    CAPTURE(method_names[method]);
+    // TightCCD can produce false positives, so only check if the hit value is
+    // negative.
+    if ((method != CCDMethod::TIGHT_CCD
+         && method != CCDMethod::FLOAT_MIN_SEPARATION)
+        || !hit) {
+        CHECK(hit == expected_hit);
+    }
+}
+
+TEST_CASE("Teseo test case 2", "[!mayfail][ccd][edge-edge][teseo2]")
+{
+    using namespace ccd;
+    CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
+
+    const Eigen::Vector3d a0s(0, 0, 1);
+    const Eigen::Vector3d a1s(0, 1, 1);
+    Eigen::Vector3d a0e(1, 1, 0);
+    Eigen::Vector3d a1e(0, 0, 0);
+    const Eigen::Vector3d b0(0.1, 0.2, 2);
+    const Eigen::Vector3d b1(0.1, 0.2, -1);
+
+    double t = GENERATE(0.5, 0.8, 0.88, 0.9, 1.0);
+    a0e = (a0e - a0s) * t + a0s;
+    a1e = (a1e - a1s) * t + a1s;
+
+    bool expected_hit = true;
+
+    bool hit = edgeEdgeCCD(a0s, a1s, b0, b1, a0e, a1e, b0, b1, method);
+
+#ifdef EXPORT_CCD_QUERIES
+    if (method == CCDMethod::FLOAT) { // Only export one query
+        dump_vf_query(
+            fmt::format("edge_edge_{:07d}", ee_counter++), x0, x1, x2, x3, x0b,
+            x1b, x2b, x3b, expected_hit);
+    }
+#endif
+
+    CAPTURE(method_names[method]);
+    // TightCCD can produce false positives, so only check if the hit value is
+    // negative.
+    if ((method != CCDMethod::TIGHT_CCD
+         && method != CCDMethod::FLOAT_MIN_SEPARATION)
+        || !hit) {
+        CHECK(hit == expected_hit);
+    }
 }

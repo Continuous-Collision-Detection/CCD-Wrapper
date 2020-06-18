@@ -34,7 +34,7 @@ if(NOT TARGET EVCTCD)
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/EVCTCD)
   # These includes are PRIVATE for some reason
   target_include_directories(collisiondetection PUBLIC "${CCD_WRAPPER_EXTERNAL}/EVCTCD/include")
-  # Turn of floating point contraction for CCD robustness
+  # Turn off floating point contraction for CCD robustness
   target_compile_options(collisiondetection PUBLIC "-ffp-contract=off")
   # Rename for convenience
   add_library(EVCTCD ALIAS collisiondetection)

@@ -24,6 +24,8 @@ enum CCDMethod {
     EXACT_RATIONAL_MIN_SEPARATION,
     /// Exact Double Minimum Separation CCD of Wang et al. [2020]
     EXACT_DOUBLE_MIN_SEPARATION,
+    /// interval CCD
+    INTERVAL,
     /// WARNING: Not a method! Counts the number of methods.
     NUM_CCD_METHODS
 };
@@ -37,6 +39,7 @@ static const char* method_names[CCDMethod::NUM_CCD_METHODS] = {
     "FloatMinSeparation",
     "ExactRationalMinSeparation",
     "ExactDoubleMinSeparation",
+    "Interval",
 };
 
 /// Minimum separation distance used when looking for 0 distance collisions.
@@ -199,5 +202,13 @@ inline bool isMinSeparationMethod(const CCDMethod& method)
         return false;
     }
 }
-
+bool edgeEdgeInterval(
+    const Eigen::Vector3d& edge0_vertex0_start,
+    const Eigen::Vector3d& edge0_vertex1_start,
+    const Eigen::Vector3d& edge1_vertex0_start,
+    const Eigen::Vector3d& edge1_vertex1_start,
+    const Eigen::Vector3d& edge0_vertex0_end,
+    const Eigen::Vector3d& edge0_vertex1_end,
+    const Eigen::Vector3d& edge1_vertex0_end,
+    const Eigen::Vector3d& edge1_vertex1_end);
 } // namespace ccd

@@ -72,6 +72,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC TightCCD)
 # Exact Minimum Separation CCD
 target_link_libraries(${PROJECT_NAME} PUBLIC ExactMSCCD::CCD_rational)
 target_link_libraries(${PROJECT_NAME} PUBLIC ExactMSCCD::CCD_double)
+target_link_libraries(${PROJECT_NAME} PUBLIC ExactMSCCD::CCD_interval)
 
 # Extra warnings
 target_link_libraries(${PROJECT_NAME} PRIVATE warnings::all)

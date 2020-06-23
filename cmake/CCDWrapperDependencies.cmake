@@ -66,6 +66,7 @@ if(NOT (TARGET ExactMSCCD::CCD_rational AND TARGET ExactMSCCD::CCD_double))
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/exact_msccd)
   add_library(ExactMSCCD::CCD_double ALIAS CCD_double)
   add_library(ExactMSCCD::CCD_rational ALIAS CCD_rational)
+  add_library(ExactMSCCD::CCD_interval ALIAS CCD_interval)
 endif()
 
 if(CCD_WRAPPER_WITH_BENCHMARK)

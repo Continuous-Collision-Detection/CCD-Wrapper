@@ -63,8 +63,8 @@ endfunction()
 # Exact Minimum Separation CCD
 function(ccd_wrapper_download_exact_msccd)
    ccd_wrapper_download_project(exact_msccd
-    GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
-    GIT_TAG        2daada9e94ff178399184f6e75c5676987675a49
+    GIT_REPOSITORY https://github.com/geometryprocessing/CCD.git
+    GIT_TAG        3d1dad13df4e730a05549b5637683c1ab3d2bae1
   )
 endfunction()
 

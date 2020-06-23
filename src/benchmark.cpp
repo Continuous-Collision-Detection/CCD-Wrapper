@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
     Args args = parse_args(argc, argv);
 
     bool use_msccd = isMinSeparationMethod(args.method);
-
+    std::cout<<"method, "<<args.method<<" out of "<< NUM_CCD_METHODS<<std::endl;
     igl::Timer timer;
 
     int num_queries = 0;
@@ -174,7 +174,8 @@ int main(int argc, char* argv[])
             { "num_false_negatives", false_negatives },
         };
     }
-
+    std::cout<<"false positives, "<<false_positives<<std::endl;
+    std::cout<<"false negatives, "<<false_negatives<<std::endl;
     std::string fname
         = (std::filesystem::path(args.data_dir) / "benchmark.json").string();
     {

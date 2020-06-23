@@ -14,6 +14,7 @@
 // Exact Minimum Separation CCD of Wang et al. [2020]
 #include <CCD/ccd.hpp>
 #include <doubleCCD/doubleccd.hpp>
+#include <interval_ccd/interval_ccd.hpp>
 
 #include <min_separation_ccd/min_separation_ccd.hpp>
 
@@ -219,6 +220,15 @@ bool edgeEdgeCCD(
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end,
                 /*minimum_distance=*/DEFAULT_MIN_DISTANCE, method);
+        case CCDMethod::INTERVAL:
+        return edgeEdgeInterval(// Edge 1 at t=0
+                edge0_vertex0_start, edge0_vertex1_start,
+                // Edge 2 at t=0
+                edge1_vertex0_start, edge1_vertex1_start,
+                // Edge 1 at t=1
+                edge0_vertex0_end, edge0_vertex1_end,
+                // Edge 2 at t=1
+                edge1_vertex0_end, edge1_vertex1_end);
 
         default:
             throw "Invalid CCDMethod";
@@ -373,6 +383,28 @@ bool edgeEdgeMSCCD(
                   << method_names[method] << std::endl;
         return true;
     }
+}
+bool edgeEdgeInterval(
+    const Eigen::Vector3d& edge0_vertex0_start,
+    const Eigen::Vector3d& edge0_vertex1_start,
+    const Eigen::Vector3d& edge1_vertex0_start,
+    const Eigen::Vector3d& edge1_vertex1_start,
+    const Eigen::Vector3d& edge0_vertex0_end,
+    const Eigen::Vector3d& edge0_vertex1_end,
+    const Eigen::Vector3d& edge1_vertex0_end,
+    const Eigen::Vector3d& edge1_vertex1_end)
+{
+    double toi;// time of intersection
+    return intervalccd::edgeEdgeCCD(
+        edge0_vertex0_start,
+        edge0_vertex1_start,
+        edge1_vertex0_start,
+        edge1_vertex1_start,
+        edge0_vertex0_end,
+        edge0_vertex1_end,
+        edge1_vertex0_end,
+        edge1_vertex1_end,toi);
+    
 }
 
 } // namespace ccd

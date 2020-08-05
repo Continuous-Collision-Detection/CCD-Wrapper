@@ -14,10 +14,9 @@ DATA_DIRS="$CCD_WRAPPER_ROOT/data"
 COLLISON_TYPES=("vf" "ee")
 
 function run_benchmark {
-    for i in $(seq 0 7); do
-        $CCD_WRAPPER_BENCHMARK $1 $2 $i > /dev/null
+    for i in 0 2 4 6 7 8; do
+        $CCD_WRAPPER_BENCHMARK $1 $2 $i -d 0 > /dev/null
     done
-    $CCD_WRAPPER_BENCHMARK $1 $2 7 -d 0 > /dev/null
 }
 
 for DATA_DIR in $DATA_DIRS/*/; do

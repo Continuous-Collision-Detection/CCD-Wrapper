@@ -46,6 +46,17 @@ bool vertexFaceCCD(
                 // Triangle at t = 1
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
                 /*eta=*/0, toi);
+        case CCDMethod::FLOAT_MIN_SEPARATION:
+            return vertexFaceMSCCD(
+                // Point at t=0
+                vertex_start,
+                // Triangle at t = 0
+                face_vertex0_start, face_vertex1_start, face_vertex2_start,
+                // Point at t=1
+                vertex_end,
+                // Triangle at t = 1
+                face_vertex0_end, face_vertex1_end, face_vertex2_end,
+                /*minimum_distance=*/DEFAULT_MIN_DISTANCE, method);
         case CCDMethod::ROOT_PARITY:
             return rootparity::RootParityCollisionTest(
                        // Point at t=0
@@ -72,6 +83,18 @@ bool vertexFaceCCD(
                 vertex_end,
                 // Triangle at t = 1
                 face_vertex0_end, face_vertex1_end, face_vertex2_end);
+        case CCDMethod::ROOT_PARITY_MIN_SEPARATION:
+        case CCDMethod::RATIONAL_ROOT_PARITY_MIN_SEPARATION:
+            return vertexFaceMSCCD(
+                // Point at t=0
+                vertex_start,
+                // Triangle at t = 0
+                face_vertex0_start, face_vertex1_start, face_vertex2_start,
+                // Point at t=1
+                vertex_end,
+                // Triangle at t = 1
+                face_vertex0_end, face_vertex1_end, face_vertex2_end,
+                /*minimum_distance=*/0, method);
         case CCDMethod::BSC:
             return bsc::Intersect_VF_robust(
                 // Triangle at t = 0
@@ -98,10 +121,8 @@ bool vertexFaceCCD(
                 Vec3d(face_vertex2_end.data()),
                 // Point at t=1
                 Vec3d(vertex_end.data()));
-        case CCDMethod::FLOAT_MIN_SEPARATION:
-        case CCDMethod::EXACT_RATIONAL_MIN_SEPARATION:
-        case CCDMethod::EXACT_DOUBLE_MIN_SEPARATION:
-            return vertexFaceMSCCD(
+        case CCDMethod::TIGHT_INTERVALS:
+            return intervalccd::vertexFaceCCD(
                 // Point at t=0
                 vertex_start,
                 // Triangle at t = 0
@@ -110,7 +131,8 @@ bool vertexFaceCCD(
                 vertex_end,
                 // Triangle at t = 1
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
-                /*minimum_distance=*/DEFAULT_MIN_DISTANCE, method);
+                // Time of impact
+                toi);
         default:
             throw "Invalid CCDMethod";
         }
@@ -153,6 +175,17 @@ bool edgeEdgeCCD(
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end,
                 /*eta=*/0, toi);
+        case CCDMethod::FLOAT_MIN_SEPARATION:
+            return edgeEdgeMSCCD(
+                // Edge 1 at t=0
+                edge0_vertex0_start, edge0_vertex1_start,
+                // Edge 2 at t=0
+                edge1_vertex0_start, edge1_vertex1_start,
+                // Edge 1 at t=1
+                edge0_vertex0_end, edge0_vertex1_end,
+                // Edge 2 at t=1
+                edge1_vertex0_end, edge1_vertex1_end,
+                /*minimum_distance=*/DEFAULT_MIN_DISTANCE, method);
         case CCDMethod::ROOT_PARITY:
             return rootparity::RootParityCollisionTest(
                        // Edge 1 at t=0
@@ -179,6 +212,18 @@ bool edgeEdgeCCD(
                 edge0_vertex0_end, edge0_vertex1_end,
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end);
+        case CCDMethod::ROOT_PARITY_MIN_SEPARATION:
+        case CCDMethod::RATIONAL_ROOT_PARITY_MIN_SEPARATION:
+            return edgeEdgeMSCCD(
+                // Edge 1 at t=0
+                edge0_vertex0_start, edge0_vertex1_start,
+                // Edge 2 at t=0
+                edge1_vertex0_start, edge1_vertex1_start,
+                // Edge 1 at t=1
+                edge0_vertex0_end, edge0_vertex1_end,
+                // Edge 2 at t=1
+                edge1_vertex0_end, edge1_vertex1_end,
+                /*minimum_distance=*/0, method);
         case CCDMethod::BSC:
             return bsc::Intersect_EE_robust(
                 // Edge 1 at t=0
@@ -207,10 +252,8 @@ bool edgeEdgeCCD(
                 // Edge 2 at t=1
                 Vec3d(edge1_vertex0_end.data()),
                 Vec3d(edge1_vertex1_end.data()));
-        case CCDMethod::FLOAT_MIN_SEPARATION:
-        case CCDMethod::EXACT_RATIONAL_MIN_SEPARATION:
-        case CCDMethod::EXACT_DOUBLE_MIN_SEPARATION:
-            return edgeEdgeMSCCD(
+        case CCDMethod::TIGHT_INTERVALS:
+            return intervalccd::edgeEdgeCCD(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
                 // Edge 2 at t=0
@@ -219,16 +262,8 @@ bool edgeEdgeCCD(
                 edge0_vertex0_end, edge0_vertex1_end,
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end,
-                /*minimum_distance=*/DEFAULT_MIN_DISTANCE, method);
-        case CCDMethod::INTERVAL:
-        return edgeEdgeInterval(// Edge 1 at t=0
-                edge0_vertex0_start, edge0_vertex1_start,
-                // Edge 2 at t=0
-                edge1_vertex0_start, edge1_vertex1_start,
-                // Edge 1 at t=1
-                edge0_vertex0_end, edge0_vertex1_end,
-                // Edge 2 at t=1
-                edge1_vertex0_end, edge1_vertex1_end);
+                // Time of impact
+                toi);
 
         default:
             throw "Invalid CCDMethod";
@@ -279,8 +314,8 @@ bool vertexFaceMSCCD(
             }
             return hit;
         }
-        case CCDMethod::EXACT_RATIONAL_MIN_SEPARATION:
-            return ccd::vertexFaceCCD(
+        case CCDMethod::ROOT_PARITY_MIN_SEPARATION:
+            return doubleccd::vertexFaceCCD(
                 // Point at t=0
                 vertex_start,
                 // Triangle at t = 0
@@ -290,8 +325,8 @@ bool vertexFaceMSCCD(
                 // Triangle at t = 1
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
                 min_distance);
-        case CCDMethod::EXACT_DOUBLE_MIN_SEPARATION:
-            return doubleccd::vertexFaceCCD(
+        case CCDMethod::RATIONAL_ROOT_PARITY_MIN_SEPARATION:
+            return ccd::vertexFaceCCD(
                 // Point at t=0
                 vertex_start,
                 // Triangle at t = 0
@@ -349,8 +384,8 @@ bool edgeEdgeMSCCD(
             }
             return hit;
         }
-        case CCDMethod::EXACT_RATIONAL_MIN_SEPARATION:
-            return ccd::edgeEdgeCCD(
+        case CCDMethod::ROOT_PARITY_MIN_SEPARATION:
+            return doubleccd::edgeEdgeCCD(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
                 // Edge 2 at t=0
@@ -359,8 +394,8 @@ bool edgeEdgeMSCCD(
                 edge0_vertex0_end, edge0_vertex1_end,
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end, min_distance);
-        case CCDMethod::EXACT_DOUBLE_MIN_SEPARATION:
-            return doubleccd::edgeEdgeCCD(
+        case CCDMethod::RATIONAL_ROOT_PARITY_MIN_SEPARATION:
+            return ccd::edgeEdgeCCD(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
                 // Edge 2 at t=0
@@ -383,28 +418,6 @@ bool edgeEdgeMSCCD(
                   << method_names[method] << std::endl;
         return true;
     }
-}
-bool edgeEdgeInterval(
-    const Eigen::Vector3d& edge0_vertex0_start,
-    const Eigen::Vector3d& edge0_vertex1_start,
-    const Eigen::Vector3d& edge1_vertex0_start,
-    const Eigen::Vector3d& edge1_vertex1_start,
-    const Eigen::Vector3d& edge0_vertex0_end,
-    const Eigen::Vector3d& edge0_vertex1_end,
-    const Eigen::Vector3d& edge1_vertex0_end,
-    const Eigen::Vector3d& edge1_vertex1_end)
-{
-    double toi;// time of intersection
-    return intervalccd::edgeEdgeCCD(
-        edge0_vertex0_start,
-        edge0_vertex1_start,
-        edge1_vertex0_start,
-        edge1_vertex1_start,
-        edge0_vertex0_end,
-        edge0_vertex1_end,
-        edge1_vertex0_end,
-        edge1_vertex1_end,toi);
-    
 }
 
 } // namespace ccd

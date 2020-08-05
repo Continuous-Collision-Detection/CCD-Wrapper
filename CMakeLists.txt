@@ -69,10 +69,12 @@ target_link_libraries(${PROJECT_NAME} PUBLIC RationalCCD)
 # TightCCD implmentation of Wang et al. [2015]
 target_link_libraries(${PROJECT_NAME} PUBLIC TightCCD)
 
-# Exact Minimum Separation CCD
-target_link_libraries(${PROJECT_NAME} PUBLIC ExactMSCCD::CCD_rational)
-target_link_libraries(${PROJECT_NAME} PUBLIC ExactMSCCD::CCD_double)
-target_link_libraries(${PROJECT_NAME} PUBLIC ExactMSCCD::CCD_interval)
+# Root parity with minimum separation
+target_link_libraries(${PROJECT_NAME} PUBLIC TightMSCCD::MSRootParity)
+target_link_libraries(${PROJECT_NAME} PUBLIC TightMSCCD::RationalMSRootParity)
+
+# Custom inclusion based CCD of [Wang et al. 2020]
+target_link_libraries(${PROJECT_NAME} PUBLIC TightMSCCD::TightIntervals)
 
 # Extra warnings
 target_link_libraries(${PROJECT_NAME} PRIVATE warnings::all)
@@ -116,15 +118,6 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC fmt::fmt)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC nlohmann_json::nlohmann_json)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC CLI11::CLI11)
-
-
-  add_executable(generate_ground_truth
-    src/tools/generate_ground_truth.cpp
-  )
-  target_link_libraries(generate_ground_truth PUBLIC ${PROJECT_NAME})
-  target_link_libraries(generate_ground_truth PUBLIC HighFive::HighFive)
-  target_link_libraries(generate_ground_truth PUBLIC fmt::fmt)
-
 
   add_executable(round_queries
     src/tools/round_queries.cpp

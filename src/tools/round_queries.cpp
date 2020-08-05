@@ -1,4 +1,5 @@
-// Time the different CCD methods
+// Round the queries to conform with the minimum seperation root parity input
+// requirements.
 
 #include <string>
 

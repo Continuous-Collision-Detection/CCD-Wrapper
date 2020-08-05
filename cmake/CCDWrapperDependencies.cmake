@@ -59,14 +59,16 @@ if(NOT TARGET TightCCD)
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/TightCCD)
 endif()
 
-# Exact Minimum Separation CCD
-if(NOT (TARGET ExactMSCCD::CCD_rational AND TARGET ExactMSCCD::CCD_double))
-  ccd_wrapper_download_exact_msccd()
+# Tight Intervals and Root Parity with Minimum Separation
+if(NOT (TARGET TightMSCCD::CCD_rational
+        AND TARGET TightMSCCD::CCD_double
+        AND TARGET TightMSCCD::CCD_interval))
+  ccd_wrapper_download_tight_msccd()
   set(CCD_WITH_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/exact_msccd)
-  add_library(ExactMSCCD::CCD_double ALIAS CCD_double)
-  add_library(ExactMSCCD::CCD_rational ALIAS CCD_rational)
-  add_library(ExactMSCCD::CCD_interval ALIAS CCD_interval)
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/tight_msccd)
+  add_library(TightMSCCD::MSRootParity ALIAS CCD_double)
+  add_library(TightMSCCD::RationalMSRootParity ALIAS CCD_rational)
+  add_library(TightMSCCD::TightIntervals ALIAS CCD_interval)
 endif()
 
 if(CCD_WRAPPER_WITH_BENCHMARK)

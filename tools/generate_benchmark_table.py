@@ -9,11 +9,13 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 method_names = [
-    "Float", "RootParity", "RationalRootParity", "BSC", "TightCCD",
-    "FloatMinSeparation", "ExactRationalMinSeparation",
-    "ExactDoubleMinSeparation"]
+    "Float", "FloatMinSeparation", "RootParity", "RationalRootParity",
+    "RootParityMinSeparation", "RationalRootParityMinSeparation", "BSC",
+    "TightCCD", "UnivariateIntervalRootFinder",
+    "MultivariateIntervalRootFinder", "TightIntervals"]
 method_abbreviations = [
-    "FPRF", "RP", "RRP", "BSC", "TCCD", "MS-FPRF", "Ours R", "Ours"]
+    "FPRF", "MS-FPRF", "RP", "RRP", "MS-RP", "RMS-RP", "BSC", "TCCD", "UIRF",
+    "MIRF", "TI"]
 
 datasets = {
     "handcrafted": [

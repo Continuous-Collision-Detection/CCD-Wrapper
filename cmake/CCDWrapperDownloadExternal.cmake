@@ -36,7 +36,7 @@ function(ccd_wrapper_download_evctcd)
   )
 endfunction()
 
-# exact-ccd (clone of Brochu et al. [2012] and Tang et al. [2014])
+# exact-ccd (clone of [Brochu et al. 2012] and [Tang et al. 2014])
 function(ccd_wrapper_download_exact_ccd)
   ccd_wrapper_download_project(exact-ccd
     GIT_REPOSITORY https://github.com/zfergus/exact-ccd.git
@@ -44,7 +44,7 @@ function(ccd_wrapper_download_exact_ccd)
   )
 endfunction()
 
-# Rational CCD (rational version of Brochu et al. [2012])
+# Rational CCD (rational version of [Brochu et al. 2012])
 function(ccd_wrapper_download_rational_ccd)
   ccd_wrapper_download_project(rational_ccd
     GIT_REPOSITORY https://github.com/teseoch/Exact-CDD.git
@@ -52,7 +52,7 @@ function(ccd_wrapper_download_rational_ccd)
   )
 endfunction()
 
-# TightCCD implmentation of Wang et al. [2015]
+# TightCCD implmentation of [Wang et al. 2015]
 function(ccd_wrapper_download_tight_ccd)
   ccd_wrapper_download_project(TightCCD
     GIT_REPOSITORY https://github.com/zfergus/TightCCD.git
@@ -60,11 +60,11 @@ function(ccd_wrapper_download_tight_ccd)
   )
 endfunction()
 
-# Exact Minimum Separation CCD
-function(ccd_wrapper_download_exact_msccd)
-   ccd_wrapper_download_project(exact_msccd
-    GIT_REPOSITORY https://github.com/geometryprocessing/CCD.git
-    GIT_TAG        3d1dad13df4e730a05549b5637683c1ab3d2bae1
+# Tight Intervals and Root Parity with Minimum Separation
+function(ccd_wrapper_download_tight_msccd)
+   ccd_wrapper_download_project(tight_msccd
+    GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
+    GIT_TAG        ab47096b053d1a3b9001d1ac9e2d89a38ad3676c
   )
 endfunction()
 

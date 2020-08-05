@@ -6,8 +6,8 @@ import pandas
 from generate_benchmark_table import (
     method_names, method_abbreviations, datasets, data_dir)
 
-method_names = [method_names[5], method_names[7]]
-method_abbreviations = [method_abbreviations[5], method_abbreviations[7]]
+method_names = [method_names[1], method_names[4]]
+method_abbreviations = [method_abbreviations[1], method_abbreviations[4]]
 
 min_distances = ["0.01", "1e-08", "1e-16", "1e-30", "1e-100"]
 
@@ -56,7 +56,7 @@ def create_benchmark_data_frame(data):
 
 
 def print_latex_table(df):
-    # {} & {} & MS-FPRF & {} &  & Ours &  \\ \midrule
+    # {} & {} & MS-FPRF & {} &  & MS-RP &  \\ \midrule
     print(df.to_latex(
         float_format=(lambda x: f"{x:.2f}"),
         column_format=('l|ccc|ccc|ccc|ccc|ccc|ccc|ccc|ccc')))

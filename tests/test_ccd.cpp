@@ -58,7 +58,8 @@ TEST_CASE(
     // TightCCD can produce false positives, so only check if the hit value is
     // negative.
     if ((method != CCDMethod::TIGHT_CCD
-         && method != CCDMethod::FLOAT_MIN_SEPARATION)
+         && method != CCDMethod::FLOAT_MIN_SEPARATION
+         && method != CCDMethod::TIGHT_INTERVALS)
         || !hit) {
         CHECK(hit == expected_hit);
     }
@@ -103,7 +104,8 @@ TEST_CASE("Test Edge-Edge Continuous Collision Detection", "[ccd][edge-edge]")
     // TightCCD can produce false positives, so only check if the hit value is
     // negative.
     if ((method != CCDMethod::TIGHT_CCD
-         && method != CCDMethod::FLOAT_MIN_SEPARATION)
+         && method != CCDMethod::FLOAT_MIN_SEPARATION
+         && method != CCDMethod::TIGHT_INTERVALS)
         || !hit) {
         CHECK(hit == expected_hit);
     }
@@ -148,7 +150,8 @@ TEST_CASE("Test Fixed Edge Edge-Edge Case", "[ccd][edge-edge]")
     // TightCCD can produce false positives, so only check if the hit value is
     // negative.
     if ((method != CCDMethod::TIGHT_CCD
-         && method != CCDMethod::FLOAT_MIN_SEPARATION)
+         && method != CCDMethod::FLOAT_MIN_SEPARATION
+         && method != CCDMethod::TIGHT_INTERVALS)
         || !hit) {
         CHECK(hit == expected_hit);
     }
@@ -197,7 +200,8 @@ TEST_CASE("Zhongshi test case", "[ccd][point-triangle]")
     // TightCCD can produce false positives, so only check if the hit value is
     // negative.
     if ((method != CCDMethod::TIGHT_CCD
-         && method != CCDMethod::FLOAT_MIN_SEPARATION)
+         && method != CCDMethod::FLOAT_MIN_SEPARATION
+         && method != CCDMethod::TIGHT_INTERVALS)
         || !hit) {
         CHECK(hit == expected_hit);
     }
@@ -227,7 +231,8 @@ TEST_CASE("Bolun test case", "[ccd][point-triangle]")
     // TightCCD can produce false positives, so only check if the hit value is
     // negative.
     if ((method != CCDMethod::TIGHT_CCD
-         && method != CCDMethod::FLOAT_MIN_SEPARATION)
+         && method != CCDMethod::FLOAT_MIN_SEPARATION
+         && method != CCDMethod::TIGHT_INTERVALS)
         || !hit) {
         CHECK(hit == expected_hit);
     }
@@ -291,7 +296,8 @@ TEST_CASE("Teseo test case", "[!mayfail][ccd][edge-edge]")
     // TightCCD can produce false positives, so only check if the hit value is
     // negative.
     if ((method != CCDMethod::TIGHT_CCD
-         && method != CCDMethod::FLOAT_MIN_SEPARATION)
+         && method != CCDMethod::FLOAT_MIN_SEPARATION
+         && method != CCDMethod::TIGHT_INTERVALS)
         || !hit) {
         CHECK(hit == expected_hit);
     }
@@ -329,7 +335,8 @@ TEST_CASE("Teseo test case 2", "[!mayfail][ccd][edge-edge][teseo2]")
     // TightCCD can produce false positives, so only check if the hit value is
     // negative.
     if ((method != CCDMethod::TIGHT_CCD
-         && method != CCDMethod::FLOAT_MIN_SEPARATION)
+         && method != CCDMethod::FLOAT_MIN_SEPARATION
+         && method != CCDMethod::TIGHT_INTERVALS)
         || !hit) {
         CHECK(hit == expected_hit);
     }

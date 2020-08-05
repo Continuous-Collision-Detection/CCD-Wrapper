@@ -10,36 +10,42 @@ namespace ccd {
 enum CCDMethod {
     /// Etienne Vouga's CCD using a root finder in floating points
     FLOAT = 0,
-    /// Root parity method of Brochu et al. [2012]
-    ROOT_PARITY,
-    /// Teseo's reimplementation of Brochu et al. [2012] using rationals
-    RATIONAL_ROOT_PARITY,
-    /// Bernstein sign classification method of Tang et al. [2014]
-    BSC,
-    /// TightCCD method of Wang et al. [2015]
-    TIGHT_CCD,
-    /// Floating-point root-finder minimum separation CCD of Lu et al. [2018]
+    /// Floating-point root-finder minimum separation CCD of [Lu et al. 2018]
     FLOAT_MIN_SEPARATION,
-    /// Exact Rational Minimum Separation CCD of Wang et al. [2020]
-    EXACT_RATIONAL_MIN_SEPARATION,
-    /// Exact Double Minimum Separation CCD of Wang et al. [2020]
-    EXACT_DOUBLE_MIN_SEPARATION,
-    /// interval CCD
-    INTERVAL,
+    /// Root parity method of [Brochu et al. 2012]
+    ROOT_PARITY,
+    /// Teseo's reimplementation of [Brochu et al. 2012] using rationals
+    RATIONAL_ROOT_PARITY,
+    /// Root parity with minimum separation and fixes
+    ROOT_PARITY_MIN_SEPARATION,
+    /// Rational root parity with minimum separation and fixes
+    RATIONAL_ROOT_PARITY_MIN_SEPARATION,
+    /// Bernstein sign classification method of [Tang et al. 2014]
+    BSC,
+    /// TightCCD method of [Wang et al. 2015]
+    TIGHT_CCD,
+    /// Interval based CCD of [Redon et al. 2002]
+    // UNIVARIATE_INTERVAL_ROOT_FINDER,
+    /// Interval based CCD of [Redon et al. 2002] solved using [Snyder 1992]
+    // MULTIVARIATE_INTERVAL_ROOT_FINDER,
+    /// Custom inclusion based CCD of [Wang et al. 2020]
+    TIGHT_INTERVALS,
     /// WARNING: Not a method! Counts the number of methods.
     NUM_CCD_METHODS
 };
 
 static const char* method_names[CCDMethod::NUM_CCD_METHODS] = {
     "Float",
+    "FloatMinSeparation",
     "RootParity",
     "RationalRootParity",
+    "MinSeparationRootParity",
+    "RationalMinSeparationRootParity",
     "BSC",
     "TightCCD",
-    "FloatMinSeparation",
-    "ExactRationalMinSeparation",
-    "ExactDoubleMinSeparation",
-    "Interval",
+    // "UnivariateIntervalRootFinder",
+    // "MultivariateIntervalRootFinder",
+    "TightIntervals",
 };
 
 /// Minimum separation distance used when looking for 0 distance collisions.
@@ -195,20 +201,12 @@ inline bool isMinSeparationMethod(const CCDMethod& method)
 {
     switch (method) {
     case CCDMethod::FLOAT_MIN_SEPARATION:
-    case CCDMethod::EXACT_RATIONAL_MIN_SEPARATION:
-    case CCDMethod::EXACT_DOUBLE_MIN_SEPARATION:
+    case CCDMethod::ROOT_PARITY_MIN_SEPARATION:
+    case CCDMethod::RATIONAL_ROOT_PARITY_MIN_SEPARATION:
         return true;
     default:
         return false;
     }
 }
-bool edgeEdgeInterval(
-    const Eigen::Vector3d& edge0_vertex0_start,
-    const Eigen::Vector3d& edge0_vertex1_start,
-    const Eigen::Vector3d& edge1_vertex0_start,
-    const Eigen::Vector3d& edge1_vertex1_start,
-    const Eigen::Vector3d& edge0_vertex0_end,
-    const Eigen::Vector3d& edge0_vertex1_end,
-    const Eigen::Vector3d& edge1_vertex0_end,
-    const Eigen::Vector3d& edge1_vertex1_end);
+
 } // namespace ccd

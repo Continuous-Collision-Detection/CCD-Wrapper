@@ -131,9 +131,9 @@ int main(int argc, char* argv[])
                     false_positives++;
                 } else {
                     false_negatives++;
-                    if (args.method == CCDMethod::EXACT_RATIONAL_MIN_SEPARATION
+                    if (args.method == CCDMethod::RATIONAL_ROOT_PARITY_MIN_SEPARATION
                         || args.method
-                            == CCDMethod::EXACT_DOUBLE_MIN_SEPARATION) {
+                            == CCDMethod::ROOT_PARITY_MIN_SEPARATION) {
                         std::cerr << fmt::format(
                             "file={} index={:d} method={} false_negative",
                             entry.path().string(), 8 * i,

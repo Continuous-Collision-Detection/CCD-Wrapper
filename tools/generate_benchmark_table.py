@@ -9,10 +9,17 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 method_names = [
-    "Float", "FloatMinSeparation", "RootParity", "RationalRootParity",
-    "RootParityMinSeparation", "RationalRootParityMinSeparation", "BSC",
-    "TightCCD", "UnivariateIntervalRootFinder",
-    "MultivariateIntervalRootFinder", "TightIntervals"]
+    "FloatPointRootFinder",
+    "MinSeperationRootFinder",
+    "RootParity",
+    "RationalRootParity",
+    "MinSeparationRootParity",
+    "RationalMinSeparationRootParity",
+    "BSC",
+    "TightCCD",
+    "UnivariateIntervalRootFinder",
+    "MultivariateIntervalRootFinder",
+    "TightIntervals"]
 method_abbreviations = [
     "FPRF", "MS-FPRF", "RP", "RRP", "MS-RP", "RMS-RP", "BSC", "TCCD", "UIRF",
     "MIRF", "TI"]

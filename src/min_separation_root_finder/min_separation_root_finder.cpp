@@ -1,4 +1,4 @@
-#include "min_separation_ccd.hpp"
+#include "min_separation_root_finder.hpp"
 
 #include <iostream>
 #include <vector>

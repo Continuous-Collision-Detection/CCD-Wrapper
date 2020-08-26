@@ -9,25 +9,25 @@ namespace ccd {
 /// Methods of continuous collision detection.
 enum CCDMethod {
     /// Etienne Vouga's CCD using a root finder in floating points
-    FLOAT = 0,
+    FLOATING_POINT_ROOT_FINDER = 0,
     /// Floating-point root-finder minimum separation CCD of [Lu et al. 2018]
-    FLOAT_MIN_SEPARATION,
+    MIN_SEPARATION_ROOT_FINDER,
     /// Root parity method of [Brochu et al. 2012]
     ROOT_PARITY,
     /// Teseo's reimplementation of [Brochu et al. 2012] using rationals
     RATIONAL_ROOT_PARITY,
     /// Root parity with minimum separation and fixes
-    ROOT_PARITY_MIN_SEPARATION,
+    MIN_SEPARATION_ROOT_PARITY,
     /// Rational root parity with minimum separation and fixes
-    RATIONAL_ROOT_PARITY_MIN_SEPARATION,
+    RATIONAL_MIN_SEPARATION_ROOT_PARITY,
     /// Bernstein sign classification method of [Tang et al. 2014]
     BSC,
     /// TightCCD method of [Wang et al. 2015]
     TIGHT_CCD,
     /// Interval based CCD of [Redon et al. 2002]
-    // UNIVARIATE_INTERVAL_ROOT_FINDER,
+    UNIVARIATE_INTERVAL_ROOT_FINDER,
     /// Interval based CCD of [Redon et al. 2002] solved using [Snyder 1992]
-    // MULTIVARIATE_INTERVAL_ROOT_FINDER,
+    MULTIVARIATE_INTERVAL_ROOT_FINDER,
     /// Custom inclusion based CCD of [Wang et al. 2020]
     TIGHT_INTERVALS,
     /// WARNING: Not a method! Counts the number of methods.
@@ -35,16 +35,16 @@ enum CCDMethod {
 };
 
 static const char* method_names[CCDMethod::NUM_CCD_METHODS] = {
-    "Float",
-    "FloatMinSeparation",
+    "FloatPointRootFinder",
+    "MinSeperationRootFinder",
     "RootParity",
     "RationalRootParity",
     "MinSeparationRootParity",
     "RationalMinSeparationRootParity",
     "BSC",
     "TightCCD",
-    // "UnivariateIntervalRootFinder",
-    // "MultivariateIntervalRootFinder",
+    "UnivariateIntervalRootFinder",
+    "MultivariateIntervalRootFinder",
     "TightIntervals",
 };
 
@@ -197,12 +197,43 @@ bool edgeEdgeMSCCD(
     const double min_distance,
     const CCDMethod method);
 
-inline bool isMinSeparationMethod(const CCDMethod& method)
+inline bool is_minimum_separation_method(const CCDMethod& method)
 {
     switch (method) {
-    case CCDMethod::FLOAT_MIN_SEPARATION:
-    case CCDMethod::ROOT_PARITY_MIN_SEPARATION:
-    case CCDMethod::RATIONAL_ROOT_PARITY_MIN_SEPARATION:
+    case CCDMethod::MIN_SEPARATION_ROOT_FINDER:
+    case CCDMethod::MIN_SEPARATION_ROOT_PARITY:
+    case CCDMethod::RATIONAL_MIN_SEPARATION_ROOT_PARITY:
+    case CCDMethod::TIGHT_INTERVALS:
+        return true;
+    default:
+        return false;
+    }
+}
+
+inline bool is_conservative_method(const CCDMethod& method)
+{
+    switch (method) {
+    // MIN_SEPARATION_ROOT_FINDER is conservative because minimum seperation
+    // distance of zero does not work well.
+    case CCDMethod::MIN_SEPARATION_ROOT_FINDER:
+    case CCDMethod::TIGHT_CCD:
+    case CCDMethod::UNIVARIATE_INTERVAL_ROOT_FINDER:
+    case CCDMethod::MULTIVARIATE_INTERVAL_ROOT_FINDER:
+    case CCDMethod::TIGHT_INTERVALS:
+        return true;
+    default:
+        return false;
+    }
+}
+
+inline bool is_time_of_impact_computed(const CCDMethod& method)
+{
+    switch (method) {
+    case CCDMethod::FLOATING_POINT_ROOT_FINDER:
+    case CCDMethod::MIN_SEPARATION_ROOT_FINDER:
+    case CCDMethod::UNIVARIATE_INTERVAL_ROOT_FINDER:
+    case CCDMethod::MULTIVARIATE_INTERVAL_ROOT_FINDER:
+    case CCDMethod::TIGHT_INTERVALS:
         return true;
     default:
         return false;

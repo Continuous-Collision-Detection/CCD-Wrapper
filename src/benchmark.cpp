@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
 {
     Args args = parse_args(argc, argv);
 
-    bool use_msccd = isMinSeparationMethod(args.method);
+    bool use_msccd = is_minimum_separation_method(args.method);
     std::cout<<"method, "<<args.method<<" out of "<< NUM_CCD_METHODS<<std::endl;
     igl::Timer timer;
 
@@ -131,9 +131,9 @@ int main(int argc, char* argv[])
                     false_positives++;
                 } else {
                     false_negatives++;
-                    if (args.method == CCDMethod::RATIONAL_ROOT_PARITY_MIN_SEPARATION
+                    if (args.method == CCDMethod::RATIONAL_MIN_SEPARATION_ROOT_PARITY
                         || args.method
-                            == CCDMethod::ROOT_PARITY_MIN_SEPARATION) {
+                            == CCDMethod::MIN_SEPARATION_ROOT_PARITY) {
                         std::cerr << fmt::format(
                             "file={} index={:d} method={} false_negative",
                             entry.path().string(), 8 * i,

@@ -282,9 +282,6 @@ TEST_CASE("Teseo test case", "[!mayfail][ccd][edge-edge]")
         FAIL();
     }
 #endif
-    if (method == CCDMethod::TIGHT_INTERVALS) {
-        FAIL();
-    }
 
     const Eigen::Vector3d a0s(-30022200, 2362580, 165247);
     const Eigen::Vector3d a1s(-32347850, 8312380, -1151003);

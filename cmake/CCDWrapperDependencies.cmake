@@ -32,9 +32,9 @@ endif()
 if(NOT TARGET EVCTCD)
   ccd_wrapper_download_evctcd()
 
-  file(GLOB EVCTCD_FILES "${IPC_TOOLKIT_EXTERNAL}/EVCTCD/src/*.cpp")
+  file(GLOB EVCTCD_FILES "${CCD_WRAPPER_EXTERNAL}/EVCTCD/src/*.cpp")
   add_library(EVCTCD ${EVCTCD_FILES})
-  target_include_directories(EVCTCD PUBLIC "${IPC_TOOLKIT_EXTERNAL}/EVCTCD/include")
+  target_include_directories(EVCTCD PUBLIC "${CCD_WRAPPER_EXTERNAL}/EVCTCD/include")
   target_link_libraries(EVCTCD PUBLIC Eigen3::Eigen)
 
   # Turn off floating point contraction for CCD robustness

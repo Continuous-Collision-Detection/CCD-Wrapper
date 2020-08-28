@@ -31,13 +31,14 @@ endif()
 # Etienne Vouga's CTCD Library
 if(NOT TARGET EVCTCD)
   ccd_wrapper_download_evctcd()
-  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/EVCTCD)
-  # These includes are PRIVATE for some reason
-  target_include_directories(collisiondetection PUBLIC "${CCD_WRAPPER_EXTERNAL}/EVCTCD/include")
+
+  file(GLOB EVCTCD_FILES "${IPC_TOOLKIT_EXTERNAL}/EVCTCD/src/*.cpp")
+  add_library(EVCTCD ${EVCTCD_FILES})
+  target_include_directories(EVCTCD PUBLIC "${IPC_TOOLKIT_EXTERNAL}/EVCTCD/include")
+  target_link_libraries(EVCTCD PUBLIC Eigen3::Eigen)
+
   # Turn off floating point contraction for CCD robustness
-  target_compile_options(collisiondetection PUBLIC "-ffp-contract=off")
-  # Rename for convenience
-  add_library(EVCTCD ALIAS collisiondetection)
+  target_compile_options(EVCTCD PUBLIC "-ffp-contract=off")
 endif()
 
 # Brochu et al. [2012] and Tang et al. [2014]

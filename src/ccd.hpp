@@ -35,7 +35,7 @@ enum CCDMethod {
 };
 
 static const char* method_names[CCDMethod::NUM_CCD_METHODS] = {
-    "FloatPointRootFinder",
+    "FloatingPointRootFinder",
     "MinSeperationRootFinder",
     "RootParity",
     "RationalRootParity",

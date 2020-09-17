@@ -370,6 +370,7 @@ bool vertexFaceMSCCD(
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
                 min_distance);
         case CCDMethod::TIGHT_INTERVALS:
+            double output_tolerance;
             return intervalccd::vertexFaceCCD_double(
                 // Point at t=0
                 vertex_start,
@@ -384,7 +385,11 @@ bool vertexFaceMSCCD(
                 // Minimum seperation distance
                 min_distance,
                 // Time of impact
-                toi);
+                toi,
+                /*tolerance=*/1e-6,
+                /*pre_check_t=*/0,
+                /*max_itr=*/-1, output_tolerance,
+                /*CCD_TYPE=*/1);
         default:
             throw "Invalid Minimum Separation CCDMethod";
         }
@@ -454,6 +459,7 @@ bool edgeEdgeMSCCD(
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end, min_distance);
         case CCDMethod::TIGHT_INTERVALS:
+            double output_tolerance;
             return intervalccd::edgeEdgeCCD_double(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
@@ -468,7 +474,11 @@ bool edgeEdgeMSCCD(
                 // Minimum seperation distance
                 min_distance,
                 // Time of impact
-                toi);
+                toi,
+                /*tolerance=*/1e-6,
+                /*pre_check_t=*/0,
+                /*max_itr=*/-1, output_tolerance,
+                /*CCD_TYPE=*/1);
         default:
             assert(!is_minimum_separation_method(method));
             throw "Invalid Minimum Separation CCDMethod";

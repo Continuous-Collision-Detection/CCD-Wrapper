@@ -26,8 +26,10 @@ enum CCDMethod {
     BSC,
     /// TightCCD method of [Wang et al. 2015]
     TIGHT_CCD,
+#ifdef ENABLE_SAFE_CCD
     // SafeCCD
-    // SAFE_CCD,
+    SAFE_CCD,
+#endif
     /// Interval based CCD of [Redon et al. 2002]
     UNIVARIATE_INTERVAL_ROOT_FINDER,
     /// Interval based CCD of [Redon et al. 2002] solved using [Snyder 1992]

@@ -12,7 +12,9 @@
 // TightCCD method of Wang et al. [2015]
 #include <bsc_tightbound.h>
 // SafeCCD
+#ifdef ENABLE_SAFE_CCD
 #include <SAFE_CCD.h>
+#endif
 // Rational root parity with minimum separation and fixes
 #include <CCD/ccd.hpp>
 // Root parity with minimum separation and fixes
@@ -131,6 +133,7 @@ bool vertexFaceCCD(
                 Vec3d(face_vertex2_end.data()),
                 // Point at t=1
                 Vec3d(vertex_end.data()));
+#ifdef ENABLE_SAFE_CCD
         case CCDMethod::SAFE_CCD: {
             double b = safeccd::calculate_B(
                 vertex_start.data(), face_vertex0_start.data(),
@@ -154,6 +157,7 @@ bool vertexFaceCCD(
             return safe.Vertex_Triangle_CCD(
                 vs, ve, f0s, f0e, f1s, f1e, f2s, f2e, t, u, v);
         }
+#endif
         case CCDMethod::UNIVARIATE_INTERVAL_ROOT_FINDER:
             return intervalccd::vertexFaceCCD_Redon(
                 // Point at t=0
@@ -302,6 +306,7 @@ bool edgeEdgeCCD(
                 // Edge 2 at t=1
                 Vec3d(edge1_vertex0_end.data()),
                 Vec3d(edge1_vertex1_end.data()));
+#ifdef ENABLE_SAFE_CCD
         case CCDMethod::SAFE_CCD: {
             double b = safeccd::calculate_B(
                 edge0_vertex0_start.data(), edge0_vertex1_start.data(),
@@ -325,6 +330,7 @@ bool edgeEdgeCCD(
             return safe.Edge_Edge_CCD(
                 vs, ve, f0s, f0e, f1s, f1e, f2s, f2e, t, u, v);
         }
+#endif
         case CCDMethod::UNIVARIATE_INTERVAL_ROOT_FINDER:
             return intervalccd::edgeEdgeCCD_Redon(
                 // Edge 1 at t=0

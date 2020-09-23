@@ -69,7 +69,8 @@ int main(int argc, char* argv[])
     Args args = parse_args(argc, argv);
 
     bool use_msccd = is_minimum_separation_method(args.method);
-    std::cout<<"method, "<<args.method<<" out of "<< NUM_CCD_METHODS<<std::endl;
+    std::cout << "method, " << args.method << " out of " << NUM_CCD_METHODS
+              << std::endl;
     igl::Timer timer;
 
     int num_queries = 0;
@@ -131,22 +132,26 @@ int main(int argc, char* argv[])
                     false_positives++;
                 } else {
                     false_negatives++;
-                    if (args.method == CCDMethod::RATIONAL_MIN_SEPARATION_ROOT_PARITY
+                    if (args.method
+                            == CCDMethod::RATIONAL_MIN_SEPARATION_ROOT_PARITY
                         || args.method
                             == CCDMethod::MIN_SEPARATION_ROOT_PARITY) {
                         std::cerr << fmt::format(
-                            "file={} index={:d} method={} false_negative",
-                            entry.path().string(), 8 * i,
-                            method_names[args.method])
+                                         "file={} index={:d} method={} "
+                                         "false_negative",
+                                         entry.path().string(), 8 * i,
+                                         method_names[args.method])
                                   << std::endl;
                     }
                 }
                 if (args.method == CCDMethod::RATIONAL_ROOT_PARITY) {
-                    std::cerr << fmt::format(
-                        "file={} index={:d} method={} {}",
-                        entry.path().string(), 8 * i, method_names[args.method],
-                        result ? "false_positive" : "false_negative")
-                              << std::endl;
+                    std::cerr
+                        << fmt::format(
+                               "file={} index={:d} method={} {}",
+                               entry.path().string(), 8 * i,
+                               method_names[args.method],
+                               result ? "false_positive" : "false_negative")
+                        << std::endl;
                 }
             }
             std::cout << ++num_queries << "\r" << std::flush;
@@ -174,8 +179,8 @@ int main(int argc, char* argv[])
             { "num_false_negatives", false_negatives },
         };
     }
-    std::cout<<"false positives, "<<false_positives<<std::endl;
-    std::cout<<"false negatives, "<<false_negatives<<std::endl;
+    std::cout << "false positives, " << false_positives << std::endl;
+    std::cout << "false negatives, " << false_negatives << std::endl;
     std::string fname
         = (std::filesystem::path(args.data_dir) / "benchmark.json").string();
     {

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <array>
+
 #include <Eigen/Core>
 
 namespace ccd {
@@ -24,6 +26,8 @@ enum CCDMethod {
     BSC,
     /// TightCCD method of [Wang et al. 2015]
     TIGHT_CCD,
+    // SafeCCD
+    // SAFE_CCD,
     /// Interval based CCD of [Redon et al. 2002]
     UNIVARIATE_INTERVAL_ROOT_FINDER,
     /// Interval based CCD of [Redon et al. 2002] solved using [Snyder 1992]
@@ -84,7 +88,9 @@ bool vertexFaceCCD(
     const Eigen::Vector3d& face_vertex0_end,
     const Eigen::Vector3d& face_vertex1_end,
     const Eigen::Vector3d& face_vertex2_end,
-    const CCDMethod method);
+    const CCDMethod method,
+    const double tolerance = 1e-6,
+    const std::array<double, 3>& err = { { -1, 0, 0 } });
 
 /**
  * @brief Detect collisions between two edges as they move.
@@ -121,7 +127,9 @@ bool edgeEdgeCCD(
     const Eigen::Vector3d& edge0_vertex1_end,
     const Eigen::Vector3d& edge1_vertex0_end,
     const Eigen::Vector3d& edge1_vertex1_end,
-    const CCDMethod method);
+    const CCDMethod method,
+    const double tolerance = 1e-6,
+    const std::array<double, 3>& err = { { -1, 0, 0 } });
 
 /**
  * @brief Detect proximity collisions between a vertex and a triangular face.
@@ -157,7 +165,9 @@ bool vertexFaceMSCCD(
     const Eigen::Vector3d& face_vertex1_end,
     const Eigen::Vector3d& face_vertex2_end,
     const double min_distance,
-    const CCDMethod method);
+    const CCDMethod method,
+    const double tolerance = 1e-6,
+    const std::array<double, 3>& err = { { -1, 0, 0 } });
 
 /**
  * @brief Detect proximity collisions between two edges as they move.
@@ -195,7 +205,9 @@ bool edgeEdgeMSCCD(
     const Eigen::Vector3d& edge1_vertex0_end,
     const Eigen::Vector3d& edge1_vertex1_end,
     const double min_distance,
-    const CCDMethod method);
+    const CCDMethod method,
+    const double tolerance = 1e-6,
+    const std::array<double, 3>& err = { { -1, 0, 0 } });
 
 inline bool is_minimum_separation_method(const CCDMethod& method)
 {
@@ -240,4 +252,39 @@ inline bool is_time_of_impact_computed(const CCDMethod& method)
     }
 }
 
+bool edgeEdgeCCD_OURS(
+    const Eigen::Vector3d& edge0_vertex0_start,
+    const Eigen::Vector3d& edge0_vertex1_start,
+    const Eigen::Vector3d& edge1_vertex0_start,
+    const Eigen::Vector3d& edge1_vertex1_start,
+    const Eigen::Vector3d& edge0_vertex0_end,
+    const Eigen::Vector3d& edge0_vertex1_end,
+    const Eigen::Vector3d& edge1_vertex0_end,
+    const Eigen::Vector3d& edge1_vertex1_end,
+    const std::array<double, 3>& err,
+    const double ms, // TODO maybe add an assertion to check if ms is too big?
+    double& toi,
+    const double tolerance,
+    const double pre_check_t,
+    const int max_itr,
+    double& output_tolerance,
+    const int CCD_TYPE);
+
+bool vertexFaceCCD_OURS(
+    const Eigen::Vector3d& edge0_vertex0_start,
+    const Eigen::Vector3d& edge0_vertex1_start,
+    const Eigen::Vector3d& edge1_vertex0_start,
+    const Eigen::Vector3d& edge1_vertex1_start,
+    const Eigen::Vector3d& edge0_vertex0_end,
+    const Eigen::Vector3d& edge0_vertex1_end,
+    const Eigen::Vector3d& edge1_vertex0_end,
+    const Eigen::Vector3d& edge1_vertex1_end,
+    const std::array<double, 3>& err,
+    const double ms, // TODO maybe add an assertion to check if ms is too big?
+    double& toi,
+    const double tolerance,
+    const double pre_check_t,
+    const int max_itr,
+    double& output_tolerance,
+    const int CCD_TYPE);
 } // namespace ccd

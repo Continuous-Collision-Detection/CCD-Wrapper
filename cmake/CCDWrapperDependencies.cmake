@@ -58,10 +58,13 @@ if(NOT TARGET TightCCD)
   ccd_wrapper_download_tight_ccd()
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/TightCCD)
 endif()
-
+# safe ccd
+if(NOT TARGET SafeCCD)
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/SafeCCD)
+endif()
 # Exact Minimum Separation CCD
 if(NOT (TARGET ExactMSCCD::CCD_rational AND TARGET ExactMSCCD::CCD_double))
-  ccd_wrapper_download_exact_msccd()
+  # ccd_wrapper_download_exact_msccd()
   set(CCD_WITH_UNIT_TESTS OFF CACHE BOOL "" FORCE)
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/exact_msccd)
   add_library(ExactMSCCD::CCD_double ALIAS CCD_double)

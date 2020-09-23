@@ -5,7 +5,7 @@ project(CCDWrapper)
 
 # project-options
 option(CCD_WRAPPER_WITH_UNIT_TESTS   "Build unit tests using Catch2"         ON)
-option(CCD_WRAPPER_WITH_BENCHMARK    "Build exectuable for timing methods"  OFF)
+option(CCD_WRAPPER_WITH_BENCHMARK    "Build exectuable for timing methods"  ON)
 
 # libigl
 option(LIBIGL_USE_STATIC_LIBRARY     "Use libigl as static library" OFF)
@@ -68,12 +68,22 @@ target_link_libraries(${PROJECT_NAME} PUBLIC RationalCCD)
 
 # TightCCD implmentation of Wang et al. [2015]
 target_link_libraries(${PROJECT_NAME} PUBLIC TightCCD)
-
+# SafeCCD
+target_link_libraries(${PROJECT_NAME} PUBLIC SafeCCD)
 # Exact Minimum Separation CCD
 target_link_libraries(${PROJECT_NAME} PUBLIC ExactMSCCD::CCD_rational)
 target_link_libraries(${PROJECT_NAME} PUBLIC ExactMSCCD::CCD_double)
 target_link_libraries(${PROJECT_NAME} PUBLIC ExactMSCCD::CCD_interval)
 
+#set(GCC_MAXV_FLAG "-mavx2")
+#add_definitions(${GCC_MAXV_FLAG})
+#target_compile_options(CCD_interval PUBLIC "-mavx2" "-mavx512f")
+#target_compile_options(CCD_interval PUBLIC "-mavx2" "-mavx512f")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2 -mavx512cd -fopt-info-vec-all")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2")
+
+
+#target_compile_options(CCD_interval PUBLIC "-mavx2" )
 # Extra warnings
 target_link_libraries(${PROJECT_NAME} PRIVATE warnings::all)
 
@@ -133,3 +143,25 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   target_link_libraries(round_queries PUBLIC HighFive::HighFive)
   target_link_libraries(round_queries PUBLIC fmt::fmt)
 endif()
+
+add_executable(${PROJECT_NAME}_benchmark_new
+    src/benchmark_new.cpp
+    #src/utils/get_rss.cpp
+  )
+  target_link_libraries(${PROJECT_NAME}_benchmark_new PUBLIC ${PROJECT_NAME})
+  target_link_libraries(${PROJECT_NAME}_benchmark_new PUBLIC igl::core)
+  target_link_libraries(${PROJECT_NAME}_benchmark_new PUBLIC HighFive::HighFive)
+  target_link_libraries(${PROJECT_NAME}_benchmark_new PUBLIC fmt::fmt)
+  target_link_libraries(${PROJECT_NAME}_benchmark_new PUBLIC nlohmann_json::nlohmann_json)
+  target_link_libraries(${PROJECT_NAME}_benchmark_new PUBLIC CLI11::CLI11)
+
+  add_executable(${PROJECT_NAME}_check_ground_truth
+    src/check_ground_truth.cpp
+
+  )
+  target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC ${PROJECT_NAME})
+  target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC igl::core)
+  target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC HighFive::HighFive)
+  target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC fmt::fmt)
+  target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC nlohmann_json::nlohmann_json)
+  target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC CLI11::CLI11)

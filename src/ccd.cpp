@@ -15,11 +15,32 @@
 #include <CCD/ccd.hpp>
 #include <doubleCCD/doubleccd.hpp>
 #include <interval_ccd/interval_ccd.hpp>
-
+#include <SAFE_CCD.h>
 #include <min_separation_ccd/min_separation_ccd.hpp>
 
 namespace ccd {
 
+std::array<double,3> vec2double(const Eigen::Vector3d& v){
+    std::array<double,3> r;
+    r[0]=v[0];
+    r[1]=v[1];
+    r[2]=v[2];
+    return r;
+}
+// const auto safe_format=[](const Eigen::Vector3d& v){
+//     double r[3];
+//     r[0]=v[0];
+//     r[1]=v[1];
+//     r[2]=v[2];
+//     return r;
+// }
+// void safe_format(const Eigen::Vector3d& v, double& r[]){
+//     // double r[3];
+//     r[0]=v[0];
+//     r[1]=v[1];
+//     r[2]=v[2];
+    
+// }
 // Detect collisions between a vertex and a triangular face.
 bool vertexFaceCCD(
     const Eigen::Vector3d& vertex_start,
@@ -30,7 +51,8 @@ bool vertexFaceCCD(
     const Eigen::Vector3d& face_vertex0_end,
     const Eigen::Vector3d& face_vertex1_end,
     const Eigen::Vector3d& face_vertex2_end,
-    const CCDMethod method)
+    const CCDMethod method,const double tolerance,
+    const std::array<double,3> &err)
 {
     double toi; // Computed by some methods but never returned
     try {
@@ -110,7 +132,64 @@ bool vertexFaceCCD(
                 vertex_end,
                 // Triangle at t = 1
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
-                /*minimum_distance=*/DEFAULT_MIN_DISTANCE, method);
+                /*minimum_distance=*/DEFAULT_MIN_DISTANCE, method,tolerance);
+        case CCDMethod::INTERVAL:
+        return vertexFaceInterval(// Edge 1 at t=0
+                // Point at t=0
+                vertex_start,
+                // Triangle at t = 0
+                face_vertex0_start, face_vertex1_start, face_vertex2_start,
+                // Point at t=1
+                vertex_end,
+                // Triangle at t = 1
+                face_vertex0_end, face_vertex1_end, face_vertex2_end);
+        case CCDMethod::OURS:
+        {
+            throw "Trying to use OUR method, but it should not be used by this function";
+            // double toi;
+
+            // return intervalccd::vertexFaceCCD_double(
+            //  vertex_start,
+            //     // Triangle at t = 0
+            //     face_vertex0_start, face_vertex1_start, face_vertex2_start,
+            //     // Point at t=1
+            //     vertex_end,
+            //     // Triangle at t = 1
+            //     face_vertex0_end, face_vertex1_end, face_vertex2_end,err,DEFAULT_MIN_DISTANCE,toi,tolerance);
+        }
+        case CCDMethod::REDON:{
+            double toi;
+
+            return intervalccd::vertexFaceCCD_Redon(
+             vertex_start,
+                // Triangle at t = 0
+                face_vertex0_start, face_vertex1_start, face_vertex2_start,
+                // Point at t=1
+                vertex_end,
+                // Triangle at t = 1
+                face_vertex0_end, face_vertex1_end, face_vertex2_end,toi);
+        }
+        case CCDMethod::SAFE_CCD:{
+            double b=safeccd::calculate_B(
+                vec2double(vertex_start),vec2double(face_vertex0_start),
+                vec2double(face_vertex1_start),vec2double(face_vertex2_start),
+                 vec2double(vertex_end),vec2double(face_vertex0_end),
+                vec2double(face_vertex1_end),vec2double(face_vertex2_end),false);
+                safeccd::SAFE_CCD<double> safe;
+                safe.Set_Coefficients(b);
+                double t,u[3],v[3];
+                double vs[3],ve[3],f0s[3],f0e[3],f1s[3],f1e[3],f2s[3],f2e[3];
+                for(int i=0;i<3;i++){
+                    vs[i]=vertex_start[i];ve[i]=vertex_end[i];
+                    f0s[i]=face_vertex0_start[i];f0e[i]=face_vertex0_end[i];
+                    f1s[i]=face_vertex1_start[i];f1e[i]=face_vertex1_end[i];
+                    f2s[i]=face_vertex2_start[i];f2e[i]=face_vertex2_end[i];
+                }
+                return safe.Vertex_Triangle_CCD(
+                    vs,ve,
+                    f0s,f0e,f1s,f1e,f2s,f2e,t,u,v);
+        }
+
         default:
             throw "Invalid CCDMethod";
         }
@@ -137,7 +216,7 @@ bool edgeEdgeCCD(
     const Eigen::Vector3d& edge0_vertex1_end,
     const Eigen::Vector3d& edge1_vertex0_end,
     const Eigen::Vector3d& edge1_vertex1_end,
-    const CCDMethod method)
+    const CCDMethod method,const double tolerance,const std::array<double,3> &err)
 {
     double toi; // Computed by some methods but never returned
     try {
@@ -219,7 +298,7 @@ bool edgeEdgeCCD(
                 edge0_vertex0_end, edge0_vertex1_end,
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end,
-                /*minimum_distance=*/DEFAULT_MIN_DISTANCE, method);
+                /*minimum_distance=*/DEFAULT_MIN_DISTANCE, method,tolerance);
         case CCDMethod::INTERVAL:
         return edgeEdgeInterval(// Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
@@ -229,6 +308,50 @@ bool edgeEdgeCCD(
                 edge0_vertex0_end, edge0_vertex1_end,
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end);
+        case CCDMethod::OURS:
+        {
+            throw "Trying to use OUR method, but it should not be used by this function";
+            // double toi;
+            // return intervalccd::edgeEdgeCCD_double(
+            // edge0_vertex0_start, edge0_vertex1_start,
+            //     // Edge 2 at t=0
+            //     edge1_vertex0_start, edge1_vertex1_start,
+            //     // Edge 1 at t=1
+            //     edge0_vertex0_end, edge0_vertex1_end,
+            //     // Edge 2 at t=1
+            //     edge1_vertex0_end, edge1_vertex1_end,err,DEFAULT_MIN_DISTANCE,toi,tolerance);
+        }
+        case CCDMethod::REDON:{
+            double toi;
+            return intervalccd::edgeEdgeCCD_Redon(
+            edge0_vertex0_start, edge0_vertex1_start,
+                // Edge 2 at t=0
+                edge1_vertex0_start, edge1_vertex1_start,
+                // Edge 1 at t=1
+                edge0_vertex0_end, edge0_vertex1_end,
+                // Edge 2 at t=1
+                edge1_vertex0_end, edge1_vertex1_end,toi);
+        }
+        case CCDMethod::SAFE_CCD:{
+            double b=safeccd::calculate_B(
+                vec2double(edge0_vertex0_start),vec2double(edge0_vertex1_start),
+                vec2double(edge1_vertex0_start),vec2double(edge1_vertex1_start),
+                 vec2double(edge0_vertex0_end),vec2double(edge0_vertex1_end),
+                vec2double(edge1_vertex0_end),vec2double(edge1_vertex1_end),true);
+                safeccd::SAFE_CCD<double> safe;
+                safe.Set_Coefficients(b);
+                 double t,u[3],v[3];
+                double vs[3],ve[3],f0s[3],f0e[3],f1s[3],f1e[3],f2s[3],f2e[3];
+                for(int i=0;i<3;i++){
+                    vs[i]=edge0_vertex0_start[i];ve[i]=edge0_vertex0_end[i];
+                    f0s[i]=edge0_vertex1_start[i];f0e[i]=edge0_vertex1_end[i];
+                    f1s[i]=edge1_vertex0_start[i];f1e[i]=edge1_vertex0_end[i];
+                    f2s[i]=edge1_vertex1_start[i];f2e[i]=edge1_vertex1_end[i];
+                }
+                return safe.Edge_Edge_CCD(
+                    vs,ve,
+                    f0s,f0e,f1s,f1e,f2s,f2e,t,u,v);
+        }
 
         default:
             throw "Invalid CCDMethod";
@@ -245,7 +368,63 @@ bool edgeEdgeCCD(
         return true;
     }
 }
-
+bool edgeEdgeCCD_OURS(
+    const Eigen::Vector3d& edge0_vertex0_start,
+    const Eigen::Vector3d& edge0_vertex1_start,
+    const Eigen::Vector3d& edge1_vertex0_start,
+    const Eigen::Vector3d& edge1_vertex1_start,
+    const Eigen::Vector3d& edge0_vertex0_end,
+    const Eigen::Vector3d& edge0_vertex1_end,
+    const Eigen::Vector3d& edge1_vertex0_end,
+    const Eigen::Vector3d& edge1_vertex1_end,
+    const std::array<double, 3>& err,
+    const double ms,//TODO maybe add an assertion to check if ms is too big?
+    double& toi,
+    const double tolerance,
+    const double pre_check_t,
+    const int max_itr,
+    double &output_tolerance,
+    const int CCD_TYPE){
+    
+    return intervalccd::edgeEdgeCCD_double(
+        edge0_vertex0_start,
+        edge0_vertex1_start,
+        edge1_vertex0_start,
+        edge1_vertex1_start,
+        edge0_vertex0_end,
+        edge0_vertex1_end,
+        edge1_vertex0_end,
+        edge1_vertex1_end,err,ms,toi,tolerance,pre_check_t,max_itr,output_tolerance,CCD_TYPE);
+    }
+bool vertexFaceCCD_OURS(
+    const Eigen::Vector3d& edge0_vertex0_start,
+    const Eigen::Vector3d& edge0_vertex1_start,
+    const Eigen::Vector3d& edge1_vertex0_start,
+    const Eigen::Vector3d& edge1_vertex1_start,
+    const Eigen::Vector3d& edge0_vertex0_end,
+    const Eigen::Vector3d& edge0_vertex1_end,
+    const Eigen::Vector3d& edge1_vertex0_end,
+    const Eigen::Vector3d& edge1_vertex1_end,
+    const std::array<double, 3>& err,
+    const double ms,//TODO maybe add an assertion to check if ms is too big?
+    double& toi,
+    const double tolerance,
+    const double pre_check_t,
+    const int max_itr,
+    double &output_tolerance,
+    const int CCD_TYPE){
+    
+    
+    return intervalccd::vertexFaceCCD_double(
+        edge0_vertex0_start,
+        edge0_vertex1_start,
+        edge1_vertex0_start,
+        edge1_vertex1_start,
+        edge0_vertex0_end,
+        edge0_vertex1_end,
+        edge1_vertex0_end,
+        edge1_vertex1_end,err,ms,toi,tolerance,pre_check_t,max_itr,output_tolerance,CCD_TYPE);
+    }
 // Detect collisions between a vertex and a triangular face.
 bool vertexFaceMSCCD(
     const Eigen::Vector3d& vertex_start,
@@ -257,7 +436,8 @@ bool vertexFaceMSCCD(
     const Eigen::Vector3d& face_vertex1_end,
     const Eigen::Vector3d& face_vertex2_end,
     const double min_distance,
-    const CCDMethod method)
+    const CCDMethod method,const double tolerance,
+    const std::array<double,3> &err)
 {
     double toi; // Computed by some methods but never returned
     try {
@@ -301,6 +481,21 @@ bool vertexFaceMSCCD(
                 // Triangle at t = 1
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
                 min_distance);
+        case CCDMethod::OURS:
+        {
+            throw "Trying to use OUR method, but it should not be used by this function";
+        //     double toi;
+            
+        //     return intervalccd::vertexFaceCCD_double(
+        // // Point at t=0
+        //         vertex_start,
+        //         // Triangle at t = 0
+        //         face_vertex0_start, face_vertex1_start, face_vertex2_start,
+        //         // Point at t=1
+        //         vertex_end,
+        //         // Triangle at t = 1
+        //         face_vertex0_end, face_vertex1_end, face_vertex2_end,err,min_distance,toi,tolerance);
+        }
         default:
             throw "Invalid Minimum Separation CCDMethod";
         }
@@ -328,7 +523,8 @@ bool edgeEdgeMSCCD(
     const Eigen::Vector3d& edge1_vertex0_end,
     const Eigen::Vector3d& edge1_vertex1_end,
     const double min_distance,
-    const CCDMethod method)
+    const CCDMethod method,const double tolerance,
+    const std::array<double,3> &err)
 {
     double toi; // Computed by some methods but never returned
     try {
@@ -369,6 +565,23 @@ bool edgeEdgeMSCCD(
                 edge0_vertex0_end, edge0_vertex1_end,
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end, min_distance);
+        case CCDMethod::OURS:
+        {
+            throw "Trying to use OUR method, but it should not be used by this function";
+        //     double toi;
+            
+        //     return intervalccd::edgeEdgeCCD_double(
+        //  // Edge 1 at t=0
+        //         edge0_vertex0_start, edge0_vertex1_start,
+        //         // Edge 2 at t=0
+        //         edge1_vertex0_start, edge1_vertex1_start,
+        //         // Edge 1 at t=1
+        //         edge0_vertex0_end, edge0_vertex1_end,
+        //         // Edge 2 at t=1
+        //         edge1_vertex0_end, edge1_vertex1_end,err,min_distance,toi,tolerance);
+        }
+        
+
         default:
             throw "Invalid Minimum Separation CCDMethod";
         }
@@ -384,6 +597,28 @@ bool edgeEdgeMSCCD(
         return true;
     }
 }
+bool vertexFaceInterval(
+    const Eigen::Vector3d& vertex_start,
+    const Eigen::Vector3d& face_vertex0_start,
+    const Eigen::Vector3d& face_vertex1_start,
+    const Eigen::Vector3d& face_vertex2_start,
+    const Eigen::Vector3d& vertex_end,
+    const Eigen::Vector3d& face_vertex0_end,
+    const Eigen::Vector3d& face_vertex1_end,
+    const Eigen::Vector3d& face_vertex2_end){
+        double toi;
+        return intervalccd::vertexFaceCCD(
+            // Point at t=0
+                vertex_start,
+                // Triangle at t = 0
+                face_vertex0_start, face_vertex1_start, face_vertex2_start,
+                // Point at t=1
+                vertex_end,
+                // Triangle at t = 1
+                face_vertex0_end, face_vertex1_end, face_vertex2_end,
+                toi
+        );
+    }
 bool edgeEdgeInterval(
     const Eigen::Vector3d& edge0_vertex0_start,
     const Eigen::Vector3d& edge0_vertex1_start,

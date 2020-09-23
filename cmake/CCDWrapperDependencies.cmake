@@ -60,6 +60,11 @@ if(NOT TARGET TightCCD)
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/TightCCD EXCLUDE_FROM_ALL)
 endif()
 
+# SafeCCD
+# if(NOT TARGET SafeCCD)
+#   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/SafeCCD)
+# endif()
+
 # Minimum separation root finder of [Harmon et al. 2011]
 if(NOT TARGET MinimumSeparationRootFinder)
   ccd_wrapper_download_minimum_separation_root_finder()

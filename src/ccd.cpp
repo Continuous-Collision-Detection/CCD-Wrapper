@@ -11,6 +11,8 @@
 #include <bsc.h>
 // TightCCD method of Wang et al. [2015]
 #include <bsc_tightbound.h>
+// SafeCCD
+#include <SAFE_CCD.h>
 // Rational root parity with minimum separation and fixes
 #include <CCD/ccd.hpp>
 // Root parity with minimum separation and fixes
@@ -34,7 +36,9 @@ bool vertexFaceCCD(
     const Eigen::Vector3d& face_vertex0_end,
     const Eigen::Vector3d& face_vertex1_end,
     const Eigen::Vector3d& face_vertex2_end,
-    const CCDMethod method)
+    const CCDMethod method,
+    const double tolerance,
+    const std::array<double, 3>& err)
 {
     double toi; // Computed by some methods but never returned
     try {
@@ -127,6 +131,29 @@ bool vertexFaceCCD(
                 Vec3d(face_vertex2_end.data()),
                 // Point at t=1
                 Vec3d(vertex_end.data()));
+        case CCDMethod::SAFE_CCD: {
+            double b = safeccd::calculate_B(
+                vertex_start.data(), face_vertex0_start.data(),
+                face_vertex1_start.data(), face_vertex2_start.data(),
+                vertex_end.data(), face_vertex0_end.data(),
+                face_vertex1_end.data(), face_vertex2_end.data(), false);
+            safeccd::SAFE_CCD<double> safe;
+            safe.Set_Coefficients(b);
+            double t, u[3], v[3];
+            double vs[3], ve[3], f0s[3], f0e[3], f1s[3], f1e[3], f2s[3], f2e[3];
+            for (int i = 0; i < 3; i++) {
+                vs[i] = vertex_start[i];
+                ve[i] = vertex_end[i];
+                f0s[i] = face_vertex0_start[i];
+                f0e[i] = face_vertex0_end[i];
+                f1s[i] = face_vertex1_start[i];
+                f1e[i] = face_vertex1_end[i];
+                f2s[i] = face_vertex2_start[i];
+                f2e[i] = face_vertex2_end[i];
+            }
+            return safe.Vertex_Triangle_CCD(
+                vs, ve, f0s, f0e, f1s, f1e, f2s, f2e, t, u, v);
+        }
         case CCDMethod::UNIVARIATE_INTERVAL_ROOT_FINDER:
             return intervalccd::vertexFaceCCD_Redon(
                 // Point at t=0
@@ -178,7 +205,9 @@ bool edgeEdgeCCD(
     const Eigen::Vector3d& edge0_vertex1_end,
     const Eigen::Vector3d& edge1_vertex0_end,
     const Eigen::Vector3d& edge1_vertex1_end,
-    const CCDMethod method)
+    const CCDMethod method,
+    const double tolerance,
+    const std::array<double, 3>& err)
 {
     double toi; // Computed by some methods but never returned
     try {
@@ -273,6 +302,29 @@ bool edgeEdgeCCD(
                 // Edge 2 at t=1
                 Vec3d(edge1_vertex0_end.data()),
                 Vec3d(edge1_vertex1_end.data()));
+        case CCDMethod::SAFE_CCD: {
+            double b = safeccd::calculate_B(
+                edge0_vertex0_start.data(), edge0_vertex1_start.data(),
+                edge1_vertex0_start.data(), edge1_vertex1_start.data(),
+                edge0_vertex0_end.data(), edge0_vertex1_end.data(),
+                edge1_vertex0_end.data(), edge1_vertex1_end.data(), true);
+            safeccd::SAFE_CCD<double> safe;
+            safe.Set_Coefficients(b);
+            double t, u[3], v[3];
+            double vs[3], ve[3], f0s[3], f0e[3], f1s[3], f1e[3], f2s[3], f2e[3];
+            for (int i = 0; i < 3; i++) {
+                vs[i] = edge0_vertex0_start[i];
+                ve[i] = edge0_vertex0_end[i];
+                f0s[i] = edge0_vertex1_start[i];
+                f0e[i] = edge0_vertex1_end[i];
+                f1s[i] = edge1_vertex0_start[i];
+                f1e[i] = edge1_vertex0_end[i];
+                f2s[i] = edge1_vertex1_start[i];
+                f2e[i] = edge1_vertex1_end[i];
+            }
+            return safe.Edge_Edge_CCD(
+                vs, ve, f0s, f0e, f1s, f1e, f2s, f2e, t, u, v);
+        }
         case CCDMethod::UNIVARIATE_INTERVAL_ROOT_FINDER:
             return intervalccd::edgeEdgeCCD_Redon(
                 // Edge 1 at t=0
@@ -314,6 +366,56 @@ bool edgeEdgeCCD(
     }
 }
 
+bool edgeEdgeCCD_OURS(
+    const Eigen::Vector3d& edge0_vertex0_start,
+    const Eigen::Vector3d& edge0_vertex1_start,
+    const Eigen::Vector3d& edge1_vertex0_start,
+    const Eigen::Vector3d& edge1_vertex1_start,
+    const Eigen::Vector3d& edge0_vertex0_end,
+    const Eigen::Vector3d& edge0_vertex1_end,
+    const Eigen::Vector3d& edge1_vertex0_end,
+    const Eigen::Vector3d& edge1_vertex1_end,
+    const std::array<double, 3>& err,
+    const double ms, // TODO maybe add an assertion to check if ms is too big?
+    double& toi,
+    const double tolerance,
+    const double pre_check_t,
+    const int max_itr,
+    double& output_tolerance,
+    const int CCD_TYPE)
+{
+    return intervalccd::edgeEdgeCCD_double(
+        edge0_vertex0_start, edge0_vertex1_start, edge1_vertex0_start,
+        edge1_vertex1_start, edge0_vertex0_end, edge0_vertex1_end,
+        edge1_vertex0_end, edge1_vertex1_end, err, ms, toi, tolerance,
+        pre_check_t, max_itr, output_tolerance, CCD_TYPE);
+}
+
+bool vertexFaceCCD_OURS(
+    const Eigen::Vector3d& edge0_vertex0_start,
+    const Eigen::Vector3d& edge0_vertex1_start,
+    const Eigen::Vector3d& edge1_vertex0_start,
+    const Eigen::Vector3d& edge1_vertex1_start,
+    const Eigen::Vector3d& edge0_vertex0_end,
+    const Eigen::Vector3d& edge0_vertex1_end,
+    const Eigen::Vector3d& edge1_vertex0_end,
+    const Eigen::Vector3d& edge1_vertex1_end,
+    const std::array<double, 3>& err,
+    const double ms, // TODO maybe add an assertion to check if ms is too big?
+    double& toi,
+    const double tolerance,
+    const double pre_check_t,
+    const int max_itr,
+    double& output_tolerance,
+    const int CCD_TYPE)
+{
+    return intervalccd::vertexFaceCCD_double(
+        edge0_vertex0_start, edge0_vertex1_start, edge1_vertex0_start,
+        edge1_vertex1_start, edge0_vertex0_end, edge0_vertex1_end,
+        edge1_vertex0_end, edge1_vertex1_end, err, ms, toi, tolerance,
+        pre_check_t, max_itr, output_tolerance, CCD_TYPE);
+}
+
 // Detect collisions between a vertex and a triangular face.
 bool vertexFaceMSCCD(
     const Eigen::Vector3d& vertex_start,
@@ -325,7 +427,9 @@ bool vertexFaceMSCCD(
     const Eigen::Vector3d& face_vertex1_end,
     const Eigen::Vector3d& face_vertex2_end,
     const double min_distance,
-    const CCDMethod method)
+    const CCDMethod method,
+    const double tolerance,
+    const std::array<double, 3>& err)
 {
     double toi; // Computed by some methods but never returned
     try {
@@ -417,7 +521,9 @@ bool edgeEdgeMSCCD(
     const Eigen::Vector3d& edge1_vertex0_end,
     const Eigen::Vector3d& edge1_vertex1_end,
     const double min_distance,
-    const CCDMethod method)
+    const CCDMethod method,
+    const double tolerance,
+    const std::array<double, 3>& err)
 {
     double toi; // Computed by some methods but never returned
     try {

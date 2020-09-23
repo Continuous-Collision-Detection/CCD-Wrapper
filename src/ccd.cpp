@@ -387,7 +387,7 @@ bool vertexFaceMSCCD(
                 // Time of impact
                 toi,
                 /*tolerance=*/1e-6,
-                /*pre_check_t=*/0,
+                /*t_max=*/1,
                 /*max_itr=*/-1, output_tolerance,
                 /*CCD_TYPE=*/1);
         default:
@@ -476,7 +476,7 @@ bool edgeEdgeMSCCD(
                 // Time of impact
                 toi,
                 /*tolerance=*/1e-6,
-                /*pre_check_t=*/0,
+                /*t_max=*/1,
                 /*max_itr=*/-1, output_tolerance,
                 /*CCD_TYPE=*/1);
         default:

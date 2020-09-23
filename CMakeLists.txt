@@ -42,11 +42,7 @@ include(${PROJECT_NAME}Dependencies)
 # Library
 ################################################################################
 
-add_library(${PROJECT_NAME}
-  src/ccd.cpp
-
-  src/min_separation_root_finder/min_separation_root_finder.cpp
-)
+add_library(${PROJECT_NAME} src/ccd.cpp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC src)
 
@@ -58,16 +54,19 @@ target_include_directories(${PROJECT_NAME} PUBLIC src)
 target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
 
 # Etienne Vouga's CTCD Library for the floating point root finding algorithm
-target_link_libraries(${PROJECT_NAME} PUBLIC EVCTCD)
+target_link_libraries(${PROJECT_NAME} PUBLIC FloatingPointRootFinder)
 
 # Exact-CCD from Brochu et al. [2012] and Tang et al. [2014]
-target_link_libraries(${PROJECT_NAME} PUBLIC exact-ccd::exact-ccd)
+target_link_libraries(${PROJECT_NAME} PUBLIC RootParity_and_BernsteinSignClassification)
 
 # Rational implmentation of Brochu et al. [2012]
-target_link_libraries(${PROJECT_NAME} PUBLIC RationalCCD)
+target_link_libraries(${PROJECT_NAME} PUBLIC RationalRootParity)
 
 # TightCCD implmentation of Wang et al. [2015]
 target_link_libraries(${PROJECT_NAME} PUBLIC TightCCD)
+
+# Minimum separation root finder of [Harmon et al. 2011]
+target_link_libraries(${PROJECT_NAME} PUBLIC MinimumSeparationRootFinder)
 
 # Root parity with minimum separation
 target_link_libraries(${PROJECT_NAME} PUBLIC TightMSCCD::MSRootParity)

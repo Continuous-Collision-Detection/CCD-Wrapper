@@ -19,8 +19,8 @@
 // Interval based CCD of [Redon et al. 2002] solved using [Snyder 1992]
 // Custom inclusion based CCD of [Wang et al. 2020]
 #include <interval_ccd/interval_ccd.hpp>
-
-#include <min_separation_root_finder/min_separation_root_finder.hpp>
+// Minimum separation root finder of Harmon et al. [2011]
+#include <minimum_separation_root_finder.hpp>
 
 namespace ccd {
 

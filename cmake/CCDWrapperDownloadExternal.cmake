@@ -29,34 +29,42 @@ function(ccd_wrapper_download_eigen)
 endfunction()
 
 # Etienne Vouga's CTCD Library
-function(ccd_wrapper_download_evctcd)
-  ccd_wrapper_download_project(EVCTCD
-    GIT_REPOSITORY https://github.com/evouga/collisiondetection.git
+function(ccd_wrapper_download_floating_point_root_finder)
+  ccd_wrapper_download_project(Floating-Point-Root-Finder
+    GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Floating-Point-Root-Finder.git
     GIT_TAG        e5fe5c9767207df5047e375fb20180a665ae186f
   )
 endfunction()
 
-# exact-ccd (clone of [Brochu et al. 2012] and [Tang et al. 2014])
-function(ccd_wrapper_download_exact_ccd)
-  ccd_wrapper_download_project(exact-ccd
-    GIT_REPOSITORY https://github.com/zfergus/exact-ccd.git
-    GIT_TAG        cf0bd9b3de14d9ae735d9b8db3b6a6e94e4f3dfe
+# Root Parity [Brochu et al. 2012] and BSC [Tang et al. 2014]
+function(ccd_wrapper_download_root_parity_and_bernstein_sign_classification)
+  ccd_wrapper_download_project(Root-Parity-and-Bernstein-Sign-Classification
+    GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Root-Parity-and-Bernstein-Sign-Classification.git
+    GIT_TAG        a6c5082010315670953e6429a681bf1ef3a02b76
   )
 endfunction()
 
-# Rational CCD (rational version of [Brochu et al. 2012])
-function(ccd_wrapper_download_rational_ccd)
-  ccd_wrapper_download_project(rational_ccd
-    GIT_REPOSITORY https://github.com/teseoch/Exact-CDD.git
-    GIT_TAG        63fdb92b917c8d7349c9403656f1497df6fa6ce5
+# Rational Root Parity CCD (rational version of [Brochu et al. 2012])
+function(ccd_wrapper_download_rational_root_parity)
+  ccd_wrapper_download_project(Rational-Root-Parity
+    GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Rational-Root-Parity.git
+    GIT_TAG        4125e192ea7e4df9cd6cf13a7dac1d6016ce7c97
   )
 endfunction()
 
 # TightCCD implmentation of [Wang et al. 2015]
 function(ccd_wrapper_download_tight_ccd)
   ccd_wrapper_download_project(TightCCD
-    GIT_REPOSITORY https://github.com/zfergus/TightCCD.git
-    GIT_TAG        1da1fd01fffabd2611707b0b3a1096928c0da98b
+    GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/TightCCD.git
+    GIT_TAG        366384bac36ed1549d265e90c180fdd1beab42c6
+  )
+endfunction()
+
+# Minimum separation root finder of [Harmon et al. 2011]
+function(ccd_wrapper_download_minimum_separation_root_finder)
+  ccd_wrapper_download_project(Minimum-Separation-Root-Finder
+    GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Minimum-Separation-Root-Finder.git
+    GIT_TAG        7f2a75d50139444c8e412a8d9b54f1c20d9e8848
   )
 endfunction()
 

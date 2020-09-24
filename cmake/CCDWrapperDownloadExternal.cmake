@@ -71,8 +71,8 @@ endfunction()
 # Tight Intervals and Root Parity with Minimum Separation
 function(ccd_wrapper_download_tight_msccd)
    ccd_wrapper_download_project(tight_msccd
-    GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
-    GIT_TAG        ed282878600787ea6d2b15fcef0763d42eb0a438
+    GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Tight-Inclusion.git
+    GIT_TAG        88886091ee85c999ca6064df61d8c01b2531d5d2
   )
 endfunction()
 

@@ -71,9 +71,9 @@ target_link_libraries(${PROJECT_NAME} PUBLIC TightCCD)
 # Minimum separation root finder of [Harmon et al. 2011]
 target_link_libraries(${PROJECT_NAME} PUBLIC MinimumSeparationRootFinder)
 
-# Root parity with minimum separation
-target_link_libraries(${PROJECT_NAME} PUBLIC TightMSCCD::MSRootParity)
-target_link_libraries(${PROJECT_NAME} PUBLIC TightMSCCD::RationalMSRootParity)
+# Root parity with minimum separation TODO
+# target_link_libraries(${PROJECT_NAME} PUBLIC TightMSCCD::MSRootParity)
+# target_link_libraries(${PROJECT_NAME} PUBLIC TightMSCCD::RationalMSRootParity)
 
 # Custom inclusion based CCD of [Wang et al. 2020]
 target_link_libraries(${PROJECT_NAME} PUBLIC TightMSCCD::TightIntervals)
@@ -128,6 +128,9 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC fmt::fmt)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC nlohmann_json::nlohmann_json)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC CLI11::CLI11)
+  target_compile_features(${PROJECT_NAME}_benchmark PUBLIC cxx_std_14)
+
+
 
   add_executable(round_queries src/tools/round_queries.cpp)
   target_link_libraries(round_queries PUBLIC ${PROJECT_NAME})
@@ -141,4 +144,5 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC fmt::fmt)
   target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC nlohmann_json::nlohmann_json)
   target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC CLI11::CLI11)
+  target_compile_features(${PROJECT_NAME}_benchmark PUBLIC cxx_std_14)
 endif()

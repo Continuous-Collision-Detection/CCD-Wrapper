@@ -40,7 +40,7 @@ endfunction()
 function(ccd_wrapper_download_root_parity_and_bernstein_sign_classification)
   ccd_wrapper_download_project(Root-Parity-and-Bernstein-Sign-Classification
     GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Root-Parity-and-Bernstein-Sign-Classification.git
-    GIT_TAG        346b421546f123ee65e2db35c0e2c514188e8a51
+    GIT_TAG        ac8a63b2aeaf83f9f3ab90a16c7a1860f037bc69
   )
 endfunction()
 

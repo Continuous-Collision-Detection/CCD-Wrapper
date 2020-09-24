@@ -116,12 +116,6 @@ endif()
 if(CCD_WRAPPER_WITH_TIGHT_INCLUSION)
   target_link_libraries(${PROJECT_NAME} PUBLIC TightInclusion)
   target_compile_definitions(${PROJECT_NAME} PUBLIC CCD_WRAPPER_WITH_TIGHT_INCLUSION)
-  # Figure out AVX level support
-  message(STATUS "Searching for AVX...")
-  find_package(AVX)
-  # Add SSE, AVX, and FMA flags to compiler flags
-  string(REPLACE " " ";" SIMD_FLAGS "${AVX_FLAGS}")
-  target_compile_options(${PROJECT_NAME} PUBLIC ${SIMD_FLAGS})
 endif()
 
 # Extra warnings

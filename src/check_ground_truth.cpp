@@ -13,8 +13,8 @@
 #include <nlohmann/json.hpp>
 
 #include <ccd.hpp>
-#include <interval_ccd/interval_ccd.hpp>
-#include <interval_ccd/interval_root_finder.hpp>
+#include <tight_inclusion/interval_ccd.hpp>
+#include <tight_inclusion/interval_root_finder.hpp>
 
 using namespace ccd;
 
@@ -224,7 +224,7 @@ Eigen::MatrixXd read_rational_CSV(const std::string inputFileName)
                     e.what();
                 }
             }
-            intervalccd::Rational rt;
+            inclusion_ccd::Rational rt;
             double x = rt.get_double(record[0], record[1]),
                    y = rt.get_double(record[2], record[3]),
                    z = rt.get_double(record[4], record[5]);
@@ -288,7 +288,7 @@ read_rational_CSV(const std::string inputFileName, std::vector<bool>& results)
                     e.what();
                 }
             }
-            intervalccd::Rational rt;
+            inclusion_ccd::Rational rt;
             double x = rt.get_double(record[0], record[1]),
                    y = rt.get_double(record[2], record[3]),
                    z = rt.get_double(record[4], record[5]);
@@ -606,7 +606,7 @@ int get_rational_vertices(int argc, char* argv[])
                 for (int j = 0; j < 8; j++) {
 
                     for (int k = 0; k < 3; k++) {
-                        intervalccd::Rational r(V(j, k)), new_r;
+                        inclusion_ccd::Rational r(V(j, k)), new_r;
                         Rational_V(j, 2 * k) = r.get_numerator_str();
                         Rational_V(j, 2 * k + 1) = r.get_denominator_str();
                         // std::cout<<r.get_numerator_str()<<"
@@ -953,8 +953,8 @@ void run_rational_data_single_method(
 #ifdef TEMP_CHECK
             std::cout << "is edge edge? " << is_edge_edge << std::endl;
             std::cout << "V\n" << V << std::endl;
-            intervalccd::print_time_1();
-            intervalccd::print_time_2();
+            inclusion_ccd::print_time_1();
+            inclusion_ccd::print_time_2();
 #endif
             timer.stop();
             new_timing += timer.getElapsedTimeInMicroSec();
@@ -1030,8 +1030,8 @@ void run_rational_data_single_method(
     std::cout << "max tol, " << max_tol << std::endl;
     std::cout << "average tol, " << sum_tol / total_number << std::endl
               << std::endl;
-    //    intervalccd::print_time_1();
-    // intervalccd::print_time_2();
+    // inclusion_ccd::print_time_1();
+    // inclusion_ccd::print_time_2();
     std::cout << "total time, " << new_timing << std::endl << std::endl;
     /// home/bolun1/interval/
     write_summary(

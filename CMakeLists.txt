@@ -4,8 +4,17 @@ project(CCDWrapper)
 ################################################################################
 
 # project-options
-option(CCD_WRAPPER_WITH_UNIT_TESTS   "Build unit tests using Catch2"         ON)
-option(CCD_WRAPPER_WITH_BENCHMARK    "Build exectuable for timing methods"   ON)
+option(CCD_WRAPPER_WITH_UNIT_TESTS "Build unit tests using Catch2"                 ON)
+option(CCD_WRAPPER_WITH_BENCHMARK  "Build exectuable for timing methods"          OFF)
+option(CCD_WRAPPER_WITH_FPRF       "Enable floating-point root finder method"      ON)
+option(CCD_WRAPPER_WITH_MSRF       "Enable minimum separation root-finding method" ON)
+option(CCD_WRAPPER_WITH_RP         "Enable root parity method"                     ON)
+option(CCD_WRAPPER_WITH_RRP        "Enable rational root parity method"            ON)
+option(CCD_WRAPPER_WITH_MSRP       "Enable minimum separation root parity method" OFF)
+option(CCD_WRAPPER_WITH_BSC        "Enable Bernstein sign classification method"   ON)
+option(CCD_WRAPPER_WITH_TIGHT_CCD  "Enable TightCCD method"                        ON)
+option(CCD_WRAPPER_WITH_INTERVAL   "Enable interval-based methods"                OFF)
+option(CCD_WRAPPER_WITH_TIGHT_INCLUSION "Enable Tight Inclusion method"           OFF)
 
 # libigl
 option(LIBIGL_USE_STATIC_LIBRARY     "Use libigl as static library" OFF)
@@ -26,7 +35,7 @@ option(LIBIGL_WITH_TETGEN            "Use Tetgen"                   OFF)
 option(LIBIGL_WITH_TRIANGLE          "Use Triangle"                 OFF)
 option(LIBIGL_WITH_VIEWER            "Use OpenGL viewer"            OFF)
 option(LIBIGL_WITH_XML               "Use XML"                      OFF)
-option(LIBIGL_WITH_PREDICATES        "Use exact predicates"         ON)
+option(LIBIGL_WITH_PREDICATES        "Use exact predicates"          ON)
 
 ################################################################################
 
@@ -54,38 +63,67 @@ target_include_directories(${PROJECT_NAME} PUBLIC src)
 target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen)
 
 # Etienne Vouga's CTCD Library for the floating point root finding algorithm
-target_link_libraries(${PROJECT_NAME} PUBLIC FloatingPointRootFinder)
+if(CCD_WRAPPER_WITH_FPRF)
+  target_link_libraries(${PROJECT_NAME} PUBLIC FloatingPointRootFinder)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CCD_WRAPPER_WITH_FPRF)
+endif()
 
 # Exact-CCD from Brochu et al. [2012] and Tang et al. [2014]
-target_link_libraries(${PROJECT_NAME} PUBLIC RootParity_and_BernsteinSignClassification)
+if(CCD_WRAPPER_WITH_RP OR CCD_WRAPPER_WITH_BSC)
+  target_link_libraries(${PROJECT_NAME} PUBLIC RootParity_and_BernsteinSignClassification)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CCD_WRAPPER_WITH_RP)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CCD_WRAPPER_WITH_BSC)
+endif()
 
 # Rational implmentation of Brochu et al. [2012]
-target_link_libraries(${PROJECT_NAME} PUBLIC RationalRootParity)
+if(CCD_WRAPPER_WITH_RRP)
+  target_link_libraries(${PROJECT_NAME} PUBLIC RationalRootParity)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CCD_WRAPPER_WITH_RRP)
+endif()
 
 # TightCCD implmentation of Wang et al. [2015]
-target_link_libraries(${PROJECT_NAME} PUBLIC TightCCD)
+if(CCD_WRAPPER_WITH_TIGHT_CCD)
+  target_link_libraries(${PROJECT_NAME} PUBLIC TightCCD)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CCD_WRAPPER_WITH_TIGHT_CCD)
+endif()
 
 # SafeCCD
-# target_link_libraries(${PROJECT_NAME} PUBLIC SafeCCD)
+if(CCD_WRAPPER_WITH_SAFE_CCD)
+  target_link_libraries(${PROJECT_NAME} PUBLIC SafeCCD)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CCD_WRAPPER_WITH_SAFE_CCD)
+endif()
 
 # Minimum separation root finder of [Harmon et al. 2011]
-target_link_libraries(${PROJECT_NAME} PUBLIC MinimumSeparationRootFinder)
+if(CCD_WRAPPER_WITH_MSRF)
+  target_link_libraries(${PROJECT_NAME} PUBLIC MinimumSeparationRootFinder)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CCD_WRAPPER_WITH_MSRF)
+endif()
 
-# Root parity with minimum separation TODO
-# target_link_libraries(${PROJECT_NAME} PUBLIC TightMSCCD::MSRootParity)
-# target_link_libraries(${PROJECT_NAME} PUBLIC TightMSCCD::RationalMSRootParity)
+# Root parity with minimum separation
+if(CCD_WRAPPER_WITH_MSRP)
+  target_link_libraries(${PROJECT_NAME} PUBLIC MSRootParity)
+  target_link_libraries(${PROJECT_NAME} PUBLIC RationalMSRootParity)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CCD_WRAPPER_WITH_MSRP)
+endif()
+
+# Interval-based methods
+if(CCD_WRAPPER_WITH_INTERVAL)
+  target_link_libraries(${PROJECT_NAME} PUBLIC IntervalBased)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CCD_WRAPPER_WITH_INTERVAL)
+endif()
 
 # Custom inclusion based CCD of [Wang et al. 2020]
-target_link_libraries(${PROJECT_NAME} PUBLIC TightMSCCD::TightIntervals)
+if(CCD_WRAPPER_WITH_TIGHT_INCLUSION)
+  target_link_libraries(${PROJECT_NAME} PUBLIC TightInclusion)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CCD_WRAPPER_WITH_TIGHT_INCLUSION)
+  # Figure out AVX level support
+  message(STATUS "Searching for AVX...")
+  find_package(AVX)
+  # Add SSE, AVX, and FMA flags to compiler flags
+  string(REPLACE " " ";" SIMD_FLAGS "${AVX_FLAGS}")
+  target_compile_options(${PROJECT_NAME} PUBLIC ${SIMD_FLAGS})
+endif()
 
-#set(GCC_MAXV_FLAG "-mavx2")
-#add_definitions(${GCC_MAXV_FLAG})
-#target_compile_options(CCD_interval PUBLIC "-mavx2" "-mavx512f")
-#target_compile_options(CCD_interval PUBLIC "-mavx2" "-mavx512f")
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2 -mavx512cd -fopt-info-vec-all")
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2")
-
-#target_compile_options(CCD_interval PUBLIC "-mavx2" )
 # Extra warnings
 target_link_libraries(${PROJECT_NAME} PRIVATE warnings::all)
 
@@ -93,7 +131,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE warnings::all)
 # Compiler options
 ################################################################################
 
-# Use C++11
+# Use C++17
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 ################################################################################
@@ -130,12 +168,12 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC CLI11::CLI11)
   target_compile_features(${PROJECT_NAME}_benchmark PUBLIC cxx_std_14)
 
-
-
-  add_executable(round_queries src/tools/round_queries.cpp)
-  target_link_libraries(round_queries PUBLIC ${PROJECT_NAME})
-  target_link_libraries(round_queries PUBLIC HighFive::HighFive)
-  target_link_libraries(round_queries PUBLIC fmt::fmt)
+  if(CCD_WRAPPER_WITH_MSRP)
+    add_executable(round_queries src/tools/round_queries.cpp)
+    target_link_libraries(round_queries PUBLIC ${PROJECT_NAME})
+    target_link_libraries(round_queries PUBLIC HighFive::HighFive)
+    target_link_libraries(round_queries PUBLIC fmt::fmt)
+  endif()
 
   add_executable(${PROJECT_NAME}_check_ground_truth src/check_ground_truth.cpp)
   target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC ${PROJECT_NAME})
@@ -144,5 +182,5 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC fmt::fmt)
   target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC nlohmann_json::nlohmann_json)
   target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC CLI11::CLI11)
-  target_compile_features(${PROJECT_NAME}_benchmark PUBLIC cxx_std_14)
+  target_compile_features(${PROJECT_NAME}_check_ground_truth PUBLIC cxx_std_14)
 endif()

@@ -18,6 +18,10 @@ TEST_CASE(
     using namespace ccd;
     CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
 
+    if (!is_method_enabled(method)) {
+        return;
+    }
+
     // point
     double v0z = GENERATE(0.0, -1.0);
     Eigen::Vector3d v0(0, 1, v0z);
@@ -68,6 +72,10 @@ TEST_CASE("Test Edge-Edge Continuous Collision Detection", "[ccd][edge-edge]")
     using namespace ccd;
     CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
 
+    if (!is_method_enabled(method)) {
+        return;
+    }
+
     // e0 = (v0, v1)
     Eigen::Vector3d v0(-1, -1, 0);
     Eigen::Vector3d v1(1, -1, 0);
@@ -112,6 +120,10 @@ TEST_CASE("Test Fixed Edge Edge-Edge Case", "[ccd][edge-edge]")
     using namespace ccd;
     CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
 
+    if (!is_method_enabled(method)) {
+        return;
+    }
+
     // e0 = (v0, v1)
     Eigen::Vector3d v0(-1, -1, 0);
     Eigen::Vector3d v1(1, -1, 0);
@@ -155,6 +167,10 @@ TEST_CASE("Zhongshi test case", "[ccd][point-triangle]")
 {
     using namespace ccd;
     CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
+
+    if (!is_method_enabled(method)) {
+        return;
+    }
 
     double qy = GENERATE(-EPSILON, 0, EPSILON);
 
@@ -203,6 +219,11 @@ TEST_CASE("Bolun test case", "[ccd][point-triangle]")
 {
     using namespace ccd;
     CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
+
+    if (!is_method_enabled(method)) {
+        return;
+    }
+
 #ifndef NDEBUG
     // BSC has an assertion that causes this test to fail.
     if (method == CCDMethod::MIN_SEPARATION_ROOT_PARITY) {
@@ -234,6 +255,7 @@ TEST_CASE("Bolun test case", "[ccd][point-triangle]")
     }
 }
 
+#if defined(CCD_WRAPPER_WITH_BSC) && defined(CCD_WRAPPER_WITH_RRP)
 TEST_CASE("BSC False Negative", "[ccd][point-triangle][bsc][!shouldfail]")
 {
     Eigen::Vector3d v0_t0, v1_t0, v2_t0, v3_t0, v0_t1, v1_t1, v2_t1, v3_t1;
@@ -270,11 +292,17 @@ TEST_CASE("BSC False Negative", "[ccd][point-triangle][bsc][!shouldfail]")
 
     CHECK(hit == expected_hit);
 }
+#endif
 
 TEST_CASE("Teseo test case", "[!mayfail][ccd][edge-edge]")
 {
     using namespace ccd;
     CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
+
+    if (!is_method_enabled(method)) {
+        return;
+    }
+
     CAPTURE(method_names[method]);
 #ifndef NDEBUG
     // BSC has an assertion that causes this test to fail.
@@ -315,6 +343,11 @@ TEST_CASE("Teseo test case 2", "[!mayfail][ccd][edge-edge][teseo2]")
 {
     using namespace ccd;
     CCDMethod method = CCDMethod(GENERATE(range(0, int(NUM_CCD_METHODS))));
+
+    if (!is_method_enabled(method)) {
+        return;
+    }
+
 #ifndef NDEBUG
     // BSC has an assertion that causes this test to fail.
     if (method == CCDMethod::MIN_SEPARATION_ROOT_PARITY) {

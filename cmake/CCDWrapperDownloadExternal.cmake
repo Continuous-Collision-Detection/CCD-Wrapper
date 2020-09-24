@@ -52,6 +52,14 @@ function(ccd_wrapper_download_rational_root_parity)
   )
 endfunction()
 
+# Tight Intervals and Root Parity with Minimum Separation
+function(ccd_wrapper_download_minimum_separation_root_parity)
+   ccd_wrapper_download_project(Minimum-Separation-Root-Parity
+    GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
+    GIT_TAG        ed282878600787ea6d2b15fcef0763d42eb0a438
+  )
+endfunction()
+
 # TightCCD implmentation of [Wang et al. 2015]
 function(ccd_wrapper_download_tight_ccd)
   ccd_wrapper_download_project(TightCCD
@@ -69,8 +77,16 @@ function(ccd_wrapper_download_minimum_separation_root_finder)
 endfunction()
 
 # Tight Intervals and Root Parity with Minimum Separation
-function(ccd_wrapper_download_tight_msccd)
-   ccd_wrapper_download_project(tight_msccd
+function(ccd_wrapper_download_interval_based)
+   ccd_wrapper_download_project(Interval-Based
+    GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Interval-Based.git
+    GIT_TAG        99ad4623ecef7677775a937965cb173cbdce6b9d
+  )
+endfunction()
+
+# Tight Intervals and Root Parity with Minimum Separation
+function(ccd_wrapper_download_tight_inclusion)
+   ccd_wrapper_download_project(Tight-Inclusion
     GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Tight-Inclusion.git
     GIT_TAG        88886091ee85c999ca6064df61d8c01b2531d5d2
   )

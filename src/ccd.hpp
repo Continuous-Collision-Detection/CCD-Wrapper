@@ -26,16 +26,14 @@ enum CCDMethod {
     BSC,
     /// TightCCD method of [Wang et al. 2015]
     TIGHT_CCD,
-#ifdef ENABLE_SAFE_CCD
     // SafeCCD
     SAFE_CCD,
-#endif
     /// Interval based CCD of [Redon et al. 2002]
     UNIVARIATE_INTERVAL_ROOT_FINDER,
     /// Interval based CCD of [Redon et al. 2002] solved using [Snyder 1992]
     MULTIVARIATE_INTERVAL_ROOT_FINDER,
     /// Custom inclusion based CCD of [Wang et al. 2020]
-    TIGHT_INTERVALS,
+    TIGHT_INCLUSION,
     /// WARNING: Not a method! Counts the number of methods.
     NUM_CCD_METHODS
 };
@@ -49,6 +47,7 @@ static const char* method_names[CCDMethod::NUM_CCD_METHODS] = {
     "RationalMinSeparationRootParity",
     "BSC",
     "TightCCD",
+    "SafeCCD",
     "UnivariateIntervalRootFinder",
     "MultivariateIntervalRootFinder",
     "TightIntervals",
@@ -217,7 +216,7 @@ inline bool is_minimum_separation_method(const CCDMethod& method)
     case CCDMethod::MIN_SEPARATION_ROOT_FINDER:
     case CCDMethod::MIN_SEPARATION_ROOT_PARITY:
     case CCDMethod::RATIONAL_MIN_SEPARATION_ROOT_PARITY:
-    case CCDMethod::TIGHT_INTERVALS:
+    case CCDMethod::TIGHT_INCLUSION:
         return true;
     default:
         return false;
@@ -233,7 +232,7 @@ inline bool is_conservative_method(const CCDMethod& method)
     case CCDMethod::TIGHT_CCD:
     case CCDMethod::UNIVARIATE_INTERVAL_ROOT_FINDER:
     case CCDMethod::MULTIVARIATE_INTERVAL_ROOT_FINDER:
-    case CCDMethod::TIGHT_INTERVALS:
+    case CCDMethod::TIGHT_INCLUSION:
         return true;
     default:
         return false;
@@ -247,13 +246,84 @@ inline bool is_time_of_impact_computed(const CCDMethod& method)
     case CCDMethod::MIN_SEPARATION_ROOT_FINDER:
     case CCDMethod::UNIVARIATE_INTERVAL_ROOT_FINDER:
     case CCDMethod::MULTIVARIATE_INTERVAL_ROOT_FINDER:
-    case CCDMethod::TIGHT_INTERVALS:
+    case CCDMethod::TIGHT_INCLUSION:
         return true;
     default:
         return false;
     }
 }
 
+inline bool is_method_enabled(const CCDMethod& method)
+{
+    switch (method) {
+    case FLOATING_POINT_ROOT_FINDER:
+#ifdef CCD_WRAPPER_WITH_FPRF
+        return true;
+#else
+        return false;
+#endif
+    case MIN_SEPARATION_ROOT_FINDER:
+#ifdef CCD_WRAPPER_WITH_MSRF
+        return true;
+#else
+        return false;
+#endif
+    case ROOT_PARITY:
+#ifdef CCD_WRAPPER_WITH_RP
+        return true;
+#else
+        return false;
+#endif
+    case RATIONAL_ROOT_PARITY:
+#ifdef CCD_WRAPPER_WITH_RRP
+        return true;
+#else
+        return false;
+#endif
+    case MIN_SEPARATION_ROOT_PARITY:
+    case RATIONAL_MIN_SEPARATION_ROOT_PARITY:
+#ifdef CCD_WRAPPER_WITH_MSRP
+        return true;
+#else
+        return false;
+#endif
+    case BSC:
+#ifdef CCD_WRAPPER_WITH_BSC
+        return true;
+#else
+        return false;
+#endif
+    case TIGHT_CCD:
+#ifdef CCD_WRAPPER_WITH_TIGHT_CCD
+        return true;
+#else
+        return false;
+#endif
+    case SAFE_CCD:
+#ifdef CCD_WRAPPER_WITH_SAFE_CCD
+        return true;
+#else
+        return false;
+#endif
+    case UNIVARIATE_INTERVAL_ROOT_FINDER:
+    case MULTIVARIATE_INTERVAL_ROOT_FINDER:
+#ifdef CCD_WRAPPER_WITH_INTERVAL
+        return true;
+#else
+        return false;
+#endif
+    case TIGHT_INCLUSION:
+#ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
+        return true;
+#else
+        return false;
+#endif
+    default:
+        return false;
+    }
+}
+
+#ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
 bool edgeEdgeCCD_OURS(
     const Eigen::Vector3d& edge0_vertex0_start,
     const Eigen::Vector3d& edge0_vertex1_start,
@@ -289,4 +359,5 @@ bool vertexFaceCCD_OURS(
     const int max_itr,
     double& output_tolerance,
     const int CCD_TYPE);
+#endif
 } // namespace ccd

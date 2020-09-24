@@ -27,7 +27,7 @@ if(NOT TARGET Eigen3::Eigen)
 endif()
 
 # Etienne Vouga's CTCD Library
-if(NOT TARGET FloatingPointRootFinder)
+if(CCD_WRAPPER_WITH_FPRF AND NOT TARGET FloatingPointRootFinder)
   ccd_wrapper_download_floating_point_root_finder()
 
   file(GLOB FLOATING_POINT_ROOT_FINDER_FILES "${CCD_WRAPPER_EXTERNAL}/Floating-Point-Root-Finder/src/*.cpp")
@@ -41,46 +41,58 @@ if(NOT TARGET FloatingPointRootFinder)
 endif()
 
 # Brochu et al. [2012] and Tang et al. [2014]
-if(NOT TARGET RootParity_and_BernsteinSignClassification)
+if((CCD_WRAPPER_WITH_RP OR CCD_WRAPPER_WITH_BSC) AND NOT TARGET RootParity_and_BernsteinSignClassification)
   ccd_wrapper_download_root_parity_and_bernstein_sign_classification()
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Root-Parity-and-Bernstein-Sign-Classification EXCLUDE_FROM_ALL)
   add_library(RootParity_and_BernsteinSignClassification ALIAS exact-ccd)
 endif()
 
 # Rational implmentation of Brochu et al. [2012]
-if(NOT TARGET RationalRootParity)
+if(CCD_WRAPPER_WITH_RRP AND NOT TARGET RationalRootParity)
   ccd_wrapper_download_rational_root_parity()
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Rational-Root-Parity EXCLUDE_FROM_ALL)
   add_library(RationalRootParity ALIAS RationalCCD)
 endif()
 
+# Root Parity with Minimum Separation
+if(CCD_WRAPPER_WITH_MSRP AND NOT TARGET MSRootParity)
+  ccd_wrapper_download_minimum_separation_root_parity()
+  set(CCD_WITH_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Minimum-Separation-Root-Parity)
+  add_library(MSRootParity ALIAS CCD_double)
+  add_library(RationalMSRootParity ALIAS CCD_rational)
+endif()
+
 # TightCCD implmentation of Wang et al. [2015]
-if(NOT TARGET TightCCD)
+if(CCD_WRAPPER_WITH_TIGHT_CCD AND NOT TARGET TightCCD)
   ccd_wrapper_download_tight_ccd()
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/TightCCD EXCLUDE_FROM_ALL)
 endif()
 
 # SafeCCD
-# if(NOT TARGET SafeCCD)
-#   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/SafeCCD)
-# endif()
+if(CCD_WRAPPER_WITH_SAFE_CCD AND NOT TARGET SafeCCD)
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/SafeCCD)
+endif()
 
 # Minimum separation root finder of [Harmon et al. 2011]
-if(NOT TARGET MinimumSeparationRootFinder)
+if(CCD_WRAPPER_WITH_MSRF AND NOT TARGET MinimumSeparationRootFinder)
   ccd_wrapper_download_minimum_separation_root_finder()
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Minimum-Separation-Root-Finder EXCLUDE_FROM_ALL)
   add_library(MinimumSeparationRootFinder ALIAS MSRF_CCD)
 endif()
 
-# Tight Intervals and Root Parity with Minimum Separation
-if(NOT TARGET TightMSCCD::TightIntervals)
-  ccd_wrapper_download_tight_msccd()
-  set(CCD_WITH_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/tight_msccd)
-  #TODO add other target
-  # add_library(TightMSCCD::MSRootParity ALIAS CCD_double)
-  # add_library(TightMSCCD::RationalMSRootParity ALIAS CCD_rational)
-  add_library(TightMSCCD::TightIntervals ALIAS tight_inclusion)
+# Interval-based CCD
+if(CCD_WRAPPER_WITH_INTERVAL AND NOT TARGET IntervalBased)
+  ccd_wrapper_download_interval_based()
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Interval-Based)
+  add_library(IntervalBased ALIAS interval_based)
+endif()
+
+# Tight Inclusion
+if(CCD_WRAPPER_WITH_TIGHT_INCLUSION AND NOT TARGET TightInclusion)
+  ccd_wrapper_download_tight_inclusion()
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Tight-Inclusion)
+  add_library(TightInclusion ALIAS tight_inclusion)
 endif()
 
 if(CCD_WRAPPER_WITH_BENCHMARK)

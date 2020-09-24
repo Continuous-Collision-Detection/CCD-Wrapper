@@ -88,7 +88,7 @@ endfunction()
 function(ccd_wrapper_download_tight_inclusion)
    ccd_wrapper_download_project(Tight-Inclusion
     GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Tight-Inclusion.git
-    GIT_TAG        63d0d53ec9299fefeecd339031137271d18a5782
+    GIT_TAG        3cc653be5aa50dd16d7e2503687bbffd243e32a9
   )
 endfunction()
 

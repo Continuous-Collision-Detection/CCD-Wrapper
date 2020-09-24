@@ -92,7 +92,8 @@ bool vertexFaceCCD(
                 vertex_end,
                 // Triangle at t = 1
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
-                /*minimum_distance=*/DEFAULT_MIN_DISTANCE, method);
+                /*minimum_distance=*/DEFAULT_MIN_DISTANCE, method, tolerance,
+                err);
 #else
             throw "CCD method is not enabled";
 #endif
@@ -143,7 +144,7 @@ bool vertexFaceCCD(
                 vertex_end,
                 // Triangle at t = 1
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
-                /*minimum_distance=*/0, method);
+                /*minimum_distance=*/0, method, tolerance, err);
         case CCDMethod::BSC:
 #ifdef CCD_WRAPPER_WITH_BSC
             return bsc::Intersect_VF_robust(
@@ -298,7 +299,8 @@ bool edgeEdgeCCD(
                 edge0_vertex0_end, edge0_vertex1_end,
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end,
-                /*minimum_distance=*/DEFAULT_MIN_DISTANCE, method);
+                /*minimum_distance=*/DEFAULT_MIN_DISTANCE, method, tolerance,
+                err);
 #else
             throw "CCD method is not enabled";
 #endif
@@ -349,7 +351,7 @@ bool edgeEdgeCCD(
                 edge0_vertex0_end, edge0_vertex1_end,
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end,
-                /*minimum_distance=*/0, method);
+                /*minimum_distance=*/0, method, tolerance, err);
         case CCDMethod::BSC:
 #ifdef CCD_WRAPPER_WITH_BSC
             return bsc::Intersect_EE_robust(
@@ -597,15 +599,13 @@ bool vertexFaceMSCCD(
                 vertex_end,
                 // Triangle at t = 1
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
-                // Calculate the rounding error automatically
-                { -1.0, -1.0, -1.0 },
-                // Minimum seperation distance
-                min_distance,
-                // Time of impact
-                toi,
-                /*tolerance=*/1e-6,
+                err,          // rounding error
+                min_distance, // minimum separation distance
+                toi,          // time of impact
+                tolerance,    // δ
                 /*t_max=*/1,
-                /*max_itr=*/-1, output_tolerance,
+                /*max_itr=*/-1,
+                output_tolerance, // δ_actual
                 /*CCD_TYPE=*/1);
 #else
             throw "CCD method is not enabled";
@@ -705,15 +705,13 @@ bool edgeEdgeMSCCD(
                 edge0_vertex0_end, edge0_vertex1_end,
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end,
-                // Calculate the rounding error automatically
-                { -1.0, -1.0, -1.0 },
-                // Minimum seperation distance
-                min_distance,
-                // Time of impact
-                toi,
-                /*tolerance=*/1e-6,
+                err,          // rounding error
+                min_distance, // minimum separation distance
+                toi,          // Time of impact
+                tolerance,    //δ
                 /*t_max=*/1,
-                /*max_itr=*/-1, output_tolerance,
+                /*max_itr=*/-1,
+                output_tolerance, //δ_actual
                 /*CCD_TYPE=*/1);
 #else
             throw "CCD method is not enabled";

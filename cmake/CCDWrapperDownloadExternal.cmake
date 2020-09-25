@@ -48,7 +48,7 @@ endfunction()
 function(ccd_wrapper_download_rational_root_parity)
   ccd_wrapper_download_project(Rational-Root-Parity
     GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Rational-Root-Parity.git
-    GIT_TAG        4125e192ea7e4df9cd6cf13a7dac1d6016ce7c97
+    GIT_TAG        c58bd6fd056a5ac4305bca1bdd24acc038ad44cd
   )
 endfunction()
 

@@ -1,9 +1,5 @@
 // Time the different CCD methods
 
-#include <fstream>
-#include <regex>
-#include <string>
-
 #include <CLI/CLI.hpp>
 #include <Eigen/Core>
 #include <boost/filesystem.hpp>
@@ -11,11 +7,30 @@
 #include <nlohmann/json.hpp>
 
 #include <ccd.hpp>
-
-#include <utils/rational.hpp>
+#include <utils/read_rational_csv.hpp>
 #include <utils/timer.hpp>
 
 using namespace ccd;
+
+std::string root_path(CCD_WRAPPER_SAMPLE_QUERIES_DIR);
+std::vector<std::string> simulation_folders
+    = { { "chain", "cow-heads", "golf-ball", "mat-twist" } };
+std::vector<std::string> handcrafted_folders
+    = { { "erleben-sliding-spike", "erleben-spike-wedge",
+          "erleben-sliding-wedge", "erleben-wedge-crack", "erleben-spike-crack",
+          "erleben-wedges", "erleben-cube-cliff-edges", "erleben-spike-hole",
+          "erleben-cube-internal-edges", "erleben-spikes", "unit-tests" } };
+std::vector<std::string> fnames = { { "data_0_0.csv", "data_0_1.csv" } };
+
+struct write_format {
+    std::string file;
+    int nbr;
+    bool is_edge_edge;
+    bool result;
+    bool ground_truth;
+    double time;
+    int method;
+};
 
 struct Args {
     std::string data_dir;
@@ -195,97 +210,6 @@ Args parse_args(int argc, char* argv[])
 //     std::ofstream(fname) << benchmark.dump(4);
 // }
 
-std::string root_path = "/home/bolun1/interval/data/";
-std::vector<std::string> simulation_folders
-    = { { "chain", "cow-heads", "golf-ball", "mat-twist" } };
-std::vector<std::string> handcrafted_folders
-    = { { "erleben-sliding-spike", "erleben-spike-wedge",
-          "erleben-sliding-wedge", "erleben-wedge-crack", "erleben-spike-crack",
-          "erleben-wedges", "erleben-cube-cliff-edges", "erleben-spike-hole",
-          "erleben-cube-internal-edges", "erleben-spikes", "unit-tests" } };
-std::vector<std::string> fnames = { { "data_0_0.csv", "data_0_1.csv" } };
-
-struct write_format {
-    std::string file;
-    int nbr;
-    bool is_edge_edge;
-    bool result;
-    bool ground_truth;
-    double time;
-    int method;
-};
-
-Eigen::MatrixXd
-read_rational_CSV(const std::string inputFileName, std::vector<bool>& results)
-{
-    // be careful, there are n lines which means there are n/8 queries, but has
-    // n results, which means results are duplicated
-    results.clear();
-    std::vector<std::array<double, 3>> vs;
-    vs.clear();
-    std::ifstream infile;
-    infile.open(inputFileName);
-    std::array<double, 3> v;
-    if (!infile.is_open()) {
-        std::cout << "Path Wrong!!!!" << std::endl;
-        std::cout << "path, " << inputFileName << std::endl;
-        return Eigen::MatrixXd(1, 1);
-    }
-
-    int l = 0;
-    while (infile) // there is input overload classfile
-    {
-        l++;
-        std::string s;
-        if (!getline(infile, s))
-            break;
-        if (s[0] != '#') {
-            std::istringstream ss(s);
-            std::array<std::string, 7> record; // the first six are one vetex,
-                                               // the seventh is the result
-            int c = 0;
-            while (ss) {
-                std::string line;
-                if (!getline(ss, line, ','))
-                    break;
-                try {
-                    record[c] = line;
-                    c++;
-                } catch (const std::invalid_argument e) {
-                    std::cout << "NaN found in file " << inputFileName
-                              << " line " << l << std::endl;
-                    e.what();
-                }
-            }
-            Rational rt;
-            double x = rt.get_double(record[0], record[1]),
-                   y = rt.get_double(record[2], record[3]),
-                   z = rt.get_double(record[4], record[5]);
-            v[0] = x;
-            v[1] = y;
-            v[2] = z;
-            vs.push_back(v);
-            if (record[6] != "1" && record[6] != "0") {
-                std::cout
-                    << "ERROR:result position should be 1 or 0, but it is "
-                    << record[6] << std::endl;
-            }
-            results.push_back(std::stoi(record[6]));
-        }
-    }
-    Eigen::MatrixXd all_v(vs.size(), 3);
-    for (int i = 0; i < vs.size(); i++) {
-        all_v(i, 0) = vs[i][0];
-        all_v(i, 1) = vs[i][1];
-        all_v(i, 2) = vs[i][2];
-    }
-    if (!infile.eof()) {
-        std::cerr << "Could not read file " << inputFileName << "\n";
-    }
-
-    return all_v;
-}
-
 void run_rational_data_single_method(
     const bool is_edge_edge,
     const bool is_simulation_data,
@@ -324,7 +248,7 @@ void run_rational_data_single_method(
         = is_simulation_data ? simulation_folders : handcrafted_folders;
     for (int fnbr = 0; fnbr < max_fnbr; fnbr++) {
         for (int ff = 0; ff < 2; ff++) {
-            all_V = read_rational_CSV(
+            all_V = read_rational_csv(
                 root_path + folders[fnbr] + sub_folder + fnames[ff], results);
             assert(all_V.rows() % 8 == 0 && all_V.cols() == 3);
             int v_size = all_V.rows() / 8;
@@ -465,7 +389,6 @@ void run_rational_data_single_method(
     //    intervalccd::print_time_1();
     // intervalccd::print_time_2();
     std::cout << "total time, " << new_timing << std::endl << std::endl;
-    /// home/bolun1/interval/
     // write_summary(folder+"method"+std::to_string(method)+"_is_edge_edge_"+std::to_string(is_edge_edge)
     // +"_"+std::to_string(total_number+1)+tail+".csv",method,total_number+1,total_positives,is_edge_edge,new_false_positives,
     // new_false_negatives,new_timing/double(total_number+1));

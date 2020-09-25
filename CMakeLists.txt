@@ -138,7 +138,11 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   set(Boost_USE_MULTITHREADED TRUE)
   find_package(Boost COMPONENTS filesystem REQUIRED)
 
-  add_executable(${PROJECT_NAME}_benchmark src/benchmark.cpp)
+  add_executable(${PROJECT_NAME}_benchmark
+    src/benchmark.cpp
+    src/utils/read_rational_csv.cpp
+  )
+
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC ${PROJECT_NAME})
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC Boost::filesystem)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC fmt::fmt)
@@ -147,6 +151,10 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   target_include_directories(${PROJECT_NAME}_benchmark PUBLIC ${GMP_INCLUDE_DIRS} src)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC ${GMP_LIBRARIES})
   target_compile_features(${PROJECT_NAME}_benchmark PUBLIC cxx_std_14)
+
+  ccd_wrapper_download_sample_queries()
+  target_compile_definitions(${PROJECT_NAME}_benchmark PUBLIC
+  CCD_WRAPPER_SAMPLE_QUERIES_DIR="${CCD_WRAPPER_EXTERNAL}/Sample-Queries/")
 
   if(CCD_WRAPPER_WITH_MSRP)
     add_executable(round_queries src/tools/round_queries.cpp)

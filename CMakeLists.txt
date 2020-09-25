@@ -154,7 +154,7 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
 
   ccd_wrapper_download_sample_queries()
   target_compile_definitions(${PROJECT_NAME}_benchmark PUBLIC
-  CCD_WRAPPER_SAMPLE_QUERIES_DIR="${CCD_WRAPPER_EXTERNAL}/Sample-Queries/")
+    CCD_WRAPPER_SAMPLE_QUERIES_DIR="${CCD_WRAPPER_EXTERNAL}/Sample-Queries/")
 
   if(CCD_WRAPPER_WITH_MSRP)
     add_executable(round_queries src/tools/round_queries.cpp)

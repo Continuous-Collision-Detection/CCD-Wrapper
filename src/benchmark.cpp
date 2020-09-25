@@ -9,12 +9,14 @@
 #include <Eigen/Core>
 #include <fmt/format.h>
 #include <highfive/H5Easy.hpp>
-#include <igl/Timer.h>
 #include <nlohmann/json.hpp>
 
 #include <ccd.hpp>
+
 #include <utils/get_rss.hpp>
-#include <Rational.hpp>
+#include <utils/rational.hpp>
+#include <utils/timer.hpp>
+
 using namespace ccd;
 
 struct Args {
@@ -64,13 +66,14 @@ Args parse_args(int argc, char* argv[])
     return args;
 }
 
-void run_benchmark(int argc, char* argv[]){
+void run_benchmark(int argc, char* argv[])
+{
     Args args = parse_args(argc, argv);
 
     bool use_msccd = is_minimum_separation_method(args.method);
     std::cout << "method, " << args.method << " out of " << NUM_CCD_METHODS
               << std::endl;
-    igl::Timer timer;
+    Timer timer;
 
     int num_queries = 0;
     double timing = 0.0;
@@ -194,29 +197,22 @@ void run_benchmark(int argc, char* argv[]){
     std::ofstream(fname) << benchmark.dump(4);
 }
 std::string root_path = "/home/bolun1/interval/data/";
-std::array<std::string, 15> simulation_folders = {{"chain",
-                                                   "cow-heads",
-                                                   "golf-ball",
-                                                   "mat-twist"}};
-std::array<std::string, 15> handcrafted_folders = {{"erleben-sliding-spike",
-                                                    "erleben-spike-wedge",
+std::array<std::string, 15> simulation_folders
+    = { { "chain", "cow-heads", "golf-ball", "mat-twist" } };
+std::array<std::string, 15> handcrafted_folders
+    = { { "erleben-sliding-spike", "erleben-spike-wedge",
 
-                                                    "erleben-sliding-wedge",
-                                                    "erleben-wedge-crack",
+          "erleben-sliding-wedge", "erleben-wedge-crack",
 
-                                                    "erleben-spike-crack",
-                                                    "erleben-wedges",
-                                                    "erleben-cube-cliff-edges",
-                                                    "erleben-spike-hole",
+          "erleben-spike-crack", "erleben-wedges", "erleben-cube-cliff-edges",
+          "erleben-spike-hole",
 
-                                                    "erleben-cube-internal-edges",
-                                                    "erleben-spikes",
+          "erleben-cube-internal-edges", "erleben-spikes",
 
-                                                    "unit-tests"}};
-std::array<std::string, 2> fnames = {{"data_0_0.csv", "data_0_1.csv"}};
+          "unit-tests" } };
+std::array<std::string, 2> fnames = { { "data_0_0.csv", "data_0_1.csv" } };
 
-struct write_format
-{
+struct write_format {
     std::string file;
     int nbr;
     bool is_edge_edge;
@@ -225,18 +221,18 @@ struct write_format
     double time;
     int method;
 };
-Eigen::MatrixXd read_rational_CSV(const std::string inputFileName, std::vector<bool> &results)
+Eigen::MatrixXd
+read_rational_CSV(const std::string inputFileName, std::vector<bool>& results)
 {
-    // be careful, there are n lines which means there are n/8 queries, but has n results, which means
-    // results are duplicated
+    // be careful, there are n lines which means there are n/8 queries, but has
+    // n results, which means results are duplicated
     results.clear();
     std::vector<std::array<double, 3>> vs;
     vs.clear();
     std::ifstream infile;
     infile.open(inputFileName);
     std::array<double, 3> v;
-    if (!infile.is_open())
-    {
+    if (!infile.is_open()) {
         std::cout << "Path Wrong!!!!" << std::endl;
         std::cout << "path, " << inputFileName << std::endl;
         return Eigen::MatrixXd(1, 1);
@@ -249,65 +245,68 @@ Eigen::MatrixXd read_rational_CSV(const std::string inputFileName, std::vector<b
         std::string s;
         if (!getline(infile, s))
             break;
-        if (s[0] != '#')
-        {
+        if (s[0] != '#') {
             std::istringstream ss(s);
-            std::array<std::string, 7> record; // the first six are one vetex, the seventh is the result
+            std::array<std::string, 7> record; // the first six are one vetex,
+                                               // the seventh is the result
             int c = 0;
-            while (ss)
-            {
+            while (ss) {
                 std::string line;
                 if (!getline(ss, line, ','))
                     break;
-                try
-                {
+                try {
                     record[c] = line;
                     c++;
-                }
-                catch (const std::invalid_argument e)
-                {
-                    std::cout << "NaN found in file " << inputFileName << " line " << l
-                              << std::endl;
+                } catch (const std::invalid_argument e) {
+                    std::cout << "NaN found in file " << inputFileName
+                              << " line " << l << std::endl;
                     e.what();
                 }
             }
-            ccd::Rational rt;
-            double x = rt.get_double(record[0], record[1]), y = rt.get_double(record[2], record[3]), z = rt.get_double(record[4], record[5]);
+            Rational rt;
+            double x = rt.get_double(record[0], record[1]),
+                   y = rt.get_double(record[2], record[3]),
+                   z = rt.get_double(record[4], record[5]);
             v[0] = x;
             v[1] = y;
             v[2] = z;
             vs.push_back(v);
-            if (record[6] != "1" && record[6] != "0")
-            {
-                std::cout << "ERROR:result position should be 1 or 0, but it is " << record[6] << std::endl;
+            if (record[6] != "1" && record[6] != "0") {
+                std::cout
+                    << "ERROR:result position should be 1 or 0, but it is "
+                    << record[6] << std::endl;
             }
             results.push_back(std::stoi(record[6]));
         }
     }
     Eigen::MatrixXd all_v(vs.size(), 3);
-    for (int i = 0; i < vs.size(); i++)
-    {
+    for (int i = 0; i < vs.size(); i++) {
         all_v(i, 0) = vs[i][0];
         all_v(i, 1) = vs[i][1];
         all_v(i, 2) = vs[i][2];
     }
-    if (!infile.eof())
-    {
+    if (!infile.eof()) {
         std::cerr << "Could not read file " << inputFileName << "\n";
     }
 
     return all_v;
 }
 
-void run_rational_data_single_method(const bool is_edge_edge, const bool is_simulation_data, const double minimum_seperation,
-                                     const double tolerance, const CCDMethod method, const int max_itr = 1e6)
+void run_rational_data_single_method(
+    const bool is_edge_edge,
+    const bool is_simulation_data,
+    const double minimum_seperation,
+    const double tolerance,
+    const CCDMethod method,
+    const int max_itr = 1e6)
 {
-    std::cout<<"\n******* Running method: "<<method_names[method]<<std::endl;
+    std::cout << "\n******* Running method: " << method_names[method]
+              << std::endl;
     bool use_msccd = is_minimum_separation_method(method);
     std::string sub_folder;
     Eigen::MatrixXd all_V;
     std::vector<bool> results;
-    igl::Timer timer;
+    Timer timer;
 
     int total_number = -1;
     double new_timing = 0.0;
@@ -321,45 +320,45 @@ void run_rational_data_single_method(const bool is_edge_edge, const bool is_simu
     double max_tol = 0;
     double sum_tol = 0;
 
-    if (is_edge_edge)
-    {
+    if (is_edge_edge) {
         sub_folder = "/edge-edge/";
-    }
-    else
-    {
+    } else {
         sub_folder = "/vertex-face/";
     }
     int max_fnbr = is_simulation_data ? 4 : 11;
-    const auto folders = is_simulation_data ? simulation_folders : handcrafted_folders;
-    for (int fnbr = 0; fnbr < max_fnbr; fnbr++)
-    {
-        for (int ff = 0; ff < 2; ff++)
-        {
-            all_V = read_rational_CSV(root_path + folders[fnbr] + sub_folder + fnames[ff], results);
+    const auto folders
+        = is_simulation_data ? simulation_folders : handcrafted_folders;
+    for (int fnbr = 0; fnbr < max_fnbr; fnbr++) {
+        for (int ff = 0; ff < 2; ff++) {
+            all_V = read_rational_CSV(
+                root_path + folders[fnbr] + sub_folder + fnames[ff], results);
             assert(all_V.rows() % 8 == 0 && all_V.cols() == 3);
             int v_size = all_V.rows() / 8;
-            for (int i = 0; i < v_size; i++)
-            {
+            for (int i = 0; i < v_size; i++) {
                 total_number += 1;
                 Eigen::Matrix<double, 8, 3> V = all_V.middleRows<8>(8 * i);
-                bool expected_result = results[i * 8]; //args[k].result;// from mathematica
+                bool expected_result
+                    = results[i * 8]; // args[k].result;// from mathematica
 
                 bool new_result;
 
-                const std::array<double, 3> err = {{-1, -1, -1}};
+                const std::array<double, 3> err = { { -1, -1, -1 } };
 
                 double toi;
                 const double t_max = 1;
 
                 double output_tolerance = tolerance;
-                const int CCD_TYPE = 1; // 0, normal ccd method which only checks t = [0,1]; 1, ccd with max_itr and t=[0, t_max]
+                const int CCD_TYPE
+                    = 1; // 0, normal ccd method which only checks t = [0,1]; 1,
+                         // ccd with max_itr and t=[0, t_max]
                 timer.start();
                 // if (is_edge_edge)
                 // {
                 //     new_result = edgeEdgeCCD_double(
                 //         V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
                 //         V.row(5), V.row(6), V.row(7),
-                //         err, minimum_seperation, toi, tolerance, t_max, max_itr, output_tolerance, CCD_TYPE);
+                //         err, minimum_seperation, toi, tolerance, t_max,
+                //         max_itr, output_tolerance, CCD_TYPE);
                 //     //std::cout<<"edge edge check"<<std::endl;
                 // }
                 // else
@@ -367,33 +366,33 @@ void run_rational_data_single_method(const bool is_edge_edge, const bool is_simu
                 //     new_result = vertexFaceCCD_double(
                 //         V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
                 //         V.row(5), V.row(6), V.row(7),
-                //         err, minimum_seperation, toi, tolerance, t_max, max_itr, output_tolerance, CCD_TYPE);
+                //         err, minimum_seperation, toi, tolerance, t_max,
+                //         max_itr, output_tolerance, CCD_TYPE);
                 // }
 
-
                 if (use_msccd) {
-                if (is_edge_edge) {
-                    new_result = edgeEdgeMSCCD(
-                        V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
-                        V.row(5), V.row(6), V.row(7), minimum_seperation,
-                        method);
+                    if (is_edge_edge) {
+                        new_result = edgeEdgeMSCCD(
+                            V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
+                            V.row(5), V.row(6), V.row(7), minimum_seperation,
+                            method);
+                    } else {
+                        new_result = vertexFaceMSCCD(
+                            V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
+                            V.row(5), V.row(6), V.row(7), minimum_seperation,
+                            method);
+                    }
                 } else {
-                    new_result = vertexFaceMSCCD(
-                        V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
-                        V.row(5), V.row(6), V.row(7), minimum_seperation,
-                        method);
+                    if (is_edge_edge) {
+                        new_result = edgeEdgeCCD(
+                            V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
+                            V.row(5), V.row(6), V.row(7), method);
+                    } else {
+                        new_result = vertexFaceCCD(
+                            V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
+                            V.row(5), V.row(6), V.row(7), method);
+                    }
                 }
-            } else {
-                if (is_edge_edge) {
-                    new_result = edgeEdgeCCD(
-                        V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
-                        V.row(5), V.row(6), V.row(7), method);
-                } else {
-                    new_result = vertexFaceCCD(
-                        V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
-                        V.row(5), V.row(6), V.row(7), method);
-                }
-            }
                 timer.stop();
                 new_timing += timer.getElapsedTimeInMicroSec();
                 // sum_tol += output_tolerance;
@@ -421,31 +420,34 @@ void run_rational_data_single_method(const bool is_edge_edge, const bool is_simu
 
                 if (expected_result)
                     total_positives++;
-                if (new_result != expected_result)
-                {
-                    //std::cout<<"\nresult don't match, groud, "<<expected_result<<" ours, "<<new_result<<std::endl;
+                if (new_result != expected_result) {
+                    // std::cout<<"\nresult don't match, groud,
+                    // "<<expected_result<<" ours, "<<new_result<<std::endl;
 
                     if (new_result)
                         new_false_positives++;
 
-                    if (new_result == 0)
-                    {
-                            new_false_negatives++;
-                           if(method==CCDMethod::TIGHT_INCLUSION){
-                        std::cout << "false negative, " << root_path + folders[fnbr] + sub_folder + fnames[ff] << ", " << i << std::endl;
-                        for (int j = 0; j < 8; j++)
-                        {
-                            std::cout << "v" << j << " " << V(j, 0) << ", " << V(j, 1) << ", " << V(j, 2) << std::endl;
-                            if (j == 3)
-                                std::cout << std::endl;
+                    if (new_result == 0) {
+                        new_false_negatives++;
+                        if (method == CCDMethod::TIGHT_INCLUSION) {
+                            std::cout << "false negative, "
+                                      << root_path + folders[fnbr] + sub_folder
+                                    + fnames[ff]
+                                      << ", " << i << std::endl;
+                            for (int j = 0; j < 8; j++) {
+                                std::cout << "v" << j << " " << V(j, 0) << ", "
+                                          << V(j, 1) << ", " << V(j, 2)
+                                          << std::endl;
+                                if (j == 3)
+                                    std::cout << std::endl;
+                            }
+
+                            std::cout << "is edge? " << is_edge_edge
+                                      << std::endl
+                                      << std::endl;
+
+                            exit(0);
                         }
-                        
-
-                        std::cout << "is edge? " << is_edge_edge << std::endl
-                                  << std::endl;
-
-                        exit(0);
-                    }
                     }
                 }
             }
@@ -457,18 +459,19 @@ void run_rational_data_single_method(const bool is_edge_edge, const bool is_simu
     std::cout << "is_edge_edge? , " << is_edge_edge << std::endl;
     std::cout << "new_false_positives, " << new_false_positives << std::endl;
     std::cout << "new_false_negatives, " << new_false_negatives << std::endl;
-    std::cout << "average time, " << new_timing / double(total_number + 1) << std::endl
+    std::cout << "average time, " << new_timing / double(total_number + 1)
+              << std::endl
               << std::endl;
-    // std::cout << "percentage of early return, " << double(nbr_diff_tol) / total_number << std::endl;
-    // std::cout << "percentage of early and larger tol return, " << double(nbr_larger_tol) / total_number << std::endl;
+    // std::cout << "percentage of early return, " << double(nbr_diff_tol) /
+    // total_number << std::endl; std::cout << "percentage of early and larger
+    // tol return, " << double(nbr_larger_tol) / total_number << std::endl;
     // std::cout << "max tol, " << max_tol << std::endl;
     // std::cout << "average tol, " << sum_tol / total_number << std::endl
     //           << std::endl;
     //    intervalccd::print_time_1();
     // intervalccd::print_time_2();
-    std::cout << "total time, " << new_timing << std::endl
-              << std::endl;
-    ///home/bolun1/interval/
+    std::cout << "total time, " << new_timing << std::endl << std::endl;
+    /// home/bolun1/interval/
     // write_summary(folder+"method"+std::to_string(method)+"_is_edge_edge_"+std::to_string(is_edge_edge)
     // +"_"+std::to_string(total_number+1)+tail+".csv",method,total_number+1,total_positives,is_edge_edge,new_false_positives,
     // new_false_negatives,new_timing/double(total_number+1));
@@ -478,7 +481,7 @@ void run_rational_data_single_method(const bool is_edge_edge, const bool is_simu
     //     write_iteration_info(folder+"method"+std::to_string(method)+"_is_edge_edge_"+std::to_string(is_edge_edge)
     //     +"_"+std::to_string(total_number+1)+"_itration"+tail+".csv",double(nbr_diff_tol)/total_number,max_tol,sum_tol/total_number);
     // }
-    std::cout<<"** finished "<<method_names[method]<<std::endl;
+    std::cout << "** finished " << method_names[method] << std::endl;
 }
 
 void run_one_method_over_all_data(const CCDMethod method)
@@ -492,38 +495,36 @@ void run_one_method_over_all_data(const CCDMethod method)
     is_edge_edge = true;
     is_simu_data = false;
     std::cout << "****Running handcrafted dataset, edge-edge: " << std::endl;
-    run_rational_data_single_method(is_edge_edge, is_simu_data, minimum_seperation, tolerance, method,max_itr);
+    run_rational_data_single_method(
+        is_edge_edge, is_simu_data, minimum_seperation, tolerance, method,
+        max_itr);
     is_edge_edge = false;
     is_simu_data = false;
     std::cout << "****Running handcrafted dataset, vertex-face: " << std::endl;
-    run_rational_data_single_method(is_edge_edge, is_simu_data, minimum_seperation, tolerance, method,max_itr);
+    run_rational_data_single_method(
+        is_edge_edge, is_simu_data, minimum_seperation, tolerance, method,
+        max_itr);
     is_edge_edge = true;
     is_simu_data = true;
     std::cout << "****Running simulation dataset, edge-edge: " << std::endl;
-    run_rational_data_single_method(is_edge_edge, is_simu_data, minimum_seperation, tolerance, method,max_itr);
+    run_rational_data_single_method(
+        is_edge_edge, is_simu_data, minimum_seperation, tolerance, method,
+        max_itr);
     is_edge_edge = false;
     is_simu_data = true;
     std::cout << "****Running simulation dataset, vertex-face: " << std::endl;
-    run_rational_data_single_method(is_edge_edge, is_simu_data, minimum_seperation, tolerance, method,max_itr);
+    run_rational_data_single_method(
+        is_edge_edge, is_simu_data, minimum_seperation, tolerance, method,
+        max_itr);
 }
 
-void run_all_methods(){
-    for (int i=0;i<int(NUM_CCD_METHODS);i++){
+void run_all_methods()
+{
+    for (int i = 0; i < int(NUM_CCD_METHODS); i++) {
         CCDMethod method = CCDMethod(i);
-        ////////////////////////////////////////
-        if(i<7) continue;
-
-        ////////////////////////////////////////
-        if (method==CCDMethod::MIN_SEPARATION_ROOT_PARITY||method==CCDMethod::SAFE_CCD){
-            
-            continue;
+        if (is_method_enabled(method)) {
+            run_one_method_over_all_data(method);
         }
-
-
-        run_one_method_over_all_data(method);
     }
 }
-int main(int argc, char* argv[])
-{
-    run_all_methods();
-}
+int main(int argc, char* argv[]) { run_all_methods(); }

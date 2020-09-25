@@ -100,14 +100,6 @@ function(ccd_wrapper_download_catch2)
   )
 endfunction()
 
-# libigl for timing
-function(ccd_wrapper_download_libigl)
-   ccd_wrapper_download_project(libigl
-   GIT_REPOSITORY https://github.com/libigl/libigl.git
-   GIT_TAG        aea868bd1fc64f71afecd2c51e51507a99d8e3e5
-  )
-endfunction()
-
 # HighFive - Header-only C++ HDF5 interface
 function(ccd_wrapper_download_high_five)
   ccd_wrapper_download_project(HighFive

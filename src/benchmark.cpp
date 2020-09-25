@@ -356,8 +356,7 @@ void run_all_methods()
 {
     for (int i = 0; i < int(NUM_CCD_METHODS); i++) {
         CCDMethod method = CCDMethod(i);
-        if (is_method_enabled(method)
-            && method != CCDMethod::RATIONAL_ROOT_PARITY) {
+        if (is_method_enabled(method)) {
             run_one_method_over_all_data(method);
         }
     }

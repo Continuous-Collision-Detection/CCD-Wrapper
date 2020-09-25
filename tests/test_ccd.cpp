@@ -23,7 +23,11 @@ TEST_CASE(
     }
 
     // point
+#ifdef WIN32
+    double v0z = 0.0;
+#else
     double v0z = GENERATE(0.0, -1.0);
+#endif
     Eigen::Vector3d v0(0, 1, v0z);
     // triangle = (v1, v2, v3)
     Eigen::Vector3d v1(-1, 0, 1);
@@ -33,7 +37,11 @@ TEST_CASE(
     // displacements
     double u0y
         = -GENERATE(-1.0, 0.0, 0.5 - EPSILON, 0.5, 0.5 + EPSILON, 1.0, 2.0);
+#ifdef WIN32
+    double u0z = EPSILON;
+#else
     double u0z = GENERATE(-EPSILON, 0.0, EPSILON);
+#endif
     Eigen::Vector3d u0(0, u0y, u0z);
     double u1y
         = GENERATE(-1.0, 0.0, 0.5 - EPSILON, 0.5, 0.5 + EPSILON, 1.0, 2.0);
@@ -172,7 +180,11 @@ TEST_CASE("Zhongshi test case", "[ccd][point-triangle]")
         return;
     }
 
+#ifdef WIN32
+    double qy = EPSILON;
+#else
     double qy = GENERATE(-EPSILON, 0, EPSILON);
+#endif
 
     Eigen::Vector3d q;
     q << 0, qy, 0;

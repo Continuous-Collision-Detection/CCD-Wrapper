@@ -3,9 +3,21 @@ project(CCDWrapper)
 
 ################################################################################
 
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set(CCD_WRAPPER_TOPLEVEL_PROJECT ON)
+else()
+    set(CCD_WRAPPER_TOPLEVEL_PROJECT OFF)
+endif()
+
 # project-options
-option(CCD_WRAPPER_WITH_UNIT_TESTS "Build unit tests using Catch2"                 ON)
-option(CCD_WRAPPER_WITH_BENCHMARK  "Build exectuable for timing methods"           ON)
+if(CCD_WRAPPER_TOPLEVEL_PROJECT)
+  option(CCD_WRAPPER_WITH_UNIT_TESTS "Build unit tests using Catch2"        ON)
+  option(CCD_WRAPPER_WITH_BENCHMARK  "Build exectuable for timing methods"  ON)
+else()
+  option(CCD_WRAPPER_WITH_UNIT_TESTS "Build unit tests using Catch2"       OFF)
+  option(CCD_WRAPPER_WITH_BENCHMARK  "Build exectuable for timing methods" OFF)
+endif()
+
 # methods
 option(CCD_WRAPPER_WITH_FPRF       "Enable floating-point root finder method"      ON)
 option(CCD_WRAPPER_WITH_MSRF       "Enable minimum separation root-finding method" ON)

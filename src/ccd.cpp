@@ -604,7 +604,7 @@ bool vertexFaceMSCCD(
                 toi,          // time of impact
                 tolerance,    // δ
                 /*t_max=*/1,
-                /*max_itr=*/-1,
+                /*max_itr=*/1e6,
                 output_tolerance, // δ_actual
                 /*CCD_TYPE=*/1);
 #else

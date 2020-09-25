@@ -45,7 +45,7 @@
 #endif
 // Custom inclusion based CCD of [Wang et al. 2020]
 #ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
-#include <tight_inclusion/interval_ccd.hpp>
+#include <tight_inclusion/inclusion_ccd.hpp>
 #endif
 
 namespace ccd {

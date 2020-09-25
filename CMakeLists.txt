@@ -11,6 +11,7 @@ option(CCD_WRAPPER_WITH_MSRF       "Enable minimum separation root-finding metho
 option(CCD_WRAPPER_WITH_RP         "Enable root parity method"                     ON)
 option(CCD_WRAPPER_WITH_RRP        "Enable rational root parity method"            ON)
 option(CCD_WRAPPER_WITH_MSRP       "Enable minimum separation root parity method" OFF)
+mark_as_advanced(CCD_WRAPPER_WITH_MSRP) # This is a private method
 option(CCD_WRAPPER_WITH_BSC        "Enable Bernstein sign classification method"   ON)
 option(CCD_WRAPPER_WITH_TIGHT_CCD  "Enable TightCCD method"                        ON)
 option(CCD_WRAPPER_WITH_INTERVAL   "Enable interval-based methods"                ON)
@@ -127,6 +128,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE warnings::all)
 
 # Use C++17
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+
+# Fix min and max on Windows
+target_compile_definitions(${PROJECT_NAME} PUBLIC NOMINMAX)
 
 ################################################################################
 # Tests

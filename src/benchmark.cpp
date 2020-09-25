@@ -1,18 +1,17 @@
 // Time the different CCD methods
 
-#include <filesystem>
 #include <fstream>
 #include <regex>
 #include <string>
 
 #include <CLI/CLI.hpp>
 #include <Eigen/Core>
+#include <boost/filesystem.hpp>
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
 #include <ccd.hpp>
 
-#include <utils/get_rss.hpp>
 #include <utils/rational.hpp>
 #include <utils/timer.hpp>
 

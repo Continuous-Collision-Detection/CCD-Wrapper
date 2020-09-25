@@ -134,17 +134,19 @@ endif()
 ################################################################################
 
 if(CCD_WRAPPER_WITH_BENCHMARK)
-  add_executable(${PROJECT_NAME}_benchmark
-    src/benchmark.cpp
-    src/utils/get_rss.cpp
-  )
+  # Boost
+  set(Boost_USE_MULTITHREADED TRUE)
+  find_package(Boost COMPONENTS filesystem REQUIRED)
+
+  add_executable(${PROJECT_NAME}_benchmark src/benchmark.cpp)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC ${PROJECT_NAME})
+  target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC Boost::filesystem)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC fmt::fmt)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC nlohmann_json::nlohmann_json)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC CLI11::CLI11)
-  target_compile_features(${PROJECT_NAME}_benchmark PUBLIC cxx_std_14)
   target_include_directories(${PROJECT_NAME}_benchmark PUBLIC ${GMP_INCLUDE_DIRS} src)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC ${GMP_LIBRARIES})
+  target_compile_features(${PROJECT_NAME}_benchmark PUBLIC cxx_std_14)
 
   if(CCD_WRAPPER_WITH_MSRP)
     add_executable(round_queries src/tools/round_queries.cpp)
@@ -154,6 +156,7 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
 
   # add_executable(${PROJECT_NAME}_check_ground_truth src/check_ground_truth.cpp)
   # target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC ${PROJECT_NAME})
+  # target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC Boost::filesystem)
   # target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC fmt::fmt)
   # target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC nlohmann_json::nlohmann_json)
   # target_link_libraries(${PROJECT_NAME}_check_ground_truth PUBLIC CLI11::CLI11)

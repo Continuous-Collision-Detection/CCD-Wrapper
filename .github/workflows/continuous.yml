@@ -94,13 +94,13 @@ jobs:
       fail-fast: false
       matrix:
         config: [Debug, Release]
-        CCD_WRAPPER_WITH_FPRF: [ON, OFF]
-        CCD_WRAPPER_WITH_MSRF: [ON, OFF]
-        CCD_WRAPPER_WITH_RP: [ON, OFF]
-        CCD_WRAPPER_WITH_RRP: [ON, OFF]
-        CCD_WRAPPER_WITH_BSC: [ON, OFF]
-        CCD_WRAPPER_WITH_TIGHT_CCD: [ON, OFF]
-        CCD_WRAPPER_WITH_TIGHT_INCLUSION: [ON, OFF]
+        # CCD_WRAPPER_WITH_FPRF: [ON, OFF]
+        # CCD_WRAPPER_WITH_MSRF: [ON, OFF]
+        # CCD_WRAPPER_WITH_RP: [ON, OFF]
+        # CCD_WRAPPER_WITH_RRP: [ON, OFF]
+        # CCD_WRAPPER_WITH_BSC: [ON, OFF]
+        # CCD_WRAPPER_WITH_TIGHT_CCD: [ON, OFF]
+        # CCD_WRAPPER_WITH_TIGHT_INCLUSION: [ON, OFF]
     steps:
       - name: Stetup Conda
         uses: s-weigand/setup-conda@v1
@@ -147,7 +147,7 @@ jobs:
           cmake -G Ninja ^
             -DCMAKE_CXX_COMPILER_LAUNCHER=sccache ^
             -DCMAKE_BUILD_TYPE=${{ matrix.config }} ^
-            -DCCD_WRAPPER_WITH_FPRF=${{ matrix.CCD_WRAPPER_WITH_FPRF }} -DCCD_WRAPPER_WITH_MSRF=${{ matrix.CCD_WRAPPER_WITH_MSRF }} -DCCD_WRAPPER_WITH_RP=${{ matrix.CCD_WRAPPER_WITH_RP }} -DCCD_WRAPPER_WITH_RRP=${{ matrix.CCD_WRAPPER_WITH_RRP }} -DCCD_WRAPPER_WITH_BSC=${{ matrix.CCD_WRAPPER_WITH_BSC }} -DCCD_WRAPPER_WITH_TIGHT_CCD=${{ matrix.CCD_WRAPPER_WITH_TIGHT_CCD }} -DCCD_WRAPPER_WITH_TIGHT_INCLUSION=${{ matrix.CCD_WRAPPER_WITH_TIGHT_INCLUSION }} ^
+            -DCCD_WRAPPER_WITH_TIGHT_INCLUSION=OFF ^
             -B build ^
             -S .
           cd build

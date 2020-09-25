@@ -1,6 +1,6 @@
 # Continuous Collision Detection Wrapper
 
-[![Build status](https://github.com/Continuous-Collision-Detection/CCD-Wrapper/workflows/Build/badge.svg?event=push)](https://github.com/ipc-sim/ipc-toolkit/actions?query=workflow%3ABuild+branch%3Amaster+event%3Apush)
+[![Build status](https://github.com/Continuous-Collision-Detection/CCD-Wrapper/workflows/Build/badge.svg)](https://github.com/Continuous-Collision-Detection/CCD-Wrapper/actions?query=workflow%3ABuild+branch%3Amaster+event%3Apush)
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/Continuous-Collision-Detection/CCD-Wrapper.svg?color=blue"></img></a>
 
 Wrappers for various continuous collision detection algorithms.

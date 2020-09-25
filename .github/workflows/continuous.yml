@@ -114,8 +114,6 @@ jobs:
           echo "::set-env name=GMP_INC::C:\Miniconda\Library\include"
           echo "::set-env name=GMP_LIB::C:\Miniconda\Library\lib"
           echo "::set-env name=BOOST_ROOT::$($env:BOOST_ROOT_1_72_0)"
-          $env:BOOST_ROOT
-          ls $env:BOOST_ROOT
 
       - name: Cache build
         id: cache-build

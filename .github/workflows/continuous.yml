@@ -116,11 +116,11 @@ jobs:
         # https://github.com/actions/cache/issues/101
       - name: Find Boost
         run: |
-          echo %PATH%
-          echo %BOOST_ROOT%
-          dir %BOOST_ROOT%
-          echo %BOOST_ROOT_1_72_0%
-          dir %BOOST_ROOT_1_72_0%
+          $env:PATH
+          $env:BOOST_ROOT
+          ls $env:BOOST_ROOT
+          $env:BOOST_ROOT_1_72_0
+          ls $env:BOOST_ROOT_1_72_0
 
       - name: Set env
         run: |

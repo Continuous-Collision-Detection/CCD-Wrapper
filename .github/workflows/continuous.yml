@@ -89,13 +89,6 @@ jobs:
       fail-fast: false
       matrix:
         config: [Debug, Release]
-        # CCD_WRAPPER_WITH_FPRF: [ON, OFF]
-        # CCD_WRAPPER_WITH_MSRF: [ON, OFF]
-        # CCD_WRAPPER_WITH_RP: [ON, OFF]
-        # CCD_WRAPPER_WITH_RRP: [ON, OFF]
-        # CCD_WRAPPER_WITH_BSC: [ON, OFF]
-        # CCD_WRAPPER_WITH_TIGHT_CCD: [ON, OFF]
-        # CCD_WRAPPER_WITH_TIGHT_INCLUSION: [ON, OFF]
     steps:
       - name: Stetup Conda
         uses: s-weigand/setup-conda@v1
@@ -114,19 +107,13 @@ jobs:
           fetch-depth: 10
       - uses: seanmiddleditch/gha-setup-ninja@master
         # https://github.com/actions/cache/issues/101
-      - name: Find Boost
-        run: |
-          echo %PATH%
-          echo %BOOST_ROOT%
-          dir %BOOST_ROOT%
-          echo %BOOST_ROOT_1_72_0%
-          dir %BOOST_ROOT_1_72_0%
 
       - name: Set env
         run: |
           echo "::set-env name=appdata::$($env:LOCALAPPDATA)"
           echo "::set-env name=GMP_INC::C:\Miniconda\Library\include"
           echo "::set-env name=GMP_LIB::C:\Miniconda\Library\lib"
+          echo "::set-env name=BOOST_ROOT::$($env:BOOST_ROOT_1_72_0)"
 
       - name: Cache build
         id: cache-build

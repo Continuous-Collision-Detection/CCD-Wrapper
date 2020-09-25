@@ -322,42 +322,4 @@ inline bool is_method_enabled(const CCDMethod& method)
         return false;
     }
 }
-
-#ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
-bool edgeEdgeCCD_OURS(
-    const Eigen::Vector3d& edge0_vertex0_start,
-    const Eigen::Vector3d& edge0_vertex1_start,
-    const Eigen::Vector3d& edge1_vertex0_start,
-    const Eigen::Vector3d& edge1_vertex1_start,
-    const Eigen::Vector3d& edge0_vertex0_end,
-    const Eigen::Vector3d& edge0_vertex1_end,
-    const Eigen::Vector3d& edge1_vertex0_end,
-    const Eigen::Vector3d& edge1_vertex1_end,
-    const std::array<double, 3>& err,
-    const double ms, // TODO maybe add an assertion to check if ms is too big?
-    double& toi,
-    const double tolerance,
-    const double pre_check_t,
-    const int max_itr,
-    double& output_tolerance,
-    const int CCD_TYPE);
-
-bool vertexFaceCCD_OURS(
-    const Eigen::Vector3d& edge0_vertex0_start,
-    const Eigen::Vector3d& edge0_vertex1_start,
-    const Eigen::Vector3d& edge1_vertex0_start,
-    const Eigen::Vector3d& edge1_vertex1_start,
-    const Eigen::Vector3d& edge0_vertex0_end,
-    const Eigen::Vector3d& edge0_vertex1_end,
-    const Eigen::Vector3d& edge1_vertex0_end,
-    const Eigen::Vector3d& edge1_vertex1_end,
-    const std::array<double, 3>& err,
-    const double ms, // TODO maybe add an assertion to check if ms is too big?
-    double& toi,
-    const double tolerance,
-    const double pre_check_t,
-    const int max_itr,
-    double& output_tolerance,
-    const int CCD_TYPE);
-#endif
 } // namespace ccd

@@ -466,58 +466,6 @@ bool edgeEdgeCCD(
     }
 }
 
-#ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
-bool edgeEdgeCCD_OURS(
-    const Eigen::Vector3d& edge0_vertex0_start,
-    const Eigen::Vector3d& edge0_vertex1_start,
-    const Eigen::Vector3d& edge1_vertex0_start,
-    const Eigen::Vector3d& edge1_vertex1_start,
-    const Eigen::Vector3d& edge0_vertex0_end,
-    const Eigen::Vector3d& edge0_vertex1_end,
-    const Eigen::Vector3d& edge1_vertex0_end,
-    const Eigen::Vector3d& edge1_vertex1_end,
-    const std::array<double, 3>& err,
-    const double ms, // TODO maybe add an assertion to check if ms is too big?
-    double& toi,
-    const double tolerance,
-    const double pre_check_t,
-    const int max_itr,
-    double& output_tolerance,
-    const int CCD_TYPE)
-{
-    return inclusion_ccd::edgeEdgeCCD_double(
-        edge0_vertex0_start, edge0_vertex1_start, edge1_vertex0_start,
-        edge1_vertex1_start, edge0_vertex0_end, edge0_vertex1_end,
-        edge1_vertex0_end, edge1_vertex1_end, err, ms, toi, tolerance,
-        pre_check_t, max_itr, output_tolerance, CCD_TYPE);
-}
-
-bool vertexFaceCCD_OURS(
-    const Eigen::Vector3d& edge0_vertex0_start,
-    const Eigen::Vector3d& edge0_vertex1_start,
-    const Eigen::Vector3d& edge1_vertex0_start,
-    const Eigen::Vector3d& edge1_vertex1_start,
-    const Eigen::Vector3d& edge0_vertex0_end,
-    const Eigen::Vector3d& edge0_vertex1_end,
-    const Eigen::Vector3d& edge1_vertex0_end,
-    const Eigen::Vector3d& edge1_vertex1_end,
-    const std::array<double, 3>& err,
-    const double ms, // TODO maybe add an assertion to check if ms is too big?
-    double& toi,
-    const double tolerance,
-    const double pre_check_t,
-    const int max_itr,
-    double& output_tolerance,
-    const int CCD_TYPE)
-{
-    return inclusion_ccd::vertexFaceCCD_double(
-        edge0_vertex0_start, edge0_vertex1_start, edge1_vertex0_start,
-        edge1_vertex1_start, edge0_vertex0_end, edge0_vertex1_end,
-        edge1_vertex0_end, edge1_vertex1_end, err, ms, toi, tolerance,
-        pre_check_t, max_itr, output_tolerance, CCD_TYPE);
-}
-#endif
-
 // Detect collisions between a vertex and a triangular face.
 bool vertexFaceMSCCD(
     const Eigen::Vector3d& vertex_start,
@@ -590,7 +538,13 @@ bool vertexFaceMSCCD(
 #endif
         case CCDMethod::TIGHT_INCLUSION:
 #ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
+        {
             double output_tolerance;
+            const double t_max = 1.0;
+            const long max_itr = 1e6;
+            // 0: normal ccd method which only checks t = [0,1]
+            // 1: ccd with max_itr and t=[0, t_max]
+            const int CCD_TYPE = 1;
             return inclusion_ccd::vertexFaceCCD_double(
                 // Point at t=0
                 vertex_start,
@@ -600,14 +554,15 @@ bool vertexFaceMSCCD(
                 vertex_end,
                 // Triangle at t = 1
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
-                err,          // rounding error
-                min_distance, // minimum separation distance
-                toi,          // time of impact
-                tolerance,    // δ
-                /*t_max=*/1,
-                /*max_itr=*/1e6,
-                output_tolerance, // δ_actual
-                /*CCD_TYPE=*/1);
+                err,              // rounding error
+                min_distance,     // minimum separation distance
+                toi,              // time of impact
+                tolerance,        // delta
+                t_max,            // Maximum time to check
+                max_itr,          // Maximum number of iterations
+                output_tolerance, // delta_actual
+                CCD_TYPE);
+        }
 #else
             throw "CCD method is not enabled";
 #endif
@@ -696,7 +651,13 @@ bool edgeEdgeMSCCD(
 #endif
         case CCDMethod::TIGHT_INCLUSION:
 #ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
+        {
             double output_tolerance;
+            const double t_max = 1.0;
+            const long max_itr = 1e6;
+            // 0: normal ccd method which only checks t = [0,1]
+            // 1: ccd with max_itr and t=[0, t_max]
+            const int CCD_TYPE = 1;
             return inclusion_ccd::edgeEdgeCCD_double(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
@@ -706,14 +667,15 @@ bool edgeEdgeMSCCD(
                 edge0_vertex0_end, edge0_vertex1_end,
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end,
-                err,          // rounding error
-                min_distance, // minimum separation distance
-                toi,          // Time of impact
-                tolerance,    //δ
-                /*t_max=*/1,
-                /*max_itr=*/-1,
-                output_tolerance, //δ_actual
-                /*CCD_TYPE=*/1);
+                err,              // rounding error
+                min_distance,     // minimum separation distance
+                toi,              // time of impact
+                tolerance,        // delta
+                t_max,            // Maximum time to check
+                max_itr,          // Maximum number of iterations
+                output_tolerance, // delta_actual
+                CCD_TYPE);
+        }
 #else
             throw "CCD method is not enabled";
 #endif

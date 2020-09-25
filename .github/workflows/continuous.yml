@@ -89,6 +89,13 @@ jobs:
       fail-fast: false
       matrix:
         config: [Debug, Release]
+        # CCD_WRAPPER_WITH_FPRF: [ON, OFF]
+        # CCD_WRAPPER_WITH_MSRF: [ON, OFF]
+        # CCD_WRAPPER_WITH_RP: [ON, OFF]
+        # CCD_WRAPPER_WITH_RRP: [ON, OFF]
+        # CCD_WRAPPER_WITH_BSC: [ON, OFF]
+        # CCD_WRAPPER_WITH_TIGHT_CCD: [ON, OFF]
+        # CCD_WRAPPER_WITH_TIGHT_INCLUSION: [ON, OFF]
     steps:
       - name: Stetup Conda
         uses: s-weigand/setup-conda@v1
@@ -138,9 +145,11 @@ jobs:
             -B build ^
             -S .
           cd build
-          ninja
+          ninja -j1
 
       - name: Tests
         run: |
           cd build
+          cp C:\Miniconda\Library\bin\mpir.dll .\
+          cp C:\Miniconda\Library\bin\gmp.dll .\
           ctest --verbose --output-on-failure

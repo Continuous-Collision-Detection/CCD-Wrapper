@@ -8,7 +8,6 @@
 #include <CLI/CLI.hpp>
 #include <Eigen/Core>
 #include <fmt/format.h>
-#include <highfive/H5Easy.hpp>
 #include <nlohmann/json.hpp>
 
 #include <ccd.hpp>
@@ -66,151 +65,146 @@ Args parse_args(int argc, char* argv[])
     return args;
 }
 
-void run_benchmark(int argc, char* argv[])
-{
-    Args args = parse_args(argc, argv);
+// void run_benchmark(int argc, char* argv[])
+// {
+//     Args args = parse_args(argc, argv);
+//
+//     bool use_msccd = is_minimum_separation_method(args.method);
+//     std::cout << "method, " << args.method << " out of " << NUM_CCD_METHODS
+//               << std::endl;
+//     Timer timer;
+//
+//     int num_queries = 0;
+//     double timing = 0.0;
+//     int false_positives = 0;
+//     int false_negatives = 0;
+//
+//     for (auto& entry : std::filesystem::directory_iterator(args.data_dir)) {
+//         if (entry.path().extension() != ".hdf5"
+//             && entry.path().extension() != ".h5") {
+//             continue;
+//         }
+//         H5Easy::File file(entry.path().string());
+//
+//         Eigen::MatrixXd all_V
+//             = H5Easy::load<Eigen::MatrixXd>(file, "/rounded/points");
+//         assert(all_V.rows() % 8 == 0 && all_V.cols() == 3);
+//         Eigen::Matrix<unsigned char, Eigen::Dynamic, 1> expected_results
+//             = H5Easy::load<Eigen::Matrix<unsigned char, Eigen::Dynamic, 1>>(
+//                 file, "/rounded/result");
+//         assert(all_V.rows() / 8 == expected_results.rows());
+//
+//         for (size_t i = 0; i < expected_results.rows(); i++) {
+//             Eigen::Matrix<double, 8, 3> V = all_V.middleRows<8>(8 * i);
+//             bool expected_result = bool(expected_results(i));
+//
+//             // Time the methods
+//             bool result;
+//             timer.start();
+//             if (use_msccd) {
+//                 if (args.is_edge_edge) {
+//                     result = edgeEdgeMSCCD(
+//                         V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
+//                         V.row(5), V.row(6), V.row(7), args.min_distance,
+//                         args.method);
+//                 } else {
+//                     result = vertexFaceMSCCD(
+//                         V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
+//                         V.row(5), V.row(6), V.row(7), args.min_distance,
+//                         args.method);
+//                 }
+//             } else {
+//                 if (args.is_edge_edge) {
+//                     result = edgeEdgeCCD(
+//                         V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
+//                         V.row(5), V.row(6), V.row(7), args.method);
+//                 } else {
+//                     result = vertexFaceCCD(
+//                         V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
+//                         V.row(5), V.row(6), V.row(7), args.method);
+//                 }
+//             }
+//             timer.stop();
+//             timing += timer.getElapsedTimeInMicroSec();
+//
+//             // Count the inaccuracies
+//             if (result != expected_result) {
+//                 if (result) {
+//                     false_positives++;
+//                 } else {
+//                     false_negatives++;
+//                     if (args.method
+//                             == CCDMethod::RATIONAL_MIN_SEPARATION_ROOT_PARITY
+//                         || args.method
+//                             == CCDMethod::MIN_SEPARATION_ROOT_PARITY) {
+//                         std::cerr << fmt::format(
+//                                          "file={} index={:d} method={} "
+//                                          "false_negative",
+//                                          entry.path().string(), 8 * i,
+//                                          method_names[args.method])
+//                                   << std::endl;
+//                     }
+//                 }
+//                 if (args.method == CCDMethod::RATIONAL_ROOT_PARITY) {
+//                     std::cerr
+//                         << fmt::format(
+//                                "file={} index={:d} method={} {}",
+//                                entry.path().string(), 8 * i,
+//                                method_names[args.method],
+//                                result ? "false_positive" : "false_negative")
+//                         << std::endl;
+//                 }
+//             }
+//             std::cout << ++num_queries << "\r" << std::flush;
+//         }
+//     }
+//
+//     nlohmann::json benchmark;
+//     benchmark["collision_type"] = args.is_edge_edge ? "ee" : "vf";
+//     benchmark["num_queries"] = num_queries;
+//     std::string method_name = method_names[args.method];
+//
+//     if (use_msccd) {
+//         std::string str_min_distane = fmt::format("{:g}", args.min_distance);
+//         benchmark[method_name]
+//             = { { str_min_distane,
+//                   {
+//                       { "avg_query_time", timing / num_queries },
+//                       { "num_false_positives", false_positives },
+//                       { "num_false_negatives", false_negatives },
+//                   } } };
+//     } else {
+//         benchmark[method_name] = {
+//             { "avg_query_time", timing / num_queries },
+//             { "num_false_positives", false_positives },
+//             { "num_false_negatives", false_negatives },
+//         };
+//     }
+//     std::cout << "false positives, " << false_positives << std::endl;
+//     std::cout << "false negatives, " << false_negatives << std::endl;
+//     std::string fname
+//         = (std::filesystem::path(args.data_dir) / "benchmark.json").string();
+//     {
+//         std::ifstream file(fname);
+//         if (file.good()) {
+//             nlohmann::json full_benchmark = nlohmann::json::parse(file);
+//             full_benchmark.merge_patch(benchmark);
+//             benchmark = full_benchmark;
+//         }
+//     }
+//
+//     std::ofstream(fname) << benchmark.dump(4);
+// }
 
-    bool use_msccd = is_minimum_separation_method(args.method);
-    std::cout << "method, " << args.method << " out of " << NUM_CCD_METHODS
-              << std::endl;
-    Timer timer;
-
-    int num_queries = 0;
-    double timing = 0.0;
-    int false_positives = 0;
-    int false_negatives = 0;
-
-    for (auto& entry : std::filesystem::directory_iterator(args.data_dir)) {
-        if (entry.path().extension() != ".hdf5"
-            && entry.path().extension() != ".h5") {
-            continue;
-        }
-        H5Easy::File file(entry.path().string());
-
-        Eigen::MatrixXd all_V
-            = H5Easy::load<Eigen::MatrixXd>(file, "/rounded/points");
-        assert(all_V.rows() % 8 == 0 && all_V.cols() == 3);
-        Eigen::Matrix<unsigned char, Eigen::Dynamic, 1> expected_results
-            = H5Easy::load<Eigen::Matrix<unsigned char, Eigen::Dynamic, 1>>(
-                file, "/rounded/result");
-        assert(all_V.rows() / 8 == expected_results.rows());
-
-        for (size_t i = 0; i < expected_results.rows(); i++) {
-            Eigen::Matrix<double, 8, 3> V = all_V.middleRows<8>(8 * i);
-            bool expected_result = bool(expected_results(i));
-
-            // Time the methods
-            bool result;
-            timer.start();
-            if (use_msccd) {
-                if (args.is_edge_edge) {
-                    result = edgeEdgeMSCCD(
-                        V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
-                        V.row(5), V.row(6), V.row(7), args.min_distance,
-                        args.method);
-                } else {
-                    result = vertexFaceMSCCD(
-                        V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
-                        V.row(5), V.row(6), V.row(7), args.min_distance,
-                        args.method);
-                }
-            } else {
-                if (args.is_edge_edge) {
-                    result = edgeEdgeCCD(
-                        V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
-                        V.row(5), V.row(6), V.row(7), args.method);
-                } else {
-                    result = vertexFaceCCD(
-                        V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
-                        V.row(5), V.row(6), V.row(7), args.method);
-                }
-            }
-            timer.stop();
-            timing += timer.getElapsedTimeInMicroSec();
-
-            // Count the inaccuracies
-            if (result != expected_result) {
-                if (result) {
-                    false_positives++;
-                } else {
-                    false_negatives++;
-                    if (args.method
-                            == CCDMethod::RATIONAL_MIN_SEPARATION_ROOT_PARITY
-                        || args.method
-                            == CCDMethod::MIN_SEPARATION_ROOT_PARITY) {
-                        std::cerr << fmt::format(
-                                         "file={} index={:d} method={} "
-                                         "false_negative",
-                                         entry.path().string(), 8 * i,
-                                         method_names[args.method])
-                                  << std::endl;
-                    }
-                }
-                if (args.method == CCDMethod::RATIONAL_ROOT_PARITY) {
-                    std::cerr
-                        << fmt::format(
-                               "file={} index={:d} method={} {}",
-                               entry.path().string(), 8 * i,
-                               method_names[args.method],
-                               result ? "false_positive" : "false_negative")
-                        << std::endl;
-                }
-            }
-            std::cout << ++num_queries << "\r" << std::flush;
-        }
-    }
-
-    nlohmann::json benchmark;
-    benchmark["collision_type"] = args.is_edge_edge ? "ee" : "vf";
-    benchmark["num_queries"] = num_queries;
-    std::string method_name = method_names[args.method];
-
-    if (use_msccd) {
-        std::string str_min_distane = fmt::format("{:g}", args.min_distance);
-        benchmark[method_name]
-            = { { str_min_distane,
-                  {
-                      { "avg_query_time", timing / num_queries },
-                      { "num_false_positives", false_positives },
-                      { "num_false_negatives", false_negatives },
-                  } } };
-    } else {
-        benchmark[method_name] = {
-            { "avg_query_time", timing / num_queries },
-            { "num_false_positives", false_positives },
-            { "num_false_negatives", false_negatives },
-        };
-    }
-    std::cout << "false positives, " << false_positives << std::endl;
-    std::cout << "false negatives, " << false_negatives << std::endl;
-    std::string fname
-        = (std::filesystem::path(args.data_dir) / "benchmark.json").string();
-    {
-        std::ifstream file(fname);
-        if (file.good()) {
-            nlohmann::json full_benchmark = nlohmann::json::parse(file);
-            full_benchmark.merge_patch(benchmark);
-            benchmark = full_benchmark;
-        }
-    }
-
-    std::ofstream(fname) << benchmark.dump(4);
-}
 std::string root_path = "/home/bolun1/interval/data/";
-std::array<std::string, 15> simulation_folders
+std::vector<std::string> simulation_folders
     = { { "chain", "cow-heads", "golf-ball", "mat-twist" } };
-std::array<std::string, 15> handcrafted_folders
+std::vector<std::string> handcrafted_folders
     = { { "erleben-sliding-spike", "erleben-spike-wedge",
-
-          "erleben-sliding-wedge", "erleben-wedge-crack",
-
-          "erleben-spike-crack", "erleben-wedges", "erleben-cube-cliff-edges",
-          "erleben-spike-hole",
-
-          "erleben-cube-internal-edges", "erleben-spikes",
-
-          "unit-tests" } };
-std::array<std::string, 2> fnames = { { "data_0_0.csv", "data_0_1.csv" } };
+          "erleben-sliding-wedge", "erleben-wedge-crack", "erleben-spike-crack",
+          "erleben-wedges", "erleben-cube-cliff-edges", "erleben-spike-hole",
+          "erleben-cube-internal-edges", "erleben-spikes", "unit-tests" } };
+std::vector<std::string> fnames = { { "data_0_0.csv", "data_0_1.csv" } };
 
 struct write_format {
     std::string file;
@@ -221,6 +215,7 @@ struct write_format {
     double time;
     int method;
 };
+
 Eigen::MatrixXd
 read_rational_CSV(const std::string inputFileName, std::vector<bool>& results)
 {
@@ -527,4 +522,5 @@ void run_all_methods()
         }
     }
 }
+
 int main(int argc, char* argv[]) { run_all_methods(); }

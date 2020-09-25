@@ -100,14 +100,6 @@ function(ccd_wrapper_download_catch2)
   )
 endfunction()
 
-# HighFive - Header-only C++ HDF5 interface
-function(ccd_wrapper_download_high_five)
-  ccd_wrapper_download_project(HighFive
-    GIT_REPOSITORY https://github.com/BlueBrain/HighFive.git
-    GIT_TAG        v2.2.1
-  )
-endfunction()
-
 # A modern string formatting library
 function(ccd_wrapper_download_fmt)
   ccd_wrapper_download_project(fmt

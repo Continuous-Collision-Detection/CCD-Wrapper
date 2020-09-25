@@ -96,14 +96,6 @@ if(CCD_WRAPPER_WITH_TIGHT_INCLUSION AND NOT TARGET TightInclusion)
 endif()
 
 if(CCD_WRAPPER_WITH_BENCHMARK)
-  # HDF5 Reader
-  if(NOT TARGET HighFive::HighFive)
-    set(USE_EIGEN TRUE CACHE BOOL "Enable Eigen testing" FORCE)
-    ccd_wrapper_download_high_five()
-    add_subdirectory(${CCD_WRAPPER_EXTERNAL}/HighFive EXCLUDE_FROM_ALL)
-    add_library(HighFive::HighFive ALIAS HighFive)
-  endif()
-
   # String formatting
   if(NOT TARGET fmt::fmt)
     ccd_wrapper_download_fmt()

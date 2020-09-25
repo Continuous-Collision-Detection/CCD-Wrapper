@@ -40,18 +40,13 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get install \
-          libblas-dev \
           libboost-filesystem-dev \
           libboost-system-dev \
-          libboost-thread-dev \
-          libglu1-mesa-dev \
-          libsuitesparse-dev \
-          xorg-dev \
           ccache
 
       - name: Dependencies (macOS)
         if: runner.os == 'macOS'
-        run: brew install suite-sparse ccache gmp
+        run: brew install boost ccache gmp
 
       - name: Cache Build
         id: cache-build

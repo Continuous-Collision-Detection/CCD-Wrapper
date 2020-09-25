@@ -80,7 +80,7 @@ endfunction()
 function(ccd_wrapper_download_interval_based)
    ccd_wrapper_download_project(Interval-Based
     GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Interval-Based.git
-    GIT_TAG        99ad4623ecef7677775a937965cb173cbdce6b9d
+    GIT_TAG        874b0c4227ba772a65354d16bc9bfa5cc9ff337c
   )
 endfunction()
 

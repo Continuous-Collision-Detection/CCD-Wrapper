@@ -13,7 +13,7 @@ option(CCD_WRAPPER_WITH_RRP        "Enable rational root parity method"         
 option(CCD_WRAPPER_WITH_MSRP       "Enable minimum separation root parity method" OFF)
 option(CCD_WRAPPER_WITH_BSC        "Enable Bernstein sign classification method"   ON)
 option(CCD_WRAPPER_WITH_TIGHT_CCD  "Enable TightCCD method"                        ON)
-option(CCD_WRAPPER_WITH_INTERVAL   "Enable interval-based methods"                OFF)
+option(CCD_WRAPPER_WITH_INTERVAL   "Enable interval-based methods"                ON)
 option(CCD_WRAPPER_WITH_TIGHT_INCLUSION "Enable Tight Inclusion method"            ON)
 
 # libigl

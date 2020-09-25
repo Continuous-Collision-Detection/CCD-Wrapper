@@ -85,7 +85,7 @@ endif()
 if(CCD_WRAPPER_WITH_INTERVAL AND NOT TARGET IntervalBased)
   ccd_wrapper_download_interval_based()
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Interval-Based)
-  add_library(IntervalBased ALIAS interval_based)
+  add_library(IntervalBased ALIAS INTERVAL_CCD)
 endif()
 
 # Tight Inclusion

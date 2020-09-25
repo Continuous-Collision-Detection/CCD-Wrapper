@@ -41,6 +41,7 @@
 // Interval based CCD of [Redon et al. 2002]
 // Interval based CCD of [Redon et al. 2002] solved using [Snyder 1992]
 #ifdef CCD_WRAPPER_WITH_INTERVAL
+#include <interval_ccd/interval_ccd.hpp>
 #endif
 // Custom inclusion based CCD of [Wang et al. 2020]
 #ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
@@ -225,7 +226,7 @@ bool vertexFaceCCD(
 #endif
         case CCDMethod::MULTIVARIATE_INTERVAL_ROOT_FINDER:
 #ifdef CCD_WRAPPER_WITH_INTERVAL
-            return intervalccd::vertexFaceCCD(
+            return intervalccd::vertexFaceCCD_Interval(
                 // Point at t=0
                 vertex_start,
                 // Triangle at t = 0
@@ -434,7 +435,7 @@ bool edgeEdgeCCD(
 #endif
         case CCDMethod::MULTIVARIATE_INTERVAL_ROOT_FINDER:
 #ifdef CCD_WRAPPER_WITH_INTERVAL
-            return intervalccd::edgeEdgeCCD(
+            return intervalccd::edgeEdgeCCD_Interval(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
                 // Edge 2 at t=0

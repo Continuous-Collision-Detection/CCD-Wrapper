@@ -38,9 +38,9 @@ endfunction()
 
 # Root Parity [Brochu et al. 2012] and BSC [Tang et al. 2014]
 function(ccd_wrapper_download_root_parity_and_bernstein_sign_classification)
-  ccd_wrapper_download_project(Root-Parity-and-Bernstein-Sign-Classification
+  ccd_wrapper_download_project(RP-and-BSC
     GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Root-Parity-and-Bernstein-Sign-Classification.git
-    GIT_TAG        ac8a63b2aeaf83f9f3ab90a16c7a1860f037bc69
+    GIT_TAG        8db61b2c1d399f19e73e4a16373e7a869cc95ad4
   )
 endfunction()
 

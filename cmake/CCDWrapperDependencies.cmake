@@ -43,7 +43,7 @@ endif()
 # Brochu et al. [2012] and Tang et al. [2014]
 if((CCD_WRAPPER_WITH_RP OR CCD_WRAPPER_WITH_BSC) AND NOT TARGET RootParity_and_BernsteinSignClassification)
   ccd_wrapper_download_root_parity_and_bernstein_sign_classification()
-  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Root-Parity-and-Bernstein-Sign-Classification EXCLUDE_FROM_ALL)
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/RP-and-BSC EXCLUDE_FROM_ALL)
   add_library(RootParity_and_BernsteinSignClassification ALIAS exact-ccd)
 endif()
 

@@ -50,7 +50,7 @@ static const char* method_names[CCDMethod::NUM_CCD_METHODS] = {
     "SafeCCD",
     "UnivariateIntervalRootFinder",
     "MultivariateIntervalRootFinder",
-    "TightIntervals",
+    "TightInclusion",
 };
 
 /// Minimum separation distance used when looking for 0 distance collisions.

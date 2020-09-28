@@ -20,7 +20,6 @@ std::vector<std::string> handcrafted_folders
           "erleben-sliding-wedge", "erleben-wedge-crack", "erleben-spike-crack",
           "erleben-wedges", "erleben-cube-cliff-edges", "erleben-spike-hole",
           "erleben-cube-internal-edges", "erleben-spikes", "unit-tests" } };
-std::vector<std::string> fnames = { { "data_0_0.csv", "data_0_1.csv" } };
 
 /*
 struct Args {
@@ -225,9 +224,12 @@ void run_rational_data_single_method(
     const auto folders
         = is_simulation_data ? simulation_folders : handcrafted_folders;
     for (int fnbr = 0; fnbr < max_fnbr; fnbr++) {
-        for (int ff = 0; ff < 2; ff++) {
-            all_V = read_rational_csv(
-                root_path + folders[fnbr] + sub_folder + fnames[ff], results);
+        for (auto& entry : std::filesystem::directory_iterator(
+                 root_path + folders[fnbr] + sub_folder)) {
+            if (entry.path().extension() != ".csv") {
+                continue;
+            }
+            all_V = read_rational_csv(entry.path().string(), results);
             assert(all_V.rows() % 8 == 0 && all_V.cols() == 3);
             int v_size = all_V.rows() / 8;
             for (int i = 0; i < v_size; i++) {
@@ -283,9 +285,8 @@ void run_rational_data_single_method(
                         new_false_negatives++;
                         if (method == CCDMethod::TIGHT_INCLUSION) {
                             std::cout << "false negative, "
-                                      << root_path + folders[fnbr] + sub_folder
-                                    + fnames[ff]
-                                      << ", " << i << std::endl;
+                                      << entry.path().string() << ", " << i
+                                      << std::endl;
                             for (int j = 0; j < 8; j++) {
                                 std::cout << "v" << j << " " << V(j, 0) << ", "
                                           << V(j, 1) << ", " << V(j, 2)

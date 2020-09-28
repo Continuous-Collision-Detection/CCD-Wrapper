@@ -156,7 +156,6 @@ jobs:
 
       - name: Sample Benchmark
         run: |
-          ls . |
           if ("${{ matrix.config }}" -eq 'Release') {
             cd build |
             .\CCDWrapper_benchmark.exe

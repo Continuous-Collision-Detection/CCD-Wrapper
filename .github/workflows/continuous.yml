@@ -156,7 +156,7 @@ jobs:
 
       - name: Sample Benchmark
         run: |
-          if (${{ matrix.config }} -eq 'Release') {
+          if ("${{ matrix.config }}" -eq 'Release') {
             cd build |
             ./CCDWrapper_benchmark
           }

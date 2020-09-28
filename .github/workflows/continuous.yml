@@ -158,5 +158,6 @@ jobs:
         run: |
           if ("${{ matrix.config }}" -eq 'Release') {
             cd build |
-            ./CCDWrapper_benchmark
+            ls |
+            .\CCDWrapper_benchmark
           }

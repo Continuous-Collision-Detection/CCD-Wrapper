@@ -155,8 +155,10 @@ jobs:
           ctest --verbose --output-on-failure
 
       - name: Sample Benchmark
+        if: matrix.config == 'Release'
+        shell: powershell
         run: |
-          if ("${{ matrix.config }}" -eq 'Release') {
-            cd build |
-            CCDWrapper_benchmark
-          }
+          cd build
+          cp C:\Miniconda\Library\bin\mpir.dll .\
+          cp C:\Miniconda\Library\bin\gmp.dll .\
+          .\CCDWrapper_benchmark.exe

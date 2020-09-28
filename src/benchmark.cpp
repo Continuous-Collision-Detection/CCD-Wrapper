@@ -3,6 +3,7 @@
 #include <CLI/CLI.hpp>
 #include <Eigen/Core>
 #include <boost/filesystem.hpp>
+#include <fmt/color.h>
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
 
@@ -12,7 +13,6 @@
 
 using namespace ccd;
 
-std::string root_path(CCD_WRAPPER_SAMPLE_QUERIES_DIR);
 std::vector<std::string> simulation_folders
     = { { "chain", "cow-heads", "golf-ball", "mat-twist" } };
 std::vector<std::string> handcrafted_folders
@@ -21,35 +21,70 @@ std::vector<std::string> handcrafted_folders
           "erleben-wedges", "erleben-cube-cliff-edges", "erleben-spike-hole",
           "erleben-cube-internal-edges", "erleben-spikes", "unit-tests" } };
 
-/*
 struct Args {
-    std::string data_dir;
-    bool is_edge_edge;
-    CCDMethod method;
-    double min_distance = DEFAULT_MIN_DISTANCE;
+    std::string data_dir = CCD_WRAPPER_SAMPLE_QUERIES_DIR;
+    std::vector<CCDMethod> methods;
+    double minimum_separation = 0;
+    double tight_inclusion_tolerance = 1e-6;
+    long tight_inclusion_max_iter = 1e6;
+    bool run_ee_dataset = true;
+    bool run_vf_dataset = true;
+    bool run_simulation_dataset = true;
+    bool run_handcrafted_dataset = true;
 };
 
 Args parse_args(int argc, char* argv[])
 {
     Args args;
 
-    CLI::App app { "CCD Wrapper Benchmark" };
+    // Initialize args.methods;
+    args.methods.reserve(int(NUM_CCD_METHODS));
+    for (int i = 0; i < int(NUM_CCD_METHODS); i++) {
+        args.methods.push_back(CCDMethod(i));
+    }
 
-    app.add_option("data_directory", args.data_dir, "/path/to/data/")
-        ->required();
+    CLI::App app { "CCD Benchmark" };
 
-    std::string col_type;
-    app.add_set("collision_type", col_type, { "vf", "ee" }, "type of collision")
-        ->required();
+    app.add_option("--data,--queries", args.data_dir, "/path/to/data/")
+        ->check(CLI::ExistingDirectory);
+
+    // std::string col_type;
+    // app.add_set(
+    //     "collision_type", col_type, { "vf", "ee" }, "type of collision")
+    //     ->required();
 
     std::stringstream method_options;
-    method_options << "CCD method\noptions:" << std::endl;
+    method_options << "CCD methods to benchmark\noptions:" << std::endl;
     for (int i = 0; i < NUM_CCD_METHODS; i++) {
         method_options << i << ": " << method_names[i] << std::endl;
     }
-    app.add_option("CCD_method", args.method, method_options.str())->required();
+    app.add_option("-m,--methods", args.methods, method_options.str())
+        ->check(CLI::Range(0, NUM_CCD_METHODS - 1));
 
-    app.add_option("min_distance,-d", args.min_distance, "minimum distance");
+    app.add_option(
+        "-d,--minimum-separation", args.minimum_separation,
+        "minimum separation distance");
+
+    app.add_option(
+        "--delta,--ti-tolerance", args.tight_inclusion_tolerance,
+        "Tight Inclusion tolerance (δ)");
+
+    app.add_option(
+        "--mi,--ti-max-iter", args.tight_inclusion_max_iter,
+        "Tight Inclusion maximum iterations (mᵢ)");
+
+    bool no_ee = false;
+    app.add_flag("--no-ee", no_ee, "do not run the edge-edge dataset");
+    bool no_vf = false;
+    app.add_flag("--no-vf", no_vf, "do not run the vertex-face dataset");
+
+    bool no_simulation = false;
+    app.add_flag(
+        "--no-simulation", no_simulation, "do not run the simulation dataset");
+    bool no_handcrafted = false;
+    app.add_flag(
+        "--no-handcrafted", no_handcrafted,
+        "do not run the handcrafted dataset");
 
     try {
         app.parse(argc, argv);
@@ -57,18 +92,17 @@ Args parse_args(int argc, char* argv[])
         exit(app.exit(e));
     }
 
-    args.is_edge_edge = col_type == "ee";
+    // args.is_edge_edge = col_type == "ee";
 
-    if (args.method < 0 || args.method >= NUM_CCD_METHODS) {
-        exit(app.exit(CLI::Error(
-            "",
-            fmt::format(
-                "invalid method of collision detection: {:d}", args.method))));
-    }
+    args.run_ee_dataset = !no_ee;
+    args.run_vf_dataset = !no_vf;
+    args.run_simulation_dataset = !no_simulation;
+    args.run_handcrafted_dataset = !no_handcrafted;
 
     return args;
 }
 
+/*
 void run_benchmark(int argc, char* argv[])
 {
     Args args = parse_args(argc, argv);
@@ -189,117 +223,100 @@ void run_benchmark(int argc, char* argv[])
 */
 
 void run_rational_data_single_method(
-    const bool is_edge_edge,
-    const bool is_simulation_data,
-    const double minimum_seperation,
-    const double tolerance,
+    const Args& args,
     const CCDMethod method,
-    const long max_itr = 1e6)
+    const bool is_edge_edge,
+    const bool is_simulation_data)
 {
-    std::cout << "\n******* Running method: " << method_names[method]
-              << std::endl;
     bool use_msccd = is_minimum_separation_method(method);
-    std::string sub_folder;
     Eigen::MatrixXd all_V;
     std::vector<bool> results;
     Timer timer;
 
     int total_number = -1;
-    double new_timing = 0.0;
+    double total_time = 0.0;
     int total_positives = 0;
-    int new_false_positives = 0;
-    int new_false_negatives = 0;
+    int num_false_positives = 0;
+    int num_false_negatives = 0;
 
-    int nbr_larger_tol = 0;
-    int nbr_diff_tol = 0;
-    double max_tol = 0;
-    double sum_tol = 0;
-
+    std::string sub_folder;
     if (is_edge_edge) {
         sub_folder = "/edge-edge/";
     } else {
         sub_folder = "/vertex-face/";
     }
-    int max_fnbr = is_simulation_data ? 4 : 11;
-    const auto folders
+
+    const std::vector<std::string>& scene_names
         = is_simulation_data ? simulation_folders : handcrafted_folders;
-    for (int fnbr = 0; fnbr < max_fnbr; fnbr++) {
-        for (auto& entry : boost::filesystem::directory_iterator(
-                 root_path + folders[fnbr] + sub_folder)) {
+
+    for (const auto& scene_name : scene_names) {
+        for (const auto& entry : boost::filesystem::directory_iterator(
+                 args.data_dir + scene_name + sub_folder)) {
             if (entry.path().extension() != ".csv") {
                 continue;
             }
+
+            // std::cout << "reading data from " << entry.path().string()
+            //           << std::endl;
             all_V = read_rational_csv(entry.path().string(), results);
             assert(all_V.rows() % 8 == 0 && all_V.cols() == 3);
+
             int v_size = all_V.rows() / 8;
             for (int i = 0; i < v_size; i++) {
                 total_number += 1;
                 Eigen::Matrix<double, 8, 3> V = all_V.middleRows<8>(8 * i);
-                bool expected_result
-                    = results[i * 8]; // args[k].result;// from mathematica
+                bool expected_result = results[i * 8];
 
-                bool new_result;
-
-                const std::array<double, 3> err = { { -1, -1, -1 } };
-
-                double toi;
-                const double t_max = 1;
-
-                double output_tolerance = tolerance;
-
+                bool result;
                 timer.start();
                 if (use_msccd) {
                     if (is_edge_edge) {
-                        new_result = edgeEdgeMSCCD(
+                        result = edgeEdgeMSCCD(
                             V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
-                            V.row(5), V.row(6), V.row(7), minimum_seperation,
-                            method, tolerance);
+                            V.row(5), V.row(6), V.row(7),
+                            args.minimum_separation, method,
+                            args.tight_inclusion_tolerance,
+                            args.tight_inclusion_max_iter);
                     } else {
-                        new_result = vertexFaceMSCCD(
+                        result = vertexFaceMSCCD(
                             V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
-                            V.row(5), V.row(6), V.row(7), minimum_seperation,
-                            method, tolerance);
+                            V.row(5), V.row(6), V.row(7),
+                            args.minimum_separation, method,
+                            args.tight_inclusion_tolerance,
+                            args.tight_inclusion_max_iter);
                     }
                 } else {
                     if (is_edge_edge) {
-                        new_result = edgeEdgeCCD(
+                        result = edgeEdgeCCD(
                             V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
-                            V.row(5), V.row(6), V.row(7), method, tolerance);
+                            V.row(5), V.row(6), V.row(7), method,
+                            args.tight_inclusion_tolerance,
+                            args.tight_inclusion_max_iter);
                     } else {
-                        new_result = vertexFaceCCD(
+                        result = vertexFaceCCD(
                             V.row(0), V.row(1), V.row(2), V.row(3), V.row(4),
-                            V.row(5), V.row(6), V.row(7), method, tolerance);
+                            V.row(5), V.row(6), V.row(7), method,
+                            args.tight_inclusion_tolerance,
+                            args.tight_inclusion_max_iter);
                     }
                 }
                 timer.stop();
-                new_timing += timer.getElapsedTimeInMicroSec();
+                total_time += timer.getElapsedTimeInMicroSec();
                 std::cout << total_number << "\r" << std::flush;
 
                 if (expected_result) {
                     total_positives++;
                 }
-                if (new_result != expected_result) {
-                    if (new_result) {
-                        new_false_positives++;
+                if (result != expected_result) {
+                    if (result) {
+                        num_false_positives++;
                     } else {
-                        new_false_negatives++;
+                        num_false_negatives++;
                         if (method == CCDMethod::TIGHT_INCLUSION) {
-                            std::cout << "false negative, "
-                                      << entry.path().string() << ", " << i
-                                      << std::endl;
-                            for (int j = 0; j < 8; j++) {
-                                std::cout << "v" << j << " " << V(j, 0) << ", "
-                                          << V(j, 1) << ", " << V(j, 2)
-                                          << std::endl;
-                                if (j == 3)
-                                    std::cout << std::endl;
-                            }
-
-                            std::cout << "is edge? " << is_edge_edge
-                                      << std::endl
-                                      << std::endl;
-
-                            exit(0);
+                            fmt::print(
+                                "false negative, {:s}, {:d}\nis edge-edge? {}",
+                                entry.path().string(), i, is_edge_edge);
+                            exit(1);
                         }
                     }
                 }
@@ -307,60 +324,66 @@ void run_rational_data_single_method(
         }
     }
 
-    std::cout << "total number, " << total_number + 1 << std::endl;
-    std::cout << "total positives, " << total_positives << std::endl;
-    std::cout << "is_edge_edge? , " << is_edge_edge << std::endl;
-    std::cout << "new_false_positives, " << new_false_positives << std::endl;
-    std::cout << "new_false_negatives, " << new_false_negatives << std::endl;
-    std::cout << "average time, " << new_timing / double(total_number + 1)
-              << std::endl
-              << std::endl;
-    std::cout << "total time, " << new_timing << std::endl << std::endl;
-    std::cout << "** finished " << method_names[method] << std::endl;
+    fmt::print(
+        "total # of queries: {:d}\n"
+        "total positives: {:d}\n"
+        "is_edge_edge?: {}\n"
+        "# of false positives: {:d}\n"
+        "# of false negatives: {:d}\n"
+        "average time: {:g}μs\n\n",
+        total_number + 1, total_positives, is_edge_edge, num_false_positives,
+        num_false_negatives, total_time / double(total_number + 1));
 }
 
-void run_one_method_over_all_data(const CCDMethod method)
+void run_one_method_over_all_data(const Args& args, const CCDMethod method)
 {
-    double minimum_seperation = 0;
-    double tolerance = 1e-6;
-    long max_itr = 1e6;
-    bool is_edge_edge;
-    bool is_simu_data;
-
-    is_edge_edge = true;
-    is_simu_data = false;
-    std::cout << "****Running handcrafted dataset, edge-edge: " << std::endl;
-    run_rational_data_single_method(
-        is_edge_edge, is_simu_data, minimum_seperation, tolerance, method,
-        max_itr);
-    is_edge_edge = false;
-    is_simu_data = false;
-    std::cout << "****Running handcrafted dataset, vertex-face: " << std::endl;
-    run_rational_data_single_method(
-        is_edge_edge, is_simu_data, minimum_seperation, tolerance, method,
-        max_itr);
-    is_edge_edge = true;
-    is_simu_data = true;
-    std::cout << "****Running simulation dataset, edge-edge: " << std::endl;
-    run_rational_data_single_method(
-        is_edge_edge, is_simu_data, minimum_seperation, tolerance, method,
-        max_itr);
-    is_edge_edge = false;
-    is_simu_data = true;
-    std::cout << "****Running simulation dataset, vertex-face: " << std::endl;
-    run_rational_data_single_method(
-        is_edge_edge, is_simu_data, minimum_seperation, tolerance, method,
-        max_itr);
-}
-
-void run_all_methods()
-{
-    for (int i = 0; i < int(NUM_CCD_METHODS); i++) {
-        CCDMethod method = CCDMethod(i);
-        if (is_method_enabled(method)) {
-            run_one_method_over_all_data(method);
+    if (args.run_handcrafted_dataset) {
+        fmt::print(fmt::emphasis::bold, "Running handcrafted dataset:\n");
+        if (args.run_vf_dataset) {
+            std::cout << "Vertex-Face:" << std::endl;
+            run_rational_data_single_method(
+                args, method, /*is_edge_edge=*/false, /*is_simu_data=*/false);
+        }
+        if (args.run_ee_dataset) {
+            std::cout << "Edge-Edge:" << std::endl;
+            run_rational_data_single_method(
+                args, method, /*is_edge_edge=*/true, /*is_simu_data=*/false);
+        }
+    }
+    if (args.run_simulation_dataset) {
+        fmt::print(fmt::emphasis::bold, "Running simulation dataset:\n");
+        if (args.run_vf_dataset) {
+            std::cout << "Vertex-Face:" << std::endl;
+            run_rational_data_single_method(
+                args, method, /*is_edge_edge=*/false, /*is_simu_data=*/true);
+        }
+        if (args.run_ee_dataset) {
+            std::cout << "Edge-Edge:" << std::endl;
+            run_rational_data_single_method(
+                args, method, /*is_edge_edge=*/true, /*is_simu_data=*/true);
         }
     }
 }
 
-int main(int argc, char* argv[]) { run_all_methods(); }
+void run_all_methods(const Args& args)
+{
+    for (CCDMethod method : args.methods) {
+        if (is_method_enabled(method)) {
+            fmt::print(
+                fmt::emphasis::bold | fmt::emphasis::underline,
+                "Benchmarking {}\n", method_names[method]);
+            run_one_method_over_all_data(args, method);
+            std::cout << "finished" << method_names[method] << std::endl;
+        } else {
+            std::cerr << "CCD method " << method_names[method]
+                      << " requested, but it is disabled" << std::endl;
+        }
+        std::cout << std::endl;
+    }
+}
+
+int main(int argc, char* argv[])
+{
+    Args args = parse_args(argc, argv);
+    run_all_methods(args);
+}

@@ -91,6 +91,7 @@ bool vertexFaceCCD(
     const Eigen::Vector3d& face_vertex2_end,
     const CCDMethod method,
     const double tolerance = 1e-6,
+    const long max_iter = 1e6,
     const std::array<double, 3>& err = { { -1, 0, 0 } });
 
 /**
@@ -130,6 +131,7 @@ bool edgeEdgeCCD(
     const Eigen::Vector3d& edge1_vertex1_end,
     const CCDMethod method,
     const double tolerance = 1e-6,
+    const long max_iter = 1e6,
     const std::array<double, 3>& err = { { -1, 0, 0 } });
 
 /**
@@ -168,6 +170,7 @@ bool vertexFaceMSCCD(
     const double min_distance,
     const CCDMethod method,
     const double tolerance = 1e-6,
+    const long max_iter = 1e6,
     const std::array<double, 3>& err = { { -1, 0, 0 } });
 
 /**
@@ -208,6 +211,7 @@ bool edgeEdgeMSCCD(
     const double min_distance,
     const CCDMethod method,
     const double tolerance = 1e-6,
+    const long max_iter = 1e6,
     const std::array<double, 3>& err = { { -1, 0, 0 } });
 
 inline bool is_minimum_separation_method(const CCDMethod& method)

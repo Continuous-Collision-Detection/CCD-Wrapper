@@ -62,6 +62,7 @@ bool vertexFaceCCD(
     const Eigen::Vector3d& face_vertex2_end,
     const CCDMethod method,
     const double tolerance,
+    const long max_iter,
     const std::array<double, 3>& err)
 {
     double toi; // Computed by some methods but never returned
@@ -94,7 +95,7 @@ bool vertexFaceCCD(
                 // Triangle at t = 1
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
                 /*minimum_distance=*/DEFAULT_MIN_DISTANCE, method, tolerance,
-                err);
+                max_iter, err);
 #else
             throw "CCD method is not enabled";
 #endif
@@ -145,7 +146,7 @@ bool vertexFaceCCD(
                 vertex_end,
                 // Triangle at t = 1
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
-                /*minimum_distance=*/0, method, tolerance, err);
+                /*minimum_distance=*/0, method, tolerance, max_iter, err);
         case CCDMethod::BSC:
 #ifdef CCD_WRAPPER_WITH_BSC
             return bsc::Intersect_VF_robust(
@@ -269,6 +270,7 @@ bool edgeEdgeCCD(
     const Eigen::Vector3d& edge1_vertex1_end,
     const CCDMethod method,
     const double tolerance,
+    const long max_iter,
     const std::array<double, 3>& err)
 {
     double toi; // Computed by some methods but never returned
@@ -301,7 +303,7 @@ bool edgeEdgeCCD(
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end,
                 /*minimum_distance=*/DEFAULT_MIN_DISTANCE, method, tolerance,
-                err);
+                max_iter, err);
 #else
             throw "CCD method is not enabled";
 #endif
@@ -352,7 +354,7 @@ bool edgeEdgeCCD(
                 edge0_vertex0_end, edge0_vertex1_end,
                 // Edge 2 at t=1
                 edge1_vertex0_end, edge1_vertex1_end,
-                /*minimum_distance=*/0, method, tolerance, err);
+                /*minimum_distance=*/0, method, tolerance, max_iter, err);
         case CCDMethod::BSC:
 #ifdef CCD_WRAPPER_WITH_BSC
             return bsc::Intersect_EE_robust(
@@ -479,6 +481,7 @@ bool vertexFaceMSCCD(
     const double min_distance,
     const CCDMethod method,
     const double tolerance,
+    const long max_iter,
     const std::array<double, 3>& err)
 {
     double toi; // Computed by some methods but never returned
@@ -541,7 +544,6 @@ bool vertexFaceMSCCD(
         {
             double output_tolerance;
             const double t_max = 1.0;
-            const long max_itr = 1e6;
             // 0: normal ccd method which only checks t = [0,1]
             // 1: ccd with max_itr and t=[0, t_max]
             const int CCD_TYPE = 1;
@@ -559,7 +561,7 @@ bool vertexFaceMSCCD(
                 toi,              // time of impact
                 tolerance,        // delta
                 t_max,            // Maximum time to check
-                max_itr,          // Maximum number of iterations
+                max_iter,         // Maximum number of iterations
                 output_tolerance, // delta_actual
                 CCD_TYPE);
         }
@@ -595,6 +597,7 @@ bool edgeEdgeMSCCD(
     const double min_distance,
     const CCDMethod method,
     const double tolerance,
+    const long max_iter,
     const std::array<double, 3>& err)
 {
     double toi; // Computed by some methods but never returned
@@ -654,7 +657,6 @@ bool edgeEdgeMSCCD(
         {
             double output_tolerance;
             const double t_max = 1.0;
-            const long max_itr = 1e6;
             // 0: normal ccd method which only checks t = [0,1]
             // 1: ccd with max_itr and t=[0, t_max]
             const int CCD_TYPE = 1;
@@ -672,7 +674,7 @@ bool edgeEdgeMSCCD(
                 toi,              // time of impact
                 tolerance,        // delta
                 t_max,            // Maximum time to check
-                max_itr,          // Maximum number of iterations
+                max_iter,         // Maximum number of iterations
                 output_tolerance, // delta_actual
                 CCD_TYPE);
         }

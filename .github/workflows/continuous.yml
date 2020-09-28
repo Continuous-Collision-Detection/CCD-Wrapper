@@ -153,10 +153,3 @@ jobs:
           cp C:\Miniconda\Library\bin\mpir.dll .\
           cp C:\Miniconda\Library\bin\gmp.dll .\
           ctest --verbose --output-on-failure
-
-      - name: Sample Benchmark
-        run: |
-          if ("${{ matrix.config }}" -eq 'Release') {
-            cd build |
-            ./CCDWrapper_benchmark
-          }

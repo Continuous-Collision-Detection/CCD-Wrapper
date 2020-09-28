@@ -30,6 +30,9 @@ option(CCD_WRAPPER_WITH_TIGHT_CCD  "Enable TightCCD method"                     
 option(CCD_WRAPPER_WITH_INTERVAL   "Enable interval-based methods"                 ON)
 option(CCD_WRAPPER_WITH_TIGHT_INCLUSION "Enable Tight Inclusion method"            ON)
 
+option(CCD_WRAPPER_IS_CI_BUILD "Is this being built on GitHub Actions" OFF)
+mark_as_advanced(CCD_WRAPPER_IS_CI_BUILD) # Do not change this value
+
 ################################################################################
 
 ### Configuration
@@ -167,6 +170,10 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   ccd_wrapper_download_sample_queries()
   target_compile_definitions(${PROJECT_NAME}_benchmark PUBLIC
     CCD_WRAPPER_SAMPLE_QUERIES_DIR="${CCD_WRAPPER_EXTERNAL}/Sample-Queries/")
+
+  if(CCD_WRAPPER_IS_CI_BUILD)
+    target_compile_definitions(${PROJECT_NAME}_benchmark PRIVATE CCD_WRAPPER_IS_CI_BUILD)
+  endif()
 
   if(CCD_WRAPPER_WITH_MSRP)
     add_executable(round_queries src/tools/round_queries.cpp)

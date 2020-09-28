@@ -305,7 +305,9 @@ void run_rational_data_single_method(
                 }
                 timer.stop();
                 total_time += timer.getElapsedTimeInMicroSec();
+#ifndef CCD_WRAPPER_IS_CI_BUILD
                 std::cout << total_number << "\r" << std::flush;
+#endif
 
                 if (expected_result) {
                     total_positives++;

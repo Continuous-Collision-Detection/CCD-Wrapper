@@ -67,6 +67,7 @@ jobs:
           cmake .. \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_BUILD_TYPE=${{ matrix.config }} \
+            -DCCD_WRAPPER_IS_CI_BUILD=ON \
 
       - name: Build
         run: cd build; make -j2; ccache --show-stats
@@ -140,6 +141,7 @@ jobs:
           cmake -G Ninja ^
             -DCMAKE_CXX_COMPILER_LAUNCHER=sccache ^
             -DCMAKE_BUILD_TYPE=${{ matrix.config }} ^
+            -DCCD_WRAPPER_IS_CI_BUILD=ON ^
             -B build ^
             -S .
           cd build

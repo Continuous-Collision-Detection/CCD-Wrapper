@@ -83,7 +83,7 @@ void run_benchmark(int argc, char* argv[])
     int false_negatives = 0;
 
     Timer timer;
-    for (auto& entry : std::filesystem::directory_iterator(args.data_dir)) {
+    for (auto& entry : boost::filesystem::directory_iterator(args.data_dir)) {
         if (entry.path().extension() != ".csv") {
             continue;
         }
@@ -224,7 +224,7 @@ void run_rational_data_single_method(
     const auto folders
         = is_simulation_data ? simulation_folders : handcrafted_folders;
     for (int fnbr = 0; fnbr < max_fnbr; fnbr++) {
-        for (auto& entry : std::filesystem::directory_iterator(
+        for (auto& entry : boost::filesystem::directory_iterator(
                  root_path + folders[fnbr] + sub_folder)) {
             if (entry.path().extension() != ".csv") {
                 continue;

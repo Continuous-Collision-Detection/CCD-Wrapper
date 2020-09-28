@@ -22,7 +22,7 @@ std::vector<std::string> handcrafted_folders
           "erleben-cube-internal-edges", "erleben-spikes", "unit-tests" } };
 
 struct Args {
-    std::string data_dir = CCD_WRAPPER_SAMPLE_QUERIES_DIR;
+    boost::filesystem::path data_dir = CCD_WRAPPER_SAMPLE_QUERIES_DIR;
     std::vector<CCDMethod> methods;
     double minimum_separation = 0;
     double tight_inclusion_tolerance = 1e-6;
@@ -45,6 +45,7 @@ Args parse_args(int argc, char* argv[])
 
     CLI::App app { "CCD Benchmark" };
 
+    std::string data_dir_str;
     app.add_option("--data,--queries", args.data_dir, "/path/to/data/")
         ->check(CLI::ExistingDirectory);
 
@@ -92,7 +93,7 @@ Args parse_args(int argc, char* argv[])
         exit(app.exit(e));
     }
 
-    // args.is_edge_edge = col_type == "ee";
+    // args.data_dir = boost::filesystem::path(data_dir_str);
 
     args.run_ee_dataset = !no_ee;
     args.run_vf_dataset = !no_vf;
@@ -239,19 +240,21 @@ void run_rational_data_single_method(
     int num_false_positives = 0;
     int num_false_negatives = 0;
 
-    std::string sub_folder;
-    if (is_edge_edge) {
-        sub_folder = "/edge-edge/";
-    } else {
-        sub_folder = "/vertex-face/";
-    }
+    std::string sub_folder = is_edge_edge ? "/edge-edge/" : "/vertex-face/";
 
     const std::vector<std::string>& scene_names
         = is_simulation_data ? simulation_folders : handcrafted_folders;
 
     for (const auto& scene_name : scene_names) {
-        for (const auto& entry : boost::filesystem::directory_iterator(
-                 args.data_dir + scene_name + sub_folder)) {
+        boost::filesystem::path scene_path(
+            args.data_dir / scene_name / sub_folder);
+        if (!boost::filesystem::exists(scene_path)) {
+            std::cout << "Missing: " << scene_path.string() << std::endl;
+            continue;
+        }
+
+        for (const auto& entry :
+             boost::filesystem::directory_iterator(scene_path)) {
             if (entry.path().extension() != ".csv") {
                 continue;
             }

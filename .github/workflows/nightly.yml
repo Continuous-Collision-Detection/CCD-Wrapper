@@ -1,4 +1,4 @@
-name: Build
+name: Nightly
 
 on:
   schedule:
@@ -106,7 +106,6 @@ jobs:
         with:
           fetch-depth: 10
       - uses: seanmiddleditch/gha-setup-ninja@master
-
         # https://github.com/actions/cache/issues/101
       - name: Set env
         run: |

@@ -1,4 +1,4 @@
-name: Build
+name: Benchmark
 
 on:
   push:
@@ -67,13 +67,15 @@ jobs:
           cmake .. \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_BUILD_TYPE=${{ matrix.config }} \
+            -DCCD_WRAPPER_WITH_MSRF=OFF -DCCD_WRAPPER_WITH_RRP=OFF -DCCD_WRAPPER_WITH_INTERVAL=OFF \
             -DCCD_WRAPPER_IS_CI_BUILD=ON \
 
       - name: Build
         run: cd build; make -j2; ccache --show-stats
 
-      - name: Tests
-        run: cd build; ctest --verbose --output-on-failure
+      - name: Sample Benchmark
+        if: matrix.config == 'Release'
+        run: cd build; ./CCDWrapper_benchmark
 
   ####################
   # Windows
@@ -107,7 +109,6 @@ jobs:
         with:
           fetch-depth: 10
       - uses: seanmiddleditch/gha-setup-ninja@master
-
         # https://github.com/actions/cache/issues/101
       - name: Set env
         run: |
@@ -139,14 +140,17 @@ jobs:
             -DCMAKE_CXX_COMPILER_LAUNCHER=sccache ^
             -DCMAKE_BUILD_TYPE=${{ matrix.config }} ^
             -DCCD_WRAPPER_IS_CI_BUILD=ON ^
+            -DCCD_WRAPPER_WITH_MSRF=OFF -DCCD_WRAPPER_WITH_RRP=OFF -DCCD_WRAPPER_WITH_INTERVAL=OFF ^
             -B build ^
             -S .
           cd build
           ninja -j1
 
-      - name: Tests
+      - name: Sample Benchmark
+        if: matrix.config == 'Release'
+        shell: powershell
         run: |
           cd build
           cp C:\Miniconda\Library\bin\mpir.dll .\
           cp C:\Miniconda\Library\bin\gmp.dll .\
-          ctest --verbose --output-on-failure
+          .\CCDWrapper_benchmark.exe

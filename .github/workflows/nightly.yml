@@ -1,12 +1,8 @@
-name: Build
+name: Nightly
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+  schedule:
+    - cron: "0 4 * * *"
 
 env:
   CTEST_OUTPUT_ON_FAILURE: ON
@@ -75,6 +71,9 @@ jobs:
       - name: Tests
         run: cd build; ctest --verbose --output-on-failure
 
+      - name: Sample Benchmark
+        run: cd build; ./CCDWrapper_benchmark
+
   ####################
   # Windows
   ####################
@@ -107,7 +106,6 @@ jobs:
         with:
           fetch-depth: 10
       - uses: seanmiddleditch/gha-setup-ninja@master
-
         # https://github.com/actions/cache/issues/101
       - name: Set env
         run: |
@@ -139,6 +137,7 @@ jobs:
             -DCMAKE_CXX_COMPILER_LAUNCHER=sccache ^
             -DCMAKE_BUILD_TYPE=${{ matrix.config }} ^
             -DCCD_WRAPPER_IS_CI_BUILD=ON ^
+            -DCCD_WRAPPER_WITH_MSRF=OFF ^
             -B build ^
             -S .
           cd build
@@ -150,3 +149,10 @@ jobs:
           cp C:\Miniconda\Library\bin\mpir.dll .\
           cp C:\Miniconda\Library\bin\gmp.dll .\
           ctest --verbose --output-on-failure
+      - name: Sample Benchmark
+        shell: powershell
+        run: |
+          cd build
+          cp C:\Miniconda\Library\bin\mpir.dll .\
+          cp C:\Miniconda\Library\bin\gmp.dll .\
+          .\CCDWrapper_benchmark.exe

@@ -143,6 +143,7 @@ jobs:
             -DCMAKE_CXX_COMPILER_LAUNCHER=sccache ^
             -DCMAKE_BUILD_TYPE=${{ matrix.config }} ^
             -DCCD_WRAPPER_IS_CI_BUILD=ON ^
+            -DCCD_WRAPPER_WITH_MSRF=OFF ^
             -B build ^
             -S .
           cd build

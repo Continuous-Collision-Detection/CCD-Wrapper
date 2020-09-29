@@ -163,8 +163,15 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC fmt::fmt)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC nlohmann_json::nlohmann_json)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC CLI11::CLI11)
+
+  # GMP for reading rational query csv files
+  find_package(GMP_CCD)
+  IF(NOT ${GMP_FOUND})
+          MESSAGE(FATAL_ERROR "Cannot find GMP")
+  ENDIF()
   target_include_directories(${PROJECT_NAME}_benchmark PUBLIC ${GMP_INCLUDE_DIRS} src)
   target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC ${GMP_LIBRARIES})
+
   target_compile_features(${PROJECT_NAME}_benchmark PUBLIC cxx_std_14)
 
   ccd_wrapper_download_sample_queries()

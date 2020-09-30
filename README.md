@@ -1,6 +1,8 @@
 # Continuous Collision Detection Wrapper and Benchmark
 
 [![Build status](https://github.com/Continuous-Collision-Detection/CCD-Wrapper/workflows/Build/badge.svg)](https://github.com/Continuous-Collision-Detection/CCD-Wrapper/actions?query=workflow%3ABuild+branch%3Amaster+event%3Apush)
+[![Benchmark](https://github.com/Continuous-Collision-Detection/CCD-Wrapper/workflows/Benchmark/badge.svg)](https://github.com/Continuous-Collision-Detection/CCD-Wrapper/actions?query=workflow%3ABenchmark+branch%3Amaster+event%3Apush)
+[![Nightly](https://github.com/Continuous-Collision-Detection/CCD-Wrapper/workflows/Nightly/badge.svg)](https://github.com/Continuous-Collision-Detection/CCD-Wrapper/actions?query=workflow%3ANightly+branch%3Amaster)
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/github/license/Continuous-Collision-Detection/CCD-Wrapper.svg?color=blue"></img></a>
 
 A wrapper and benchmark for various continuous collision detection algorithms.

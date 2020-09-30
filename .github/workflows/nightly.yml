@@ -72,7 +72,7 @@ jobs:
         run: cd build; ctest --verbose --output-on-failure
 
       - name: Sample Benchmark
-        run: cd build; ./CCDWrapper_benchmark
+        run: cd build; ./CCDBenchmark
 
   ####################
   # Windows
@@ -155,4 +155,4 @@ jobs:
           cd build
           cp C:\Miniconda\Library\bin\mpir.dll .\
           cp C:\Miniconda\Library\bin\gmp.dll .\
-          .\CCDWrapper_benchmark.exe
+          .\CCDBenchmark.exe

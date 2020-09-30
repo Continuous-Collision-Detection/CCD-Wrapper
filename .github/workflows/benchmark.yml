@@ -75,7 +75,7 @@ jobs:
 
       - name: Sample Benchmark
         if: matrix.config == 'Release'
-        run: cd build; ./CCDWrapper_benchmark
+        run: cd build; ./CCDBenchmark
 
   ####################
   # Windows
@@ -153,4 +153,4 @@ jobs:
           cd build
           cp C:\Miniconda\Library\bin\mpir.dll .\
           cp C:\Miniconda\Library\bin\gmp.dll .\
-          .\CCDWrapper_benchmark.exe
+          .\CCDBenchmark.exe

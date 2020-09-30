@@ -153,33 +153,33 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   set(Boost_USE_MULTITHREADED TRUE)
   find_package(Boost COMPONENTS filesystem REQUIRED)
 
-  add_executable(${PROJECT_NAME}_benchmark
+  add_executable(CCDBenchmark
     src/benchmark.cpp
     src/utils/read_rational_csv.cpp
   )
 
-  target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC ${PROJECT_NAME})
-  target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC Boost::filesystem)
-  target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC fmt::fmt)
-  target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC nlohmann_json::nlohmann_json)
-  target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC CLI11::CLI11)
+  target_link_libraries(CCDBenchmark PUBLIC ${PROJECT_NAME})
+  target_link_libraries(CCDBenchmark PUBLIC Boost::filesystem)
+  target_link_libraries(CCDBenchmark PUBLIC fmt::fmt)
+  target_link_libraries(CCDBenchmark PUBLIC nlohmann_json::nlohmann_json)
+  target_link_libraries(CCDBenchmark PUBLIC CLI11::CLI11)
 
   # GMP for reading rational query csv files
   find_package(GMP_CCD)
   IF(NOT ${GMP_FOUND})
           MESSAGE(FATAL_ERROR "Cannot find GMP")
   ENDIF()
-  target_include_directories(${PROJECT_NAME}_benchmark PUBLIC ${GMP_INCLUDE_DIRS} src)
-  target_link_libraries(${PROJECT_NAME}_benchmark PUBLIC ${GMP_LIBRARIES})
+  target_include_directories(CCDBenchmark PUBLIC ${GMP_INCLUDE_DIRS} src)
+  target_link_libraries(CCDBenchmark PUBLIC ${GMP_LIBRARIES})
 
-  target_compile_features(${PROJECT_NAME}_benchmark PUBLIC cxx_std_14)
+  target_compile_features(CCDBenchmark PUBLIC cxx_std_14)
 
   ccd_wrapper_download_sample_queries()
-  target_compile_definitions(${PROJECT_NAME}_benchmark PUBLIC
+  target_compile_definitions(CCDBenchmark PUBLIC
     CCD_WRAPPER_SAMPLE_QUERIES_DIR="${CCD_WRAPPER_EXTERNAL}/Sample-Queries/")
 
   if(CCD_WRAPPER_IS_CI_BUILD)
-    target_compile_definitions(${PROJECT_NAME}_benchmark PRIVATE CCD_WRAPPER_IS_CI_BUILD)
+    target_compile_definitions(CCDBenchmark PRIVATE CCD_WRAPPER_IS_CI_BUILD)
   endif()
 
   if(CCD_WRAPPER_WITH_MSRP)

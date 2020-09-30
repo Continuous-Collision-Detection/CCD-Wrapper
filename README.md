@@ -52,12 +52,12 @@ target_link_libraries(${PROJECT_NAME} PUBLIC CCDWrapper)
 
 :warning: All benchmark results are generated on Linux using GCC.
 
-To run the benchmark run `CCDWrapper_benchmark`.
+To run the benchmark run `CCDBenchmark`.
 
-For complete list of benchmark options run `CCDWrapper_benchmark --help`.
+For complete list of benchmark options run `CCDBenchmark --help`.
 
 By default the benchmark runs on a small subset of CCD queries automatically downloaded to `external/Sample-Queries`.
-The full dataset can be found [here](https://archive.nyu.edu/handle/2451/61518). Use `CCDWrapper_benchmark --data </path/to/data>` to tell the benchmark where to find the root directory of the dataset. Currently, the dataset directories are hardcoded (e.g., `chain`, `cow-heads`, `golf-ball`, and `mat-twist` for the simulation dataset).
+The full dataset can be found [here](https://archive.nyu.edu/handle/2451/61518). Use `CCDBenchmark --data </path/to/data>` to tell the benchmark where to find the root directory of the dataset. Currently, the dataset directories are hardcoded (e.g., `chain`, `cow-heads`, `golf-ball`, and `mat-twist` for the simulation dataset).
 
 ## More Methods?
 

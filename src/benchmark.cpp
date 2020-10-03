@@ -378,7 +378,7 @@ void run_all_methods(const Args& args)
                 fmt::emphasis::bold | fmt::emphasis::underline,
                 "Benchmarking {}\n", method_names[method]);
             run_one_method_over_all_data(args, method);
-            fmt::print("finished {}\n", method_name[method]);
+            fmt::print("finished {}\n", method_names[method]);
         } else {
             std::cerr << "CCD method " << method_names[method]
                       << " requested, but it is disabled" << std::endl;

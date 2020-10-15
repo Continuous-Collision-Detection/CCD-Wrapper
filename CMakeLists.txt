@@ -23,8 +23,8 @@ option(CCD_WRAPPER_WITH_FPRF       "Enable floating-point root finder method"   
 option(CCD_WRAPPER_WITH_MSRF       "Enable minimum separation root-finding method" ON)
 option(CCD_WRAPPER_WITH_RP         "Enable root parity method"                     ON)
 option(CCD_WRAPPER_WITH_RRP        "Enable rational root parity method"            ON)
-option(CCD_WRAPPER_WITH_MSRP       "Enable minimum separation root parity method" OFF)
-mark_as_advanced(CCD_WRAPPER_WITH_MSRP) # This is a private method
+option(CCD_WRAPPER_WITH_FIXEDRP       "Enable fixed root parity method" OFF)
+mark_as_advanced(CCD_WRAPPER_WITH_FIXEDRP) # This is a private method
 option(CCD_WRAPPER_WITH_BSC        "Enable Bernstein sign classification method"   ON)
 option(CCD_WRAPPER_WITH_TIGHT_CCD  "Enable TightCCD method"                        ON)
 option(CCD_WRAPPER_WITH_INTERVAL   "Enable interval-based methods"                 ON)
@@ -96,10 +96,10 @@ if(CCD_WRAPPER_WITH_MSRF)
 endif()
 
 # Root parity with minimum separation
-if(CCD_WRAPPER_WITH_MSRP)
-  target_link_libraries(${PROJECT_NAME} PUBLIC MSRootParity)
-  target_link_libraries(${PROJECT_NAME} PUBLIC RationalMSRootParity)
-  target_compile_definitions(${PROJECT_NAME} PUBLIC CCD_WRAPPER_WITH_MSRP)
+if(CCD_WRAPPER_WITH_FIXEDRP)
+  target_link_libraries(${PROJECT_NAME} PUBLIC FixedRootParity)
+  target_link_libraries(${PROJECT_NAME} PUBLIC RationalFixedRootParity)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CCD_WRAPPER_WITH_FIXEDRP)
 endif()
 
 # Interval-based methods
@@ -182,9 +182,12 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
     target_compile_definitions(CCDBenchmark PRIVATE CCD_WRAPPER_IS_CI_BUILD)
   endif()
 
-  if(CCD_WRAPPER_WITH_MSRP)
+  if(CCD_WRAPPER_WITH_FIXEDRP)
     add_executable(round_queries src/tools/round_queries.cpp)
     target_link_libraries(round_queries PUBLIC ${PROJECT_NAME})
+    target_link_libraries(round_queries PUBLIC Boost::filesystem)
     target_link_libraries(round_queries PUBLIC fmt::fmt)
+    target_link_libraries(round_queries PUBLIC nlohmann_json::nlohmann_json)
+    target_link_libraries(round_queries PUBLIC CLI11::CLI11)
   endif()
 endif()

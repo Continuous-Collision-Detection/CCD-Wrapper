@@ -238,7 +238,7 @@ TEST_CASE("Bolun test case", "[ccd][point-triangle]")
 
 #ifndef NDEBUG
     // BSC has an assertion that causes this test to fail.
-    if (method == CCDMethod::MIN_SEPARATION_ROOT_PARITY) {
+    if (method == CCDMethod::FIXED_ROOT_PARITY) {
         FAIL();
     }
 #endif
@@ -362,7 +362,7 @@ TEST_CASE("Teseo test case 2", "[!mayfail][ccd][edge-edge][teseo2]")
 
 #ifndef NDEBUG
     // BSC has an assertion that causes this test to fail.
-    if (method == CCDMethod::MIN_SEPARATION_ROOT_PARITY) {
+    if (method == CCDMethod::FIXED_ROOT_PARITY) {
         FAIL();
     }
 #endif

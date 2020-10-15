@@ -19,9 +19,9 @@ enum CCDMethod {
     /// Teseo's reimplementation of [Brochu et al. 2012] using rationals
     RATIONAL_ROOT_PARITY,
     /// Root parity with minimum separation and fixes
-    MIN_SEPARATION_ROOT_PARITY,
+    FIXED_ROOT_PARITY,
     /// Rational root parity with minimum separation and fixes
-    RATIONAL_MIN_SEPARATION_ROOT_PARITY,
+    RATIONAL_FIXED_ROOT_PARITY,
     /// Bernstein sign classification method of [Tang et al. 2014]
     BSC,
     /// TightCCD method of [Wang et al. 2015]
@@ -218,8 +218,6 @@ inline bool is_minimum_separation_method(const CCDMethod& method)
 {
     switch (method) {
     case CCDMethod::MIN_SEPARATION_ROOT_FINDER:
-    case CCDMethod::MIN_SEPARATION_ROOT_PARITY:
-    case CCDMethod::RATIONAL_MIN_SEPARATION_ROOT_PARITY:
     case CCDMethod::TIGHT_INCLUSION:
         return true;
     default:
@@ -284,9 +282,9 @@ inline bool is_method_enabled(const CCDMethod& method)
 #else
         return false;
 #endif
-    case MIN_SEPARATION_ROOT_PARITY:
-    case RATIONAL_MIN_SEPARATION_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_MSRP
+    case FIXED_ROOT_PARITY:
+    case RATIONAL_FIXED_ROOT_PARITY:
+#ifdef CCD_WRAPPER_WITH_FIXEDRP
         return true;
 #else
         return false;

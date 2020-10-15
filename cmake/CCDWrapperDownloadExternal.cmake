@@ -53,10 +53,10 @@ function(ccd_wrapper_download_rational_root_parity)
 endfunction()
 
 # Root Parity with Minimum Separation
-function(ccd_wrapper_download_minimum_separation_root_parity)
-   ccd_wrapper_download_project(Minimum-Separation-Root-Parity
-    GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
-    GIT_TAG        ed282878600787ea6d2b15fcef0763d42eb0a438
+function(ccd_wrapper_download_fixed_root_parity)
+   ccd_wrapper_download_project(Fixed-Root-Parity
+    GIT_REPOSITORY https://github.com/geometryprocessing/CCD.git
+    GIT_TAG        4f7bdbbea3d355c88cbcf56e07201d281ab3e600
   )
 endfunction()
 

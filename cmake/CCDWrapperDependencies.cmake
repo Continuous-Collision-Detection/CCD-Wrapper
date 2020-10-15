@@ -55,12 +55,12 @@ if(CCD_WRAPPER_WITH_RRP AND NOT TARGET RationalRootParity)
 endif()
 
 # Root Parity with Minimum Separation
-if(CCD_WRAPPER_WITH_MSRP AND NOT TARGET MSRootParity)
-  ccd_wrapper_download_minimum_separation_root_parity()
+if(CCD_WRAPPER_WITH_FIXEDRP AND NOT TARGET FixedRootParity)
+  ccd_wrapper_download_fixed_root_parity()
   set(CCD_WITH_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Minimum-Separation-Root-Parity)
-  add_library(MSRootParity ALIAS CCD_double)
-  add_library(RationalMSRootParity ALIAS CCD_rational)
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Fixed-Root-Parity)
+  add_library(FixedRootParity ALIAS CCD_double)
+  add_library(RationalFixedRootParity ALIAS CCD_rational)
 endif()
 
 # TightCCD implmentation of Wang et al. [2015]

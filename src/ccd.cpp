@@ -28,7 +28,7 @@
 #include <SAFE_CCD.h>
 #endif
 // Minimum separation root parity
-#ifdef CCD_WRAPPER_WITH_MSRP
+#ifdef CCD_WRAPPER_WITH_FIXEDRP
 // Rational root parity with minimum separation and fixes
 #include <CCD/ccd.hpp>
 // Root parity with minimum separation and fixes
@@ -133,8 +133,34 @@ bool vertexFaceCCD(
 #else
             throw "CCD method is not enabled";
 #endif
-        case CCDMethod::MIN_SEPARATION_ROOT_PARITY:
-        case CCDMethod::RATIONAL_MIN_SEPARATION_ROOT_PARITY:
+        case CCDMethod::FIXED_ROOT_PARITY:
+#ifdef CCD_WRAPPER_WITH_FIXEDRP
+            return doubleccd::vertexFaceCCD(
+                // Point at t=0
+                vertex_start,
+                // Triangle at t = 0
+                face_vertex0_start, face_vertex1_start, face_vertex2_start,
+                // Point at t=1
+                vertex_end,
+                // Triangle at t = 1
+                face_vertex0_end, face_vertex1_end, face_vertex2_end);
+#else
+            throw "CCD method is not enabled";
+#endif
+        case CCDMethod::RATIONAL_FIXED_ROOT_PARITY:
+#ifdef CCD_WRAPPER_WITH_FIXEDRP
+            return ccd::vertexFaceCCD(
+                // Point at t=0
+                vertex_start,
+                // Triangle at t = 0
+                face_vertex0_start, face_vertex1_start, face_vertex2_start,
+                // Point at t=1
+                vertex_end,
+                // Triangle at t = 1
+                face_vertex0_end, face_vertex1_end, face_vertex2_end);
+#else
+            throw "CCD method is not enabled";
+#endif
         case CCDMethod::TIGHT_INCLUSION:
             // Call the MSCCD function for these to remove duplicate code
             return vertexFaceMSCCD(
@@ -341,8 +367,34 @@ bool edgeEdgeCCD(
 #else
             throw "CCD method is not enabled";
 #endif
-        case CCDMethod::MIN_SEPARATION_ROOT_PARITY:
-        case CCDMethod::RATIONAL_MIN_SEPARATION_ROOT_PARITY:
+case CCDMethod::FIXED_ROOT_PARITY:
+#ifdef CCD_WRAPPER_WITH_FIXEDRP
+            return doubleccd::edgeEdgeCCD(
+                // Edge 1 at t=0
+                edge0_vertex0_start, edge0_vertex1_start,
+                // Edge 2 at t=0
+                edge1_vertex0_start, edge1_vertex1_start,
+                // Edge 1 at t=1
+                edge0_vertex0_end, edge0_vertex1_end,
+                // Edge 2 at t=1
+                edge1_vertex0_end, edge1_vertex1_end);
+#else
+            throw "CCD method is not enabled";
+#endif
+        case CCDMethod::RATIONAL_FIXED_ROOT_PARITY:
+#ifdef CCD_WRAPPER_WITH_FIXEDRP
+            return ccd::edgeEdgeCCD(
+                // Edge 1 at t=0
+                edge0_vertex0_start, edge0_vertex1_start,
+                // Edge 2 at t=0
+                edge1_vertex0_start, edge1_vertex1_start,
+                // Edge 1 at t=1
+                edge0_vertex0_end, edge0_vertex1_end,
+                // Edge 2 at t=1
+                edge1_vertex0_end, edge1_vertex1_end);
+#else
+            throw "CCD method is not enabled";
+#endif
         case CCDMethod::TIGHT_INCLUSION:
             // Call the MSCCD function for these to remove duplicate code
             return edgeEdgeMSCCD(
@@ -509,36 +561,7 @@ bool vertexFaceMSCCD(
 #else
             throw "CCD method is not enabled";
 #endif
-        case CCDMethod::MIN_SEPARATION_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_MSRP
-            return doubleccd::vertexFaceCCD(
-                // Point at t=0
-                vertex_start,
-                // Triangle at t = 0
-                face_vertex0_start, face_vertex1_start, face_vertex2_start,
-                // Point at t=1
-                vertex_end,
-                // Triangle at t = 1
-                face_vertex0_end, face_vertex1_end, face_vertex2_end,
-                min_distance);
-#else
-            throw "CCD method is not enabled";
-#endif
-        case CCDMethod::RATIONAL_MIN_SEPARATION_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_MSRP
-            return ccd::vertexFaceCCD(
-                // Point at t=0
-                vertex_start,
-                // Triangle at t = 0
-                face_vertex0_start, face_vertex1_start, face_vertex2_start,
-                // Point at t=1
-                vertex_end,
-                // Triangle at t = 1
-                face_vertex0_end, face_vertex1_end, face_vertex2_end,
-                min_distance);
-#else
-            throw "CCD method is not enabled";
-#endif
+        
         case CCDMethod::TIGHT_INCLUSION:
 #ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
         {
@@ -624,34 +647,7 @@ bool edgeEdgeMSCCD(
 #else
             throw "CCD method is not enabled";
 #endif
-        case CCDMethod::MIN_SEPARATION_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_MSRP
-            return doubleccd::edgeEdgeCCD(
-                // Edge 1 at t=0
-                edge0_vertex0_start, edge0_vertex1_start,
-                // Edge 2 at t=0
-                edge1_vertex0_start, edge1_vertex1_start,
-                // Edge 1 at t=1
-                edge0_vertex0_end, edge0_vertex1_end,
-                // Edge 2 at t=1
-                edge1_vertex0_end, edge1_vertex1_end, min_distance);
-#else
-            throw "CCD method is not enabled";
-#endif
-        case CCDMethod::RATIONAL_MIN_SEPARATION_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_MSRP
-            return ccd::edgeEdgeCCD(
-                // Edge 1 at t=0
-                edge0_vertex0_start, edge0_vertex1_start,
-                // Edge 2 at t=0
-                edge1_vertex0_start, edge1_vertex1_start,
-                // Edge 1 at t=1
-                edge0_vertex0_end, edge0_vertex1_end,
-                // Edge 2 at t=1
-                edge1_vertex0_end, edge1_vertex1_end, min_distance);
-#else
-            throw "CCD method is not enabled";
-#endif
+        
         case CCDMethod::TIGHT_INCLUSION:
 #ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
         {

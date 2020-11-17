@@ -109,10 +109,10 @@ jobs:
         # https://github.com/actions/cache/issues/101
       - name: Set env
         run: |
-          echo "::set-env name=appdata::$($env:LOCALAPPDATA)"
-          echo "::set-env name=GMP_INC::C:\Miniconda\Library\include"
-          echo "::set-env name=GMP_LIB::C:\Miniconda\Library\lib"
-          echo "::set-env name=BOOST_ROOT::$($env:BOOST_ROOT_1_72_0)"
+          echo "appdata=$env:LOCALAPPDATA" >> ${env:GITHUB_ENV}
+          echo "GMP_INC=C:\Miniconda\Library\include" >> ${env:GITHUB_ENV}
+          echo "GMP_LIB=C:\Miniconda\Library\lib" >> ${env:GITHUB_ENV}
+          echo "BOOST_ROOT=$env:BOOST_ROOT_1_72_0" >> ${env:GITHUB_ENV}
 
       - name: Cache build
         id: cache-build
@@ -125,8 +125,8 @@ jobs:
         run: |
           Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
           scoop install sccache --global
-          # Scoop modifies the PATH so we make the modified PATH global.
-          echo "::set-env name=PATH::$env:PATH"
+          # Scoop modifies the PATH so we make it available for the next steps of the job
+          echo "${env:PATH}" >> ${env:GITHUB_PATH}
 
       - name: Configure and build
         shell: cmd

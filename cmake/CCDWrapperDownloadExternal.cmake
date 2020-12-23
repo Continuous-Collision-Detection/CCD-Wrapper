@@ -96,7 +96,7 @@ endfunction()
 function(ccd_wrapper_download_sample_queries)
    ccd_wrapper_download_project(Sample-Queries
     GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Sample-Queries.git
-    GIT_TAG        794e03d62f922b0553253fb2d3ccda69020d8d89
+    GIT_TAG        72ff558d08bf76c2e8c190ba4a37c34fb99d0e6d
   )
 endfunction()
 

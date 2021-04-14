@@ -121,7 +121,6 @@ jobs:
           echo "appdata=$env:LOCALAPPDATA" >> ${env:GITHUB_ENV}
           echo "GMP_INC=C:\Miniconda\Library\include" >> ${env:GITHUB_ENV}
           echo "GMP_LIB=C:\Miniconda\Library\lib" >> ${env:GITHUB_ENV}
-          echo "BOOST_ROOT=$env:BOOST_ROOT" >> ${env:GITHUB_ENV}
 
       - name: Cache build
         id: cache-build

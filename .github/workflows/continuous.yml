@@ -106,6 +106,7 @@ jobs:
 
       - name: Download and install Boost
         uses: MarkusJx/install-boost@v1.0.1
+        id: install-boost
         with:
           boost_version: 1.72.0
 
@@ -121,6 +122,7 @@ jobs:
           echo "appdata=$env:LOCALAPPDATA" >> ${env:GITHUB_ENV}
           echo "GMP_INC=C:\Miniconda\Library\include" >> ${env:GITHUB_ENV}
           echo "GMP_LIB=C:\Miniconda\Library\lib" >> ${env:GITHUB_ENV}
+          echo "BOOST_ROOT=${{ steps.install-boost.outputs.BOOST_ROOT }}" >> ${env:GITHUB_ENV}
 
       - name: Cache build
         id: cache-build

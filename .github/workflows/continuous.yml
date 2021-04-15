@@ -108,7 +108,7 @@ jobs:
         uses: MarkusJx/install-boost@v1.0.1
         id: install-boost
         with:
-          boost_version: 1.72.0
+          boost_version: 1.73.0
 
       - name: Checkout repository
         uses: actions/checkout@v1
@@ -147,7 +147,9 @@ jobs:
             -DCMAKE_CXX_COMPILER_LAUNCHER=sccache ^
             -DCMAKE_BUILD_TYPE=${{ matrix.config }} ^
             -DCCD_WRAPPER_IS_CI_BUILD=ON ^
-            -DBoost_ROOT="${{ steps.install-boost.outputs.BOOST_ROOT }}"
+            -DBOOST_ROOT="${{ steps.install-boost.outputs.BOOST_ROOT }}" ^
+            -DBOOST_INCLUDEDIR="${{ steps.install-boost.outputs.BOOST_ROOT }}\include" ^
+            -DBOOST_LIBRARYDIR="${{ steps.install-boost.outputs.BOOST_ROOT }}\lib" ^
             -B build ^
             -S .
           cd build

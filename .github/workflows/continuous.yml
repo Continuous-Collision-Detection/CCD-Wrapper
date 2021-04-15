@@ -147,7 +147,7 @@ jobs:
             -DCMAKE_CXX_COMPILER_LAUNCHER=sccache ^
             -DCMAKE_BUILD_TYPE=${{ matrix.config }} ^
             -DCCD_WRAPPER_IS_CI_BUILD=ON ^
-            -DBoost_INCLUDE_DIR="${{ steps.install-boost.outputs.BOOST_ROOT }}\include"
+            -DBoost_ROOT="${{ steps.install-boost.outputs.BOOST_ROOT }}"
             -B build ^
             -S .
           cd build

@@ -139,6 +139,7 @@ jobs:
           # Scoop modifies the PATH so we make it available for the next steps of the job
           echo "${env:PATH}" >> ${env:GITHUB_PATH}
 
+      # WARNING: Boost path is set manually. This is probably a bad idea, but I am done messing with this.
       - name: Configure and build
         shell: cmd
         run: |
@@ -149,8 +150,6 @@ jobs:
             -DCMAKE_BUILD_TYPE=${{ matrix.config }} ^
             -DCCD_WRAPPER_IS_CI_BUILD=ON ^
             -DBOOST_ROOT="${{ steps.install-boost.outputs.BOOST_ROOT }}" ^
-            -DBOOST_INCLUDEDIR="${{ steps.install-boost.outputs.BOOST_ROOT }}\include" ^
-            -DBOOST_LIBRARYDIR="${{ steps.install-boost.outputs.BOOST_ROOT }}\lib" ^
             -DBoost_INCLUDE_DIR="D:/a/boost/${{ steps.install-boost.outputs.BOOST_VER }}/include" ^
             -B build ^
             -S .

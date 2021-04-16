@@ -30,6 +30,8 @@ jobs:
             name: macOS
           - os: ubuntu-18.04
             name: Linux
+          - os: ubuntu-20.04
+            name: Linux
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1
@@ -103,6 +105,11 @@ jobs:
         shell: powershell
         run: |
           conda install -c conda-forge mpir -y
+
+      - name: Download and install Boost
+        uses: MarkusJx/install-boost@v1.0.1
+        with:
+          boost_version: 1.72.0
 
       - name: Checkout repository
         uses: actions/checkout@v1

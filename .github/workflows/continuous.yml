@@ -30,6 +30,8 @@ jobs:
             name: macOS
           - os: ubuntu-18.04
             name: Linux
+          - os: ubuntu-20.04
+            name: Linux
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1

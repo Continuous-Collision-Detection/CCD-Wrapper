@@ -54,7 +54,7 @@ if(CCD_WRAPPER_WITH_RRP AND NOT TARGET RationalRootParity)
   add_library(RationalRootParity ALIAS RationalCCD)
 endif()
 
-# Root Parity with Minimum Separation
+# New Root Parity
 if(CCD_WRAPPER_WITH_FIXEDRP AND NOT TARGET FixedRootParity)
   ccd_wrapper_download_fixed_root_parity()
   set(CCD_WITH_UNIT_TESTS OFF CACHE BOOL "" FORCE)

@@ -1,8 +1,19 @@
 // Time the different CCD methods
 
+#if __has_include(<filesystem>)
+#include <filesystem>
+namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#else
+// clang-format off
+#error "C++17 filesystem not supported (neither <filesystem> nor <experimental/filesystem> found)!"
+// clang-format on
+#endif
+
 #include <CLI/CLI.hpp>
 #include <Eigen/Core>
-#include <boost/filesystem.hpp>
 #include <fmt/color.h>
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
@@ -22,7 +33,7 @@ std::vector<std::string> handcrafted_folders
           "erleben-cube-internal-edges", "erleben-spikes", "unit-tests" } };
 
 struct Args {
-    boost::filesystem::path data_dir = CCD_WRAPPER_SAMPLE_QUERIES_DIR;
+    fs::path data_dir = CCD_WRAPPER_SAMPLE_QUERIES_DIR;
     std::vector<CCDMethod> methods;
     double minimum_separation = 0;
     double tight_inclusion_tolerance = 1e-6;
@@ -93,7 +104,7 @@ Args parse_args(int argc, char* argv[])
         exit(app.exit(e));
     }
 
-    // args.data_dir = boost::filesystem::path(data_dir_str);
+    // args.data_dir = fs::path(data_dir_str);
 
     args.run_ee_dataset = !no_ee;
     args.run_vf_dataset = !no_vf;
@@ -118,7 +129,7 @@ void run_benchmark(int argc, char* argv[])
     int false_negatives = 0;
 
     Timer timer;
-    for (auto& entry : boost::filesystem::directory_iterator(args.data_dir)) {
+    for (auto& entry : fs::directory_iterator(args.data_dir)) {
         if (entry.path().extension() != ".csv") {
             continue;
         }
@@ -246,15 +257,13 @@ void run_rational_data_single_method(
         = is_simulation_data ? simulation_folders : handcrafted_folders;
 
     for (const auto& scene_name : scene_names) {
-        boost::filesystem::path scene_path(
-            args.data_dir / scene_name / sub_folder);
-        if (!boost::filesystem::exists(scene_path)) {
+        fs::path scene_path(args.data_dir / scene_name / sub_folder);
+        if (!fs::exists(scene_path)) {
             std::cout << "Missing: " << scene_path.string() << std::endl;
             continue;
         }
 
-        for (const auto& entry :
-             boost::filesystem::directory_iterator(scene_path)) {
+        for (const auto& entry : fs::directory_iterator(scene_path)) {
             if (entry.path().extension() != ".csv") {
                 continue;
             }

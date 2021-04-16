@@ -149,17 +149,12 @@ endif()
 ################################################################################
 
 if(CCD_WRAPPER_WITH_BENCHMARK)
-  # Boost
-  set(Boost_USE_MULTITHREADED TRUE)
-  find_package(Boost COMPONENTS filesystem REQUIRED)
-
   add_executable(CCDBenchmark
     src/benchmark.cpp
     src/utils/read_rational_csv.cpp
   )
 
   target_link_libraries(CCDBenchmark PUBLIC ${PROJECT_NAME})
-  target_link_libraries(CCDBenchmark PUBLIC Boost::filesystem)
   target_link_libraries(CCDBenchmark PUBLIC fmt::fmt)
   target_link_libraries(CCDBenchmark PUBLIC nlohmann_json::nlohmann_json)
   target_link_libraries(CCDBenchmark PUBLIC CLI11::CLI11)
@@ -172,7 +167,7 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
   target_include_directories(CCDBenchmark PUBLIC ${GMP_INCLUDE_DIRS} src)
   target_link_libraries(CCDBenchmark PUBLIC ${GMP_LIBRARIES})
 
-  target_compile_features(CCDBenchmark PUBLIC cxx_std_14)
+  target_compile_features(CCDBenchmark PUBLIC cxx_std_17)
 
   ccd_wrapper_download_sample_queries()
   target_compile_definitions(CCDBenchmark PUBLIC
@@ -180,14 +175,5 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
 
   if(CCD_WRAPPER_IS_CI_BUILD)
     target_compile_definitions(CCDBenchmark PRIVATE CCD_WRAPPER_IS_CI_BUILD)
-  endif()
-
-  if(CCD_WRAPPER_WITH_FIXEDRP)
-    add_executable(round_queries src/tools/round_queries.cpp)
-    target_link_libraries(round_queries PUBLIC ${PROJECT_NAME})
-    target_link_libraries(round_queries PUBLIC Boost::filesystem)
-    target_link_libraries(round_queries PUBLIC fmt::fmt)
-    target_link_libraries(round_queries PUBLIC nlohmann_json::nlohmann_json)
-    target_link_libraries(round_queries PUBLIC CLI11::CLI11)
   endif()
 endif()

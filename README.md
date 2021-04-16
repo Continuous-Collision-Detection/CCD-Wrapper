@@ -21,7 +21,7 @@ make
 
 The system level dependencies vary depending on which methods are enabled. To compile all methods and the benchmark, the following are required:
 
-* [Boost](https://www.boost.org/): for filesystem and intervals (when interval-based methods are enabled)
+* [Boost](https://www.boost.org/): for intervals (when interval-based methods are enabled)
 * [GMP](https://gmplib.org/): for rational numbers arithmetic (used when loading benchmark data)
 
 Eigen and other dependencies will be downloaded through CMake.
@@ -50,14 +50,18 @@ target_link_libraries(${PROJECT_NAME} PUBLIC CCDWrapper)
 
 ## Running the Benchmark
 
-:warning: All benchmark results are generated on Linux using GCC.
-
 To run the benchmark run `CCDBenchmark`.
 
 For complete list of benchmark options run `CCDBenchmark --help`.
 
 By default the benchmark runs on a small subset of CCD queries automatically downloaded to `external/Sample-Queries`.
 The full dataset can be found [here](https://archive.nyu.edu/handle/2451/61518). Use `CCDBenchmark --data </path/to/data>` to tell the benchmark where to find the root directory of the dataset. Currently, the dataset directories are hardcoded (e.g., `chain`, `cow-heads`, `golf-ball`, and `mat-twist` for the simulation dataset).
+
+## Visualize Benchmark Queries
+
+We provide a visualization tool in `visualization/visualCCD.py` for CCD dataset of the paper "A Large Scale Benchmark and an Inclusion-Based Algorithm for Continuous Collision Detection" (https://archive.nyu.edu/handle/2451/61518).
+
+See [visualization/readme.txt](./visualization/readme.txt) for more information.
 
 ## More Methods?
 

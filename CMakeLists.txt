@@ -154,6 +154,10 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
     src/utils/read_rational_csv.cpp
   )
 
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_link_libraries(CCDBenchmark PUBLIC stdc++fs)
+  endif()
+
   target_link_libraries(CCDBenchmark PUBLIC ${PROJECT_NAME})
   target_link_libraries(CCDBenchmark PUBLIC fmt::fmt)
   target_link_libraries(CCDBenchmark PUBLIC nlohmann_json::nlohmann_json)

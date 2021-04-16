@@ -53,9 +53,9 @@ function(ccd_wrapper_download_rational_root_parity)
 endfunction()
 
 # New Root Parity
-function(ccd_wrapper_download_fixed_root_parity)
-   ccd_wrapper_download_project(Fixed-Root-Parity
-    GIT_REPOSITORY https://github.com/geometryprocessing/CCD.git
+function(ccd_wrapper_download_floating_point_root_parity)
+   ccd_wrapper_download_project(Floating-Point-Root-Parity
+    GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
     GIT_TAG        e37766c843b64f8338d3870a8a1e65279485ad41
   )
 endfunction()

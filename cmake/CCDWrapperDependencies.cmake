@@ -55,11 +55,11 @@ if(CCD_WRAPPER_WITH_RRP AND NOT TARGET RationalRootParity)
 endif()
 
 # New Root Parity
-if(CCD_WRAPPER_WITH_FIXEDRP AND NOT TARGET FixedRootParity)
-  ccd_wrapper_download_fixed_root_parity()
+if(CCD_WRAPPER_WITH_FPRP AND NOT TARGET FloatingPointRootParity)
+  ccd_wrapper_download_floating_point_root_parity()
   set(CCD_WITH_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Fixed-Root-Parity)
-  add_library(FixedRootParity ALIAS CCD_double)
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Floating-Point-Root-Parity)
+  add_library(FloatingPointRootParity ALIAS CCD_double)
   add_library(RationalFixedRootParity ALIAS CCD_rational)
 endif()
 

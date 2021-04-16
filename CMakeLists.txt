@@ -24,8 +24,8 @@ option(CCD_WRAPPER_WITH_FPRF       "Enable floating-point root finder method"   
 option(CCD_WRAPPER_WITH_MSRF       "Enable minimum separation root-finding method" ON)
 option(CCD_WRAPPER_WITH_RP         "Enable root parity method"                     ON)
 option(CCD_WRAPPER_WITH_RRP        "Enable rational root parity method"            ON)
-option(CCD_WRAPPER_WITH_FIXEDRP       "Enable fixed root parity method" OFF)
-mark_as_advanced(CCD_WRAPPER_WITH_FIXEDRP) # This is a private method
+option(CCD_WRAPPER_WITH_FPRP       "Enable floating-point root parity method" OFF)
+mark_as_advanced(CCD_WRAPPER_WITH_FPRP) # This is a private method
 option(CCD_WRAPPER_WITH_BSC        "Enable Bernstein sign classification method"   ON)
 option(CCD_WRAPPER_WITH_TIGHT_CCD  "Enable TightCCD method"                        ON)
 option(CCD_WRAPPER_WITH_INTERVAL   "Enable interval-based methods"                 ON)
@@ -97,10 +97,10 @@ if(CCD_WRAPPER_WITH_MSRF)
 endif()
 
 # Root parity with minimum separation
-if(CCD_WRAPPER_WITH_FIXEDRP)
-  target_link_libraries(${PROJECT_NAME} PUBLIC FixedRootParity)
+if(CCD_WRAPPER_WITH_FPRP)
+  target_link_libraries(${PROJECT_NAME} PUBLIC FloatingPointRootParity)
   target_link_libraries(${PROJECT_NAME} PUBLIC RationalFixedRootParity)
-  target_compile_definitions(${PROJECT_NAME} PUBLIC CCD_WRAPPER_WITH_FIXEDRP)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC CCD_WRAPPER_WITH_FPRP)
 endif()
 
 # Interval-based methods

@@ -18,9 +18,9 @@ enum CCDMethod {
     ROOT_PARITY,
     /// Teseo's reimplementation of [Brochu et al. 2012] using rationals
     RATIONAL_ROOT_PARITY,
-    /// Root parity with minimum separation and fixes
-    FIXED_ROOT_PARITY,
-    /// Rational root parity with minimum separation and fixes
+    /// Root parity with and fixes
+    FLOATING_POINT_ROOT_PARITY,
+    /// Rational root parity with fixes
     RATIONAL_FIXED_ROOT_PARITY,
     /// Bernstein sign classification method of [Tang et al. 2014]
     BSC,
@@ -43,8 +43,8 @@ static const char* method_names[CCDMethod::NUM_CCD_METHODS] = {
     "MinSeperationRootFinder",
     "RootParity",
     "RationalRootParity",
-    "MinSeparationRootParity",
-    "RationalMinSeparationRootParity",
+    "FloatingPointRootParity",
+    "RationalFloatingPointRootParity",
     "BSC",
     "TightCCD",
     "SafeCCD",
@@ -282,9 +282,9 @@ inline bool is_method_enabled(const CCDMethod& method)
 #else
         return false;
 #endif
-    case FIXED_ROOT_PARITY:
+    case FLOATING_POINT_ROOT_PARITY:
     case RATIONAL_FIXED_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_FIXEDRP
+#ifdef CCD_WRAPPER_WITH_FPRP
         return true;
 #else
         return false;

@@ -27,11 +27,11 @@
 #ifdef ENABLE_SAFE_CCD
 #include <SAFE_CCD.h>
 #endif
-// Minimum separation root parity
-#ifdef CCD_WRAPPER_WITH_FIXEDRP
-// Rational root parity with minimum separation and fixes
+// floating-point root parity
+#ifdef CCD_WRAPPER_WITH_FPRP
+// Rational root parity with fixes
 #include <CCD/ccd.hpp>
-// Root parity with minimum separation and fixes
+// Floating-point root parity with fixes
 #include <doubleCCD/doubleccd.hpp>
 #endif
 // Minimum separation root finder of Harmon et al. [2011]
@@ -133,8 +133,8 @@ bool vertexFaceCCD(
 #else
             throw "CCD method is not enabled";
 #endif
-        case CCDMethod::FIXED_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_FIXEDRP
+        case CCDMethod::FLOATING_POINT_ROOT_PARITY:
+#ifdef CCD_WRAPPER_WITH_FPRP
             return doubleccd::vertexFaceCCD(
                 // Point at t=0
                 vertex_start,
@@ -148,7 +148,7 @@ bool vertexFaceCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::RATIONAL_FIXED_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_FIXEDRP
+#ifdef CCD_WRAPPER_WITH_FPRP
             return ccd::vertexFaceCCD(
                 // Point at t=0
                 vertex_start,
@@ -367,8 +367,8 @@ bool edgeEdgeCCD(
 #else
             throw "CCD method is not enabled";
 #endif
-case CCDMethod::FIXED_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_FIXEDRP
+        case CCDMethod::FLOATING_POINT_ROOT_PARITY:
+#ifdef CCD_WRAPPER_WITH_FPRP
             return doubleccd::edgeEdgeCCD(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
@@ -382,7 +382,7 @@ case CCDMethod::FIXED_ROOT_PARITY:
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::RATIONAL_FIXED_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_FIXEDRP
+#ifdef CCD_WRAPPER_WITH_FPRP
             return ccd::edgeEdgeCCD(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
@@ -561,7 +561,7 @@ bool vertexFaceMSCCD(
 #else
             throw "CCD method is not enabled";
 #endif
-        
+
         case CCDMethod::TIGHT_INCLUSION:
 #ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
         {
@@ -647,7 +647,7 @@ bool edgeEdgeMSCCD(
 #else
             throw "CCD method is not enabled";
 #endif
-        
+
         case CCDMethod::TIGHT_INCLUSION:
 #ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
         {

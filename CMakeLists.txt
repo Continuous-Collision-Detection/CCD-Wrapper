@@ -24,7 +24,7 @@ option(CCD_WRAPPER_WITH_FPRF       "Enable floating-point root finder method"   
 option(CCD_WRAPPER_WITH_MSRF       "Enable minimum separation root-finding method" ON)
 option(CCD_WRAPPER_WITH_RP         "Enable root parity method"                     ON)
 option(CCD_WRAPPER_WITH_RRP        "Enable rational root parity method"            ON)
-option(CCD_WRAPPER_WITH_FPRP       "Enable floating-point root parity method" OFF)
+option(CCD_WRAPPER_WITH_FPRP       "Enable floating-point root parity method"     OFF)
 mark_as_advanced(CCD_WRAPPER_WITH_FPRP) # This is a private method
 option(CCD_WRAPPER_WITH_BSC        "Enable Bernstein sign classification method"   ON)
 option(CCD_WRAPPER_WITH_TIGHT_CCD  "Enable TightCCD method"                        ON)

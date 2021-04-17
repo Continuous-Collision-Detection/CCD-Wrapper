@@ -58,6 +58,8 @@ endif()
 if(CCD_WRAPPER_WITH_FPRP AND NOT TARGET FloatingPointRootParity)
   ccd_wrapper_download_floating_point_root_parity()
   set(CCD_WITH_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+  # WARNING: Turn this off if you are doing manual rounding
+  option(CCD_ROUND_INPUTS "Round the inputs before collision detection" ON)
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Floating-Point-Root-Parity)
   add_library(FloatingPointRootParity ALIAS CCD_double)
   add_library(RationalFixedRootParity ALIAS CCD_rational)

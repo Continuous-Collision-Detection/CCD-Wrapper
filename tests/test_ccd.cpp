@@ -236,13 +236,6 @@ TEST_CASE("Bolun test case", "[ccd][point-triangle]")
         return;
     }
 
-#ifndef NDEBUG
-    // BSC has an assertion that causes this test to fail.
-    if (method == CCDMethod::FIXED_ROOT_PARITY) {
-        FAIL();
-    }
-#endif
-
     Eigen::Vector3d x0(0.1, 0.1, 0.1), x1(0, 0, 1), x2(1, 0, 1), x3(0, 1, 1),
         x0b(0.1, 0.1, 0.1), x1b(0, 0, 0), x2b(0, 1, 0), x3b(1, 0, 0);
 
@@ -359,13 +352,6 @@ TEST_CASE("Teseo test case 2", "[!mayfail][ccd][edge-edge][teseo2]")
     if (!is_method_enabled(method)) {
         return;
     }
-
-#ifndef NDEBUG
-    // BSC has an assertion that causes this test to fail.
-    if (method == CCDMethod::FIXED_ROOT_PARITY) {
-        FAIL();
-    }
-#endif
 
     const Eigen::Vector3d a0s(0, 0, 1);
     const Eigen::Vector3d a1s(0, 1, 1);

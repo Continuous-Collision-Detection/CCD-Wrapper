@@ -56,7 +56,7 @@ endfunction()
 function(ccd_wrapper_download_floating_point_root_parity)
    ccd_wrapper_download_project(Floating-Point-Root-Parity
     GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
-    GIT_TAG        e37766c843b64f8338d3870a8a1e65279485ad41
+    GIT_TAG        3ec1d6fe9d59aef94bb7c69c3b8c23d956fdfa10
   )
 endfunction()
 

@@ -14,7 +14,7 @@ DATA_DIRS="$CCD_WRAPPER_ROOT/data"
 COLLISON_TYPES=("vf" "ee")
 
 function run_benchmark {
-   for method in 5 7; do
+   for method in 1 4; do # TODO: Add 8 (TightInterval)
        for d in "1e-2" "1e-8" "1e-16" "1e-30" "1e-100"; do
            $CCD_WRAPPER_BENCHMARK $1 $2 $method -d $d > /dev/null
        done

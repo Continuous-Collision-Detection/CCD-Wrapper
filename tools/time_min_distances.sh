@@ -10,5 +10,5 @@ fi
 echo "Using $CCD_WRAPPER_BENCHMARK"
 
 for d in $(python3 -c "import numpy; print(str(numpy.logspace(-100, 2, 103))[1:-1])"); do
-    $CCD_WRAPPER_BENCHMARK $1 $2 7 -d $d > /dev/null
+    $CCD_WRAPPER_BENCHMARK $1 $2 4 -d $d > /dev/null
 done

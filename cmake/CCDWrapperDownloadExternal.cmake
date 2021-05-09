@@ -29,42 +29,74 @@ function(ccd_wrapper_download_eigen)
 endfunction()
 
 # Etienne Vouga's CTCD Library
-function(ccd_wrapper_download_evctcd)
-  ccd_wrapper_download_project(EVCTCD
-    GIT_REPOSITORY https://github.com/evouga/collisiondetection.git
+function(ccd_wrapper_download_floating_point_root_finder)
+  ccd_wrapper_download_project(Floating-Point-Root-Finder
+    GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Floating-Point-Root-Finder.git
     GIT_TAG        e5fe5c9767207df5047e375fb20180a665ae186f
   )
 endfunction()
 
-# exact-ccd (clone of Brochu et al. [2012] and Tang et al. [2014])
-function(ccd_wrapper_download_exact_ccd)
-  ccd_wrapper_download_project(exact-ccd
-    GIT_REPOSITORY https://github.com/zfergus/exact-ccd.git
-    GIT_TAG        cf0bd9b3de14d9ae735d9b8db3b6a6e94e4f3dfe
+# Root Parity [Brochu et al. 2012] and BSC [Tang et al. 2014]
+function(ccd_wrapper_download_root_parity_and_bernstein_sign_classification)
+  ccd_wrapper_download_project(RP-and-BSC
+    GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Root-Parity-and-Bernstein-Sign-Classification.git
+    GIT_TAG        8db61b2c1d399f19e73e4a16373e7a869cc95ad4
   )
 endfunction()
 
-# Rational CCD (rational version of Brochu et al. [2012])
-function(ccd_wrapper_download_rational_ccd)
-  ccd_wrapper_download_project(rational_ccd
-    GIT_REPOSITORY https://github.com/teseoch/Exact-CDD.git
-    GIT_TAG        01d933b1a7d215fa8cdcc6998f9e60d9804b7354
+# Rational Root Parity CCD (rational version of [Brochu et al. 2012])
+function(ccd_wrapper_download_rational_root_parity)
+  ccd_wrapper_download_project(Rational-Root-Parity
+    GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Rational-Root-Parity.git
+    GIT_TAG        c58bd6fd056a5ac4305bca1bdd24acc038ad44cd
   )
 endfunction()
 
-# TightCCD implmentation of Wang et al. [2015]
+# Root Parity with Minimum Separation
+function(ccd_wrapper_download_fixed_root_parity)
+   ccd_wrapper_download_project(Fixed-Root-Parity
+    GIT_REPOSITORY https://github.com/geometryprocessing/CCD.git
+    GIT_TAG        5e3cd374f3ea90308b9527dc23d9ebae8b42dc6b
+  )
+endfunction()
+
+# TightCCD implmentation of [Wang et al. 2015]
 function(ccd_wrapper_download_tight_ccd)
   ccd_wrapper_download_project(TightCCD
-    GIT_REPOSITORY https://github.com/zfergus/TightCCD.git
-    GIT_TAG        1da1fd01fffabd2611707b0b3a1096928c0da98b
+    GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/TightCCD.git
+    GIT_TAG        366384bac36ed1549d265e90c180fdd1beab42c6
   )
 endfunction()
 
-# Exact Minimum Separation CCD
-function(ccd_wrapper_download_exact_msccd)
-   ccd_wrapper_download_project(exact_msccd
-    GIT_REPOSITORY https://github.com/geometryprocessing/CCD.git
-    GIT_TAG        74ad8f2dcb9848995b51a6d4d7cccec8a38a9abf
+# Minimum separation root finder of [Harmon et al. 2011]
+function(ccd_wrapper_download_minimum_separation_root_finder)
+  ccd_wrapper_download_project(Minimum-Separation-Root-Finder
+    GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Minimum-Separation-Root-Finder.git
+    GIT_TAG        7f2a75d50139444c8e412a8d9b54f1c20d9e8848
+  )
+endfunction()
+
+# Interval-based methods
+function(ccd_wrapper_download_interval_based)
+   ccd_wrapper_download_project(Interval-Based
+    GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Interval-Based.git
+    GIT_TAG        ec592c604c367e030ff16d2aefa42ed05ce58248
+  )
+endfunction()
+
+# Tight Inclusion
+function(ccd_wrapper_download_tight_inclusion)
+   ccd_wrapper_download_project(Tight-Inclusion
+    GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Tight-Inclusion.git
+    GIT_TAG        aac628970959b9ab66e95363a301985ab2c4af50
+  )
+endfunction()
+
+# Sampled CCD Queries
+function(ccd_wrapper_download_sample_queries)
+   ccd_wrapper_download_project(Sample-Queries
+    GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Sample-Queries.git
+    GIT_TAG        794e03d62f922b0553253fb2d3ccda69020d8d89
   )
 endfunction()
 
@@ -73,22 +105,6 @@ function(ccd_wrapper_download_catch2)
   ccd_wrapper_download_project(Catch2
     GIT_REPOSITORY https://github.com/catchorg/Catch2.git
     GIT_TAG        v2.11.1
-  )
-endfunction()
-
-# libigl for timing
-function(ccd_wrapper_download_libigl)
-   ccd_wrapper_download_project(libigl
-   GIT_REPOSITORY https://github.com/libigl/libigl.git
-   GIT_TAG        aea868bd1fc64f71afecd2c51e51507a99d8e3e5
-  )
-endfunction()
-
-# HighFive - Header-only C++ HDF5 interface
-function(ccd_wrapper_download_high_five)
-  ccd_wrapper_download_project(HighFive
-    GIT_REPOSITORY https://github.com/BlueBrain/HighFive.git
-    GIT_TAG        v2.2.1
   )
 endfunction()
 

@@ -24,71 +24,78 @@ if(NOT TARGET Eigen3::Eigen)
   )
   set_property(TARGET ${PROJECT_NAME}_eigen PROPERTY EXPORT_NAME Eigen3::Eigen)
   add_library(Eigen3::Eigen ALIAS ${PROJECT_NAME}_eigen)
-  # Set Eigen directory environment variable (needed for EVCTCD)
-  set(ENV{EIGEN3_INCLUDE_DIR} "${CCD_WRAPPER_EXTERNAL}/eigen/")
 endif()
 
 # Etienne Vouga's CTCD Library
-if(NOT TARGET EVCTCD)
-  ccd_wrapper_download_evctcd()
-  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/EVCTCD)
-  # These includes are PRIVATE for some reason
-  target_include_directories(collisiondetection PUBLIC "${CCD_WRAPPER_EXTERNAL}/EVCTCD/include")
+if(CCD_WRAPPER_WITH_FPRF AND NOT TARGET FloatingPointRootFinder)
+  ccd_wrapper_download_floating_point_root_finder()
+
+  file(GLOB FLOATING_POINT_ROOT_FINDER_FILES "${CCD_WRAPPER_EXTERNAL}/Floating-Point-Root-Finder/src/*.cpp")
+  add_library(FloatingPointRootFinder ${FLOATING_POINT_ROOT_FINDER_FILES})
+  target_include_directories(
+    FloatingPointRootFinder PUBLIC "${CCD_WRAPPER_EXTERNAL}/Floating-Point-Root-Finder/include")
+  target_link_libraries(FloatingPointRootFinder PUBLIC Eigen3::Eigen)
+
   # Turn off floating point contraction for CCD robustness
-  target_compile_options(collisiondetection PUBLIC "-ffp-contract=off")
-  # Rename for convenience
-  add_library(EVCTCD ALIAS collisiondetection)
+  target_compile_options(FloatingPointRootFinder PUBLIC "-ffp-contract=off")
 endif()
 
 # Brochu et al. [2012] and Tang et al. [2014]
-if(NOT TARGET exact-ccd::exact-ccd)
-  ccd_wrapper_download_exact_ccd()
-  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/exact-ccd EXCLUDE_FROM_ALL)
-  add_library(exact-ccd::exact-ccd ALIAS exact-ccd)
+if((CCD_WRAPPER_WITH_RP OR CCD_WRAPPER_WITH_BSC) AND NOT TARGET RootParity_and_BernsteinSignClassification)
+  ccd_wrapper_download_root_parity_and_bernstein_sign_classification()
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/RP-and-BSC EXCLUDE_FROM_ALL)
+  add_library(RootParity_and_BernsteinSignClassification ALIAS exact-ccd)
 endif()
 
 # Rational implmentation of Brochu et al. [2012]
-if(NOT TARGET RationalCCD)
-  ccd_wrapper_download_rational_ccd()
-  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/rational_ccd)
+if(CCD_WRAPPER_WITH_RRP AND NOT TARGET RationalRootParity)
+  ccd_wrapper_download_rational_root_parity()
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Rational-Root-Parity EXCLUDE_FROM_ALL)
+  add_library(RationalRootParity ALIAS RationalCCD)
+endif()
+
+# Root Parity with Minimum Separation
+if(CCD_WRAPPER_WITH_FIXEDRP AND NOT TARGET FixedRootParity)
+  ccd_wrapper_download_fixed_root_parity()
+  set(CCD_WITH_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Fixed-Root-Parity)
+  add_library(FixedRootParity ALIAS CCD_double)
+  add_library(RationalFixedRootParity ALIAS CCD_rational)
 endif()
 
 # TightCCD implmentation of Wang et al. [2015]
-if(NOT TARGET TightCCD)
+if(CCD_WRAPPER_WITH_TIGHT_CCD AND NOT TARGET TightCCD)
   ccd_wrapper_download_tight_ccd()
-  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/TightCCD)
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/TightCCD EXCLUDE_FROM_ALL)
 endif()
-# safe ccd
-if(NOT TARGET SafeCCD)
+
+# SafeCCD
+if(CCD_WRAPPER_WITH_SAFE_CCD AND NOT TARGET SafeCCD)
   add_subdirectory(${CCD_WRAPPER_EXTERNAL}/SafeCCD)
 endif()
-# Exact Minimum Separation CCD
-if(NOT (TARGET ExactMSCCD::CCD_rational AND TARGET ExactMSCCD::CCD_double))
-  # ccd_wrapper_download_exact_msccd()
-  set(CCD_WITH_UNIT_TESTS OFF CACHE BOOL "" FORCE)
-  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/exact_msccd)
-  add_library(ExactMSCCD::CCD_double ALIAS CCD_double)
-  add_library(ExactMSCCD::CCD_rational ALIAS CCD_rational)
-  add_library(ExactMSCCD::CCD_interval ALIAS CCD_interval)
+
+# Minimum separation root finder of [Harmon et al. 2011]
+if(CCD_WRAPPER_WITH_MSRF AND NOT TARGET MinimumSeparationRootFinder)
+  ccd_wrapper_download_minimum_separation_root_finder()
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Minimum-Separation-Root-Finder EXCLUDE_FROM_ALL)
+  add_library(MinimumSeparationRootFinder ALIAS MSRF_CCD)
+endif()
+
+# Interval-based CCD
+if(CCD_WRAPPER_WITH_INTERVAL AND NOT TARGET IntervalBased)
+  ccd_wrapper_download_interval_based()
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Interval-Based)
+  add_library(IntervalBased ALIAS INTERVAL_CCD)
+endif()
+
+# Tight Inclusion
+if(CCD_WRAPPER_WITH_TIGHT_INCLUSION AND NOT TARGET TightInclusion)
+  ccd_wrapper_download_tight_inclusion()
+  add_subdirectory(${CCD_WRAPPER_EXTERNAL}/Tight-Inclusion)
+  add_library(TightInclusion ALIAS tight_inclusion)
 endif()
 
 if(CCD_WRAPPER_WITH_BENCHMARK)
-  # libigl for timing
-  if(NOT TARGET igl::core)
-    ccd_wrapper_download_libigl()
-    # Import libigl targets
-    list(APPEND CMAKE_MODULE_PATH "${CCD_WRAPPER_EXTERNAL}/libigl/cmake")
-    include(libigl)
-  endif()
-
-  # HDF5 Reader
-  if(NOT TARGET HighFive::HighFive)
-    set(USE_EIGEN TRUE CACHE BOOL "Enable Eigen testing" FORCE)
-    ccd_wrapper_download_high_five()
-    add_subdirectory(${CCD_WRAPPER_EXTERNAL}/HighFive EXCLUDE_FROM_ALL)
-    add_library(HighFive::HighFive ALIAS HighFive)
-  endif()
-
   # String formatting
   if(NOT TARGET fmt::fmt)
     ccd_wrapper_download_fmt()

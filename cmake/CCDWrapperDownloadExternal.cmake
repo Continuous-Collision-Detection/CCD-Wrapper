@@ -54,7 +54,7 @@ endfunction()
 
 # New Root Parity
 function(ccd_wrapper_download_floating_point_root_parity)
-   ccd_wrapper_download_project(Floating-Point-Root-Parity
+  ccd_wrapper_download_project(Floating-Point-Root-Parity
     GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
     GIT_TAG        ba9a4495d44ca9f4440e5f6d91662eb2f729032b
   )
@@ -78,7 +78,7 @@ endfunction()
 
 # Interval-based methods
 function(ccd_wrapper_download_interval_based)
-   ccd_wrapper_download_project(Interval-Based
+  ccd_wrapper_download_project(Interval-Based
     GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Interval-Based.git
     GIT_TAG        7e6484583fa6c59970d83566606e345354ae8a64
   )
@@ -86,15 +86,15 @@ endfunction()
 
 # Tight Inclusion
 function(ccd_wrapper_download_tight_inclusion)
-   ccd_wrapper_download_project(Tight-Inclusion
+  ccd_wrapper_download_project(Tight-Inclusion
     GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Tight-Inclusion.git
-    GIT_TAG        aac628970959b9ab66e95363a301985ab2c4af50
+    GIT_TAG        5f81f18b4e19e7e9a9976c4e8cafd4793dcf5a36
   )
 endfunction()
 
 # Sampled CCD Queries
 function(ccd_wrapper_download_sample_queries)
-   ccd_wrapper_download_project(Sample-Queries
+  ccd_wrapper_download_project(Sample-Queries
     GIT_REPOSITORY https://github.com/Continuous-Collision-Detection/Sample-Queries.git
     GIT_TAG        72ff558d08bf76c2e8c190ba4a37c34fb99d0e6d
   )

@@ -307,12 +307,14 @@ void write_csv(const std::string& file, const std::vector<std::string> titles,co
 	fout.close();
 }
 void write_csv(const std::string& file, const std::vector<std::string> titles,const std::vector<long> data) {
-	std::ofstream fout;
+	std::cout<<"inside write"<<std::endl;
+    std::ofstream fout;
 	fout.open(file);
 	for (int i = 0; i < titles.size()-1; i++) {
 	fout << titles[i] << ",";
 		}
 	fout << titles.back() << std::endl;
+    std::cout<<"finish writting titles"<<std::endl;
         for (int i = 0; i < data.size() - 1; i++) {
 		fout << data[i] << ",";
 			}

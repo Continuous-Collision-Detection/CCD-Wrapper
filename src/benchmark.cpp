@@ -280,6 +280,7 @@ void write_results_csv(
     }
     fout.close();
 }
+
 void write_iteration_info(
     const std::string file,
     const double ratio,
@@ -321,6 +322,19 @@ void write_csv(const std::string& file, const std::vector<std::string> titles,co
 	fout << data.back() << std::endl;
 	fout.close();
 }
+void write_queue_sizes(
+    const std::string file,
+    const std::vector<long>& sizes)
+{
+    std::ofstream fout;
+    fout.open(file);
+    fout << "queue_size" << std::endl;
+    for(int i=0;i<sizes.size();i++){
+        fout<<sizes[i]<<std::endl;
+    }
+
+    fout.close();
+}
 //#############################
 // this is a value used to control if write info for per query
 bool WRITE_QUERY_INFO=false;
@@ -358,6 +372,7 @@ void run_rational_data_single_method(
     long  queue_size_avg=0;
     long  queue_size_max=0;
     long  current_queue_size=0;
+    std::vector<long> queue_sizes;
     long long queue_size_total=0;
     const std::vector<std::string>& scene_names
         = is_simulation_data ? simulation_folders : handcrafted_folders;
@@ -528,6 +543,7 @@ void run_rational_data_single_method(
                 if(current_queue_size>queue_size_max){
                     queue_size_max=current_queue_size;
                 }
+                queue_sizes.push_back(current_queue_size);
                 //queue_size_total+=current_queue_size;
                 if(DEBUG_FLAG){
                     std::cout<<"result, "<<result<<std::endl;
@@ -611,6 +627,10 @@ void run_rational_data_single_method(
         std::cout<<"check pt"<<std::endl;
         //std::vector<std::string> titles={{"max","avg"}};
         std::cout<<"max avg "<<queue_size_max<<" "<<queue_size_avg<<std::endl;
+        write_queue_sizes(folder + "method" + std::to_string(method) + "_is_edge_edge_"
+                + std::to_string(is_edge_edge) + "_"
+                + std::to_string(total_number + 1) + "_queue_info" + tail
+                + ".csv",queue_sizes);
         // std::vector<long> queue_info={{queue_size_max,queue_size_avg}};
         
         // write_csv(folder + "method" + std::to_string(method) + "_is_edge_edge_"

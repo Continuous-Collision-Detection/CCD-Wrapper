@@ -593,6 +593,7 @@ void run_rational_data_single_method(
     if(1){
         std::cout<<"start writting queue info"<<std::endl;
         queue_size_avg=queue_size_total/(total_number + 1);
+        std::cout<<"check pt"<<std::endl;
         std::vector<std::string> titles={{"max","avg"}};
         std::vector<double> queue_info={{double(queue_size_max),double(queue_size_avg)}};
         

@@ -306,6 +306,19 @@ void write_csv(const std::string& file, const std::vector<std::string> titles,co
 	fout << data.back() << std::endl;
 	fout.close();
 }
+void write_csv(const std::string& file, const std::vector<std::string> titles,const std::vector<long> data) {
+	std::ofstream fout;
+	fout.open(file);
+	for (int i = 0; i < titles.size()-1; i++) {
+	fout << titles[i] << ",";
+		}
+	fout << titles.back() << std::endl;
+        for (int i = 0; i < data.size() - 1; i++) {
+		fout << data[i] << ",";
+			}
+	fout << data.back() << std::endl;
+	fout.close();
+}
 //#############################
 // this is a value used to control if write info for per query
 bool WRITE_QUERY_INFO=false;
@@ -595,7 +608,7 @@ void run_rational_data_single_method(
         queue_size_avg=queue_size_total/(total_number + 1);
         std::cout<<"check pt"<<std::endl;
         std::vector<std::string> titles={{"max","avg"}};
-        std::vector<double> queue_info={{double(queue_size_max),double(queue_size_avg)}};
+        std::vector<double> queue_info={{queue_size_max,queue_size_avg}};
         
         write_csv(folder + "method" + std::to_string(method) + "_is_edge_edge_"
                 + std::to_string(is_edge_edge) + "_"

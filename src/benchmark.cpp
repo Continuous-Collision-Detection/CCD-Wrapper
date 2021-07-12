@@ -591,10 +591,11 @@ void run_rational_data_single_method(
             sum_tol / total_number);
     }
     if(1){
+        std::cout<<"start writting queue info"<<std::endl;
         queue_size_avg=queue_size_total/(total_number + 1);
         std::vector<std::string> titles={{"max","avg"}};
         std::vector<double> queue_info={{double(queue_size_max),double(queue_size_avg)}};
-        std::cout<<"start writting queue info"<<std::endl;
+        
         write_csv(folder + "method" + std::to_string(method) + "_is_edge_edge_"
                 + std::to_string(is_edge_edge) + "_"
                 + std::to_string(total_number + 1) + "_queue_info" + tail

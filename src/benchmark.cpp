@@ -11,6 +11,7 @@
 #include <utils/read_rational_csv.hpp>
 #include <utils/timer.hpp>
 #include <utils/rational.hpp>
+#include <tight_inclusion/inclusion_ccd.hpp>
 // #include <tight_inclusion/interval_ccd.hpp>
 #include <CTCD.h>
 using namespace ccd;
@@ -339,7 +340,10 @@ void run_rational_data_single_method(
     int nbr_diff_tol = 0;
     double max_tol = 0;
     double sum_tol = 0;
-    
+    long  queue_size_avg=0;
+    long  queue_size_max=0;
+    long  current_queue_size=0;
+    long long queue_size_total=0;
     const std::vector<std::string>& scene_names
         = is_simulation_data ? simulation_folders : handcrafted_folders;
     if(WRITE_ALL_TIMING){
@@ -386,7 +390,7 @@ void run_rational_data_single_method(
                 bool result;
                 timer.start();
                 long round_nbr=0;
-                for(int ri=0;;ri++){
+                for(int ri=0;ri<1;ri++){
 
                     round_nbr+=1;
                     if (method==CCDMethod::TIGHT_INCLUSION && WRITE_ITERATION_INFO){
@@ -505,6 +509,11 @@ void run_rational_data_single_method(
 #ifndef CCD_WRAPPER_IS_CI_BUILD
                 std::cout << total_number << "\r" << std::flush;
 #endif
+                current_queue_size=return_queue_size();
+                if(current_queue_size>queue_size_max){
+                    queue_size_max=current_queue_size;
+                }
+                queue_size_total+=current_queue_size;
                 if(DEBUG_FLAG){
                     std::cout<<"result, "<<result<<std::endl;
                     std::cout<<V<<std::endl;
@@ -581,6 +590,17 @@ void run_rational_data_single_method(
             double(nbr_diff_tol) / total_number, max_tol,
             sum_tol / total_number);
     }
+    if(1){
+        queue_size_avg=queue_size_total/(total_number + 1);
+        std::vector<std::string> titles={{"max","avg"}};
+        std::vector<double> queue_info={{double(queue_size_max),double(queue_size_avg)}};
+        write_csv(folder + "method" + std::to_string(method) + "_is_edge_edge_"
+                + std::to_string(is_edge_edge) + "_"
+                + std::to_string(total_number + 1) + "_queue_info" + tail
+                + ".csv",titles,queue_info);
+    }
+
+    
     fmt::print(
         "total # of queries: {:d}\n"
         "total positives: {:d}\n"

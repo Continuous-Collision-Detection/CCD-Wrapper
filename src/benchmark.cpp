@@ -554,7 +554,7 @@ void run_rational_data_single_method(
                 }
         if(time_upper<this_time){
             time_upper=this_time;
-            std::cout<<"upper get updated, "<<time_upper<<std::endl;
+            //std::cout<<"upper get updated, "<<time_upper<<std::endl;
         }
         if(time_lower>this_time){
             time_lower=this_time;
@@ -610,12 +610,13 @@ void run_rational_data_single_method(
         queue_size_avg=queue_size_total/(total_number + 1);
         std::cout<<"check pt"<<std::endl;
         std::vector<std::string> titles={{"max","avg"}};
-        std::vector<long> queue_info={{queue_size_max,queue_size_avg}};
+        std::cout<<"max avg "<<queue_size_max<<" "<<queue_size_avg<<std::endl;
+        // std::vector<long> queue_info={{queue_size_max,queue_size_avg}};
         
-        write_csv(folder + "method" + std::to_string(method) + "_is_edge_edge_"
-                + std::to_string(is_edge_edge) + "_"
-                + std::to_string(total_number + 1) + "_queue_info" + tail
-                + ".csv",titles,queue_info);
+        // write_csv(folder + "method" + std::to_string(method) + "_is_edge_edge_"
+        //         + std::to_string(is_edge_edge) + "_"
+        //         + std::to_string(total_number + 1) + "_queue_info" + tail
+        //         + ".csv",titles,queue_info);
     }
 
     

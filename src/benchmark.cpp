@@ -509,7 +509,7 @@ void run_rational_data_single_method(
 #ifndef CCD_WRAPPER_IS_CI_BUILD
                 std::cout << total_number << "\r" << std::flush;
 #endif
-                current_queue_size=return_queue_size();
+                current_queue_size=inclusion_ccd::return_queue_size();
                 if(current_queue_size>queue_size_max){
                     queue_size_max=current_queue_size;
                 }

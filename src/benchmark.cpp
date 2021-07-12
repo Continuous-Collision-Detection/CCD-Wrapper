@@ -10,6 +10,7 @@
 #include <ccd.hpp>
 #include <utils/read_rational_csv.hpp>
 #include <utils/timer.hpp>
+#include <utils/rational.hpp>
 // #include <tight_inclusion/interval_ccd.hpp>
 #include <CTCD.h>
 using namespace ccd;
@@ -291,6 +292,19 @@ void write_iteration_info(
 
     fout.close();
 }
+void write_csv(const std::string& file, const std::vector<std::string> titles,const std::vector<double> data) {
+	std::ofstream fout;
+	fout.open(file);
+	for (int i = 0; i < titles.size()-1; i++) {
+	fout << titles[i] << ",";
+		}
+	fout << titles.back() << std::endl;
+        for (int i = 0; i < data.size() - 1; i++) {
+		fout << data[i] << ",";
+			}
+	fout << data.back() << std::endl;
+	fout.close();
+}
 //#############################
 // this is a value used to control if write info for per query
 bool WRITE_QUERY_INFO=false;
@@ -298,7 +312,7 @@ bool WRITE_QUERY_INFO=false;
 bool WRITE_ITERATION_INFO=false;
 // this is to print all the result and timing
 bool WRITE_ALL_TIMING=false;
-bool WRITE_STATISTIC=false;
+bool WRITE_STATISTIC=true;
 bool DEBUG_FLAG=false;
 std::ofstream pout;
 //#############################
@@ -325,6 +339,7 @@ void run_rational_data_single_method(
     int nbr_diff_tol = 0;
     double max_tol = 0;
     double sum_tol = 0;
+    
     const std::vector<std::string>& scene_names
         = is_simulation_data ? simulation_folders : handcrafted_folders;
     if(WRITE_ALL_TIMING){
@@ -509,7 +524,7 @@ void run_rational_data_single_method(
                             fmt::print(
                                 "false negative, {:s}, {:d}\nis edge-edge? {}",
                                 entry.path().string(), i, is_edge_edge);
-                            exit(1);
+                            //exit(1);
                         }
                     }
                 }
@@ -1042,12 +1057,194 @@ void run_debug(const int which){
     }
     // run_one_method_over_all_data(arg, CCDMethod::TIGHT_INCLUSION,folder,tail);
 }
+void write_csv_double_2_float_data_result(const Eigen::MatrixXd& data,const std::vector<bool> & results,
+const std::string & filename){
+    std::ofstream fout;
+    if(data.rows()!=results.size()){
+        std::cout<<"data size don't match"<<std::endl;
+    }
+     fout.open(filename);
+    for(unsigned int i=0;i<data.rows();i++){       
+        // convert to float
+        
+        float d0=data(i,0);
+        float d1=data(i,1);
+        float d2=data(i,2);
+        std::array<double,3> floats={{d0,d1,d2}};
+        std::vector<std::string> fs;
+        for(int j=0;j<3;j++){
+            Rational r(floats[j]);
+            std::string nu=r.get_numerator_str();
+            std::string de=r.get_denominator_str();
+            fs.push_back(nu);
+            fs.push_back(de);
+        }
+        if(fs.size()!=6){
+            std::cout<<"wrong size in write_csv_double_2_float_data_result()"<<std::endl;
+        }
+        fout<<fs[0]<<","<<fs[1]<<","<<fs[2]<<","<<fs[3]
+        <<","<<fs[4]<<","<<fs[5]<<","<<results[i]<<std::endl;
+    }
+    fout.close();
+}
+void read_csv_2_float_write_csv(
+    boost::filesystem::path dir,
+    const bool is_edge_edge,
+    const bool is_simulation_data, const std::string outfolder)
+{
+
+    // std::vector<std::array<std::string,6>> all_Vstring;
+    std::vector<bool> results;
+    Eigen::MatrixXd all_V;
+    std::string sub_folder = is_edge_edge ? "/edge-edge/" : "/vertex-face/";
+    const std::vector<std::string>& scene_names
+        = is_simulation_data ? simulation_folders : handcrafted_folders;
+    
+    for (const auto& scene_name : scene_names) {
+        boost::filesystem::path scene_path(
+            dir / scene_name / sub_folder);
+        if (!boost::filesystem::exists(scene_path)) {
+            std::cout << "Missing: " << scene_path.string() << std::endl;
+            continue;
+        }
+        for (const auto& entry :
+             boost::filesystem::directory_iterator(scene_path)) {
+            if (entry.path().extension() != ".csv") {
+                continue;
+            }
+            //all_Vstring= read_rational_CSV_get_string(entry.path().string(), results);
+            all_V = read_rational_csv(entry.path().string(), results);
+            if(all_V.rows()%8!=0){
+                std::cout<<"wrong size of vertices"<<std::endl;
+            }
+            boost::filesystem::path pathObj(entry.path().string());
+            std::string filename=pathObj.filename().string();
+            
+            boost::filesystem::path outdir_convert=outfolder;
+            boost::filesystem::path out_path(
+            outdir_convert / scene_name / sub_folder);
+            std::string outfile=out_path.string()+filename;
+            //std::cout<<"path correct? "<<outfile<<std::endl; exit(0);
+            write_csv_double_2_float_data_result(all_V, results, outfile);
+            std::cout<<"finish "<<outfile<<std::endl;
+            
+        }
+    }
+}
+void compare_two_rational_csv(
+    boost::filesystem::path dir,
+    const bool is_edge_edge,
+    const bool is_simulation_data, const std::string outfolder)
+{
+
+    // std::vector<std::array<std::string,6>> all_Vstring;
+    std::vector<bool> results;
+    Eigen::MatrixXd all_V, all_V1;
+    std::string sub_folder = is_edge_edge ? "/edge-edge/" : "/vertex-face/";
+    const std::vector<std::string>& scene_names
+        = is_simulation_data ? simulation_folders : handcrafted_folders;
+    
+    for (const auto& scene_name : scene_names) {
+        boost::filesystem::path scene_path(
+            dir / scene_name / sub_folder);
+        if (!boost::filesystem::exists(scene_path)) {
+            std::cout << "Missing: " << scene_path.string() << std::endl;
+            continue;
+        }
+        for (const auto& entry :
+             boost::filesystem::directory_iterator(scene_path)) {
+            if (entry.path().extension() != ".csv") {
+                continue;
+            }
+             boost::filesystem::path pathObj(entry.path().string());
+            std::string filename=pathObj.filename().string();
+            
+            boost::filesystem::path outdir_convert=outfolder;
+            boost::filesystem::path out_path(
+            outdir_convert / scene_name / sub_folder);
+            std::string outfile=out_path.string()+filename;
+            //all_Vstring= read_rational_CSV_get_string(entry.path().string(), results);
+            all_V = read_rational_csv(entry.path().string(), results);
+            all_V1 = read_rational_csv(outfile, results);
+
+            if(all_V.rows()!=all_V1.rows()){
+                std::cout<<"wrong in size"<<std::endl;
+                exit(0);
+            }
+            for(int i=0;i<all_V.rows();i++){
+                double dis=(all_V.row(i)-all_V1.row(i)).norm();
+                if(dis>0){
+                    std::cout<<"good! dis="<<dis<<std::endl;
+                }
+            }
+
+            if(all_V.rows()%8!=0){
+                std::cout<<"wrong size of vertices"<<std::endl;
+                exit(0);
+            }
+           
+            //std::cout<<"path correct? "<<outfile<<std::endl; exit(0);
+            
+        }
+    }
+}
+void round_all_the_csv_to_float(){
+boost::filesystem::path dir="/home/bolun1/interval/fixed_data/ccd-queries/";
+std::string outdir="/home/bolun1/interval/fixed_data/float_without_gt/";
+// read_csv_2_float_write_csv(dir,0,0,outdir);
+// read_csv_2_float_write_csv(dir,1,0,outdir);
+// read_csv_2_float_write_csv(dir,0,1,outdir);
+// read_csv_2_float_write_csv(dir,1,1,outdir);
+    //compare_two_rational_csv(dir,1,0,outdir);
+}
+void run_ours_float_for_all_data(){
+    std::string folder = "/home/bolun1/interval/data0706/";// this is the output folder
+    std::string tail = "";
+
+    
+
+    // tolerance.push_back("1");
+    Args arg;
+    arg.data_dir="/home/bolun1/interval/fixed_data/float_without_gt/";
+    
+    arg.methods.clear();
+    arg.methods.push_back(CCDMethod::TIGHT_INCLUSION);// only run ours
+
+    arg.minimum_separation=0;
+    arg.tight_inclusion_tolerance=1e-6;
+    arg.tight_inclusion_max_iter = 1e6;
+    arg.run_ee_dataset = true;
+    arg.run_vf_dataset = true;
+    arg.run_simulation_dataset = true; // not running simulation
+    arg.run_handcrafted_dataset = true;
+
+    WRITE_QUERY_INFO=false;// write query info
+
+    for (CCDMethod method : arg.methods) {
+        if (is_method_enabled(method)) {
+            fmt::print(
+                fmt::emphasis::bold | fmt::emphasis::underline,
+                "Benchmarking {}\n", method_names[method]);
+            run_one_method_over_all_data(arg, method,folder,tail);
+            fmt::print("finished {}\n", method_names[method]);
+        } else {
+            std::cerr << "CCD method " << method_names[method]
+                      << " requested, but it is disabled" << std::endl;
+        }
+        std::cout << std::endl;
+    }
+    // run_one_method_over_all_data(arg, CCDMethod::TIGHT_INCLUSION,folder,tail);
+}
+
+
 int main(int argc, char* argv[])
 {
-    // Args args = parse_args(argc, argv);
-    // run_all_methods(args);
-    // std::string select=argv[1];
-    // run_three_methods_diff_delta(std::stoi(select));
+
+    //round_all_the_csv_to_float();
+    //std::cout<<"round all data to float"<<std::endl;
+    run_ours_float_for_all_data();
+    exit(0);
+
     std::string func_name=argv[1];
     if(func_name=="table1"){
         std::cout<<"running run_all_methods_for_handcrafted_table"<<std::endl;

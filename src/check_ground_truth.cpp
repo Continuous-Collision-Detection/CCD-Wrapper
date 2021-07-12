@@ -17,6 +17,7 @@
 #include<interval_ccd/interval_ccd.hpp>
 #include<interval_ccd/interval_root_finder.hpp>
 #include<fstream>
+#include <boost/filesystem.hpp>
 using namespace ccd;
 
 struct Args {
@@ -365,7 +366,62 @@ std::vector<std::array<std::string,6>> read_rational_CSV_get_string(const std::s
 	
 	return vstring;
 }
+std::vector<std::array<std::string,6>> read_rational_CSV_get_string(const std::string inputFileName,
+std::vector<bool>&results) {
+    results.clear();
+    std::vector<std::array<std::string,6>> vstring;
+    vstring.clear();
+	std::ifstream infile;
+	infile.open(inputFileName);
+    
+	if (!infile.is_open())
+	{
+		std::cout << "Path Wrong!!!!" << std::endl;
+        exit(0);
+	}
 
+	int l = 0;
+	while (infile) // there is input overload classfile
+	{
+		l++;
+		std::string s;
+		if (!getline(infile, s)) break;
+		if (s[0] != '#') {
+			std::istringstream ss(s);
+			std::array<std::string,7> record;
+			int c = 0;
+			while (ss) {
+				std::string line;
+				if (!getline(ss, line, ','))
+					break;
+				try {
+					record[c] = line;
+					c++;
+
+				}
+				catch (const std::invalid_argument e) {
+					std::cout << "NaN found in file " << inputFileName << " line " << l
+						<< std::endl;
+					e.what();
+				}
+			}
+            std::array<std::string,6> snumber={{record[0],record[1],record[2],record[3],record[4],record[5]}};
+            vstring.push_back(snumber);
+            results.push_back(std::stoi(record[6]));
+		}
+	}
+    // Eigen::MatrixXd all_v(vs.size(),3);
+    // for(int i=0;i<vs.size();i++){
+    //     all_v(i,0)=vs[i][0];
+    //     all_v(i,1)=vs[i][1];
+    //     all_v(i,2)=vs[i][2];
+    // }
+	if (!infile.eof()) {
+		std::cerr << "Could not read file " << inputFileName << "\n";
+	}
+	
+	return vstring;
+}
 void run_single_query(int argc, char* argv[]){
     //Args args = parse_args(argc, argv);
     Args args;// arguments are like: executable, filename, query id, is_vf, result
@@ -1096,82 +1152,51 @@ void run_our_methods_diff_max_itr(){
 
 int main(int argc, char* argv[])
 {   
-    std::string select_content=argv[1];
-    if(select_content=="0"){
-        int select=std::stoi(argv[2]);
-        std::cout<<"running method "<<select<<std::endl;
-        run_select(select);
-    }
-    if(select_content=="1"){
-        std::cout<<"running different eps, input start number should be 0, 10, 20, 30,..."<<std::endl;
-        int start=std::stoi(argv[2]);
-        run_ms_methods_diff_eps(start);
-    }
-    if(select_content=="2"){
-        std::cout<<"running different delta"<<std::endl;
-        // int start=std::stoi(argv[2]);
-        run_our_methods_diff_delta(0);
-    }
-    if(select_content=="3"){
-        std::cout<<"running different max_itr"<<std::endl;
-        // int start=std::stoi(argv[2]);
-        run_our_methods_diff_max_itr();
-    }
-    if(select_content=="1024"){
+    // std::string select_content=argv[1];
+    // if(select_content=="0"){
+    //     int select=std::stoi(argv[2]);
+    //     std::cout<<"running method "<<select<<std::endl;
+    //     run_select(select);
+    // }
+    // if(select_content=="1"){
+    //     std::cout<<"running different eps, input start number should be 0, 10, 20, 30,..."<<std::endl;
+    //     int start=std::stoi(argv[2]);
+    //     run_ms_methods_diff_eps(start);
+    // }
+    // if(select_content=="2"){
+    //     std::cout<<"running different delta"<<std::endl;
+    //     // int start=std::stoi(argv[2]);
+    //     run_our_methods_diff_delta(0);
+    // }
+    // if(select_content=="3"){
+    //     std::cout<<"running different max_itr"<<std::endl;
+    //     // int start=std::stoi(argv[2]);
+    //     run_our_methods_diff_max_itr();
+    // }
+    // if(select_content=="1024"){
     
-    std::string folder1="/home/bolun1/interval/data0824/";
-    std::vector<std::string> files;
+    // std::string folder1="/home/bolun1/interval/data0824/";
+    // std::vector<std::string> files;
 
-    files.clear();
-    files.push_back(folder1+"truthsm_hand_crafted_new.csv");
-    write_final_version_data_set(files);
+    // files.clear();
+    // files.push_back(folder1+"truthsm_hand_crafted_new.csv");
+    // write_final_version_data_set(files);
 
-    files.clear();
-    files.push_back(folder1+"truthsm_hand_crafted_vf_new.csv");
-    write_final_version_data_set(files);
+    // files.clear();
+    // files.push_back(folder1+"truthsm_hand_crafted_vf_new.csv");
+    // write_final_version_data_set(files);
         
-    files.clear();
-    files.push_back(folder1+"truthsm_simulation_new.csv");
-    write_final_version_data_set(files);
+    // files.clear();
+    // files.push_back(folder1+"truthsm_simulation_new.csv");
+    // write_final_version_data_set(files);
     
-    // // exit(0);
-    files.clear();
-    files.push_back(folder1+"truthsm_simulation_vf_new.csv");
-    write_final_version_data_set(files);
-    }
+    // // // exit(0);
+    // files.clear();
+    // files.push_back(folder1+"truthsm_simulation_vf_new.csv");
+    // write_final_version_data_set(files);
+    // }
     
     
-    // run_all();
-    // const std::string inputFileName="/home/bolun1/interval/new_truths.csv";
-    // std::vector<Args> args;
-    // read_CSV(inputFileName, args);
-    
-    // std::cout<<"args13653, "<<args[13653].data_dir<<", "<<args[13653].nbr<<", is collision,"<<args[13653].result
-    // <<" is edge edge, "<<args[13653].is_edge_edge<<std::endl;
-    // run_csv_file();
-    // run_rational_csv_file();
-    //  run_rational_data_single_method(false,0,CCDMethod::RATIONAL_ROOT_PARITY);
-
-    {
-// // std::string file="/home/bolun1/interval/two_roots_vf.csv";
-//     // bool is_ee=false;
-//     // std::string file="/home/bolun1/interval/two_roots_ee.csv";
-//     // bool is_ee=true;
-//     std::string file="/home/bolun1/interval/cop_vf.csv";
-//     bool is_ee=false;
-//     run_single_rational_csv_file(true,0, CCDMethod::OURS, is_ee, file);
-//     run_single_rational_csv_file(true,0, CCDMethod::EXACT_DOUBLE_MIN_SEPARATION, is_ee, file);
-//     run_single_rational_csv_file(false,0, CCDMethod::RATIONAL_ROOT_PARITY, is_ee, file);
-//     std::cout<<"start BSC "<<std::endl;
-//     run_single_rational_csv_file(false,0, CCDMethod::BSC, is_ee, file);
-//     std::cout<<"start TIGHT_CCD "<<std::endl;
-//     run_single_rational_csv_file(false,0, CCDMethod::TIGHT_CCD, is_ee, file);
-//     std::cout<<"start FLOAT "<<std::endl;
-//     run_single_rational_csv_file(false,0, CCDMethod::FLOAT, is_ee, file);
-    }
-    
-    //write hdf5 file into rational string csv files
-    // get_rational_vertices(argc,argv);
     return 0;
     
 }

@@ -513,7 +513,7 @@ void run_rational_data_single_method(
                 if(current_queue_size>queue_size_max){
                     queue_size_max=current_queue_size;
                 }
-                queue_size_total+=current_queue_size;
+                //queue_size_total+=current_queue_size;
                 if(DEBUG_FLAG){
                     std::cout<<"result, "<<result<<std::endl;
                     std::cout<<V<<std::endl;
@@ -594,6 +594,7 @@ void run_rational_data_single_method(
         queue_size_avg=queue_size_total/(total_number + 1);
         std::vector<std::string> titles={{"max","avg"}};
         std::vector<double> queue_info={{double(queue_size_max),double(queue_size_avg)}};
+        std::cout<<"start writting queue info"<<std::endl;
         write_csv(folder + "method" + std::to_string(method) + "_is_edge_edge_"
                 + std::to_string(is_edge_edge) + "_"
                 + std::to_string(total_number + 1) + "_queue_info" + tail

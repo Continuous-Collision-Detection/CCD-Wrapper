@@ -74,7 +74,7 @@ jobs:
         run: cd build; ctest --verbose --output-on-failure
 
       - name: Sample Benchmark
-        run: cd build; ./CCDBenchmark
+        run: cd build; ./ccd_benchmark
 
   ####################
   # Windows
@@ -115,7 +115,7 @@ jobs:
         with:
           fetch-depth: 10
       - uses: seanmiddleditch/gha-setup-ninja@master
-      
+
         # https://github.com/actions/cache/issues/101
       - name: Set env
         run: |
@@ -168,4 +168,4 @@ jobs:
           cd build
           cp C:\Miniconda\Library\bin\mpir.dll .\
           cp C:\Miniconda\Library\bin\gmp.dll .\
-          .\CCDBenchmark.exe
+          .\ccd_benchmark.exe

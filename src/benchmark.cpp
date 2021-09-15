@@ -65,16 +65,19 @@ Args parse_args(int argc, char* argv[])
         ->default_val(args.methods);
 
     app.add_option(
-        "-d,--minimum-separation", args.minimum_separation,
-        "minimum separation distance");
+           "-d,--minimum-separation", args.minimum_separation,
+           "minimum separation distance")
+        ->default_val(args.minimum_separation);
 
     app.add_option(
-        "--delta,--ti-tolerance", args.tight_inclusion_tolerance,
-        "Tight Inclusion tolerance (δ)");
+           "--delta,--ti-tolerance", args.tight_inclusion_tolerance,
+           "Tight Inclusion tolerance (δ)")
+        ->default_val(args.tight_inclusion_tolerance);
 
     app.add_option(
-        "--mi,--ti-max-iter", args.tight_inclusion_max_iter,
-        "Tight Inclusion maximum iterations (mᵢ)");
+           "--mi,--ti-max-iter", args.tight_inclusion_max_iter,
+           "Tight Inclusion maximum iterations (mᵢ)")
+        ->default_val(args.tight_inclusion_max_iter);
 
     app.add_flag(
         "!--no-ee", args.run_ee_dataset, "do not run the edge-edge dataset");

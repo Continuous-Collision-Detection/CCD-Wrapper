@@ -39,9 +39,10 @@ Args parse_args(int argc, char* argv[])
 
     CLI::App app { "CCD Benchmark" };
 
-    app.add_option("--data,--queries", args.data_dir, "/path/to/data/")
+    std::string data_dir_str = "";
+    app.add_option("--data,--queries", data_dir_str, "/path/to/data/")
         ->check(CLI::ExistingDirectory)
-        ->default_val(args.data_dir);
+        ->default_val(args.data_dir.string());
 
     // std::string col_type;
     // app.add_set(
@@ -95,6 +96,10 @@ Args parse_args(int argc, char* argv[])
         app.parse(argc, argv);
     } catch (const CLI::ParseError& e) {
         exit(app.exit(e));
+    }
+
+    if (!data_dir_str.empty()) {
+        args.data_dir = data_dir_str;
     }
 
     return args;

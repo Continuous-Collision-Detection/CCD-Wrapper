@@ -33,7 +33,7 @@ CMake provides functionality for doing this called [FetchContent](https://cmake.
 We use this same process to download all external dependencies.
 For example,
 
-```CMake
+```cmake
 include(FetchContent)
 FetchContent_Declare(
     ccd_wrapper
@@ -46,7 +46,7 @@ FetchContent_MakeAvailable(ccd_wrapper)
 
 where `CCD_WRAPPER_GIT_TAG` is set to the version of the wrapper you want to use. This will download and add the CCD wrapper to CMake. The CCD wrapper library can then be linked against using
 
-```CMake
+```cmake
 # Link against the CCD Wrapper
 target_link_libraries(${MY_LIB_NAME} PUBLIC ccd_wrapper::ccd_wrapper)
 ```

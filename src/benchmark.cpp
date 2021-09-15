@@ -37,12 +37,6 @@ Args parse_args(int argc, char* argv[])
 {
     Args args;
 
-    // Initialize args.methods;
-    args.methods.reserve(int(NUM_CCD_METHODS));
-    for (int i = 0; i < int(NUM_CCD_METHODS); i++) {
-        args.methods.push_back(CCDMethod(i));
-    }
-
     CLI::App app { "CCD Benchmark" };
 
     app.add_option("--data,--queries", args.data_dir, "/path/to/data/")
@@ -54,14 +48,21 @@ Args parse_args(int argc, char* argv[])
     //     "collision_type", col_type, { "vf", "ee" }, "type of collision")
     //     ->required();
 
+    // Initialize args.methods;
+    args.methods.reserve(int(NUM_CCD_METHODS));
+    for (int i = 0; i < int(NUM_CCD_METHODS); i++) {
+        args.methods.push_back(CCDMethod(i));
+    }
+
     std::stringstream method_options;
     method_options << "CCD methods to benchmark\noptions:" << std::endl;
     for (int i = 0; i < NUM_CCD_METHODS; i++) {
         method_options << i << ": " << method_names[i] << std::endl;
     }
+
     app.add_option("-m,--methods", args.methods, method_options.str())
         ->check(CLI::Range(0, NUM_CCD_METHODS - 1))
-        ->required();
+        ->default_val(args.methods);
 
     app.add_option(
         "-d,--minimum-separation", args.minimum_separation,

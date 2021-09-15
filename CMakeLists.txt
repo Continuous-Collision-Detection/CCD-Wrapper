@@ -34,19 +34,22 @@ project(CCDWrapper
 option(CCD_WRAPPER_WITH_UNIT_TESTS "Build unit tests using Catch2"        ${CCD_WRAPPER_TOPLEVEL_PROJECT})
 option(CCD_WRAPPER_WITH_BENCHMARK  "Build exectuable for timing methods"  ${CCD_WRAPPER_TOPLEVEL_PROJECT})
 
-# methods
-option(CCD_WRAPPER_WITH_FPRF            "Enable floating-point root finder method"                      ON)
-option(CCD_WRAPPER_WITH_MSRF            "Enable minimum separation root-finding method"                 ON)
-option(CCD_WRAPPER_WITH_RP              "Enable root parity method"                                     ON)
-option(CCD_WRAPPER_WITH_RRP             "Enable rational root parity method"                            ON)
-option(CCD_WRAPPER_WITH_FPRP            "Enable floating-point root parity method"                     OFF)
+########################################################################################################################
+# Methods:
+# If this project is the top level then enable all by default otherwise enable no methods
+option(CCD_WRAPPER_WITH_FPRF            "Enable floating-point root finder method"      ${CCD_WRAPPER_TOPLEVEL_PROJECT})
+option(CCD_WRAPPER_WITH_MSRF            "Enable minimum separation root-finding method" ${CCD_WRAPPER_TOPLEVEL_PROJECT})
+option(CCD_WRAPPER_WITH_RP              "Enable root parity method"                     ${CCD_WRAPPER_TOPLEVEL_PROJECT})
+option(CCD_WRAPPER_WITH_RRP             "Enable rational root parity method"            ${CCD_WRAPPER_TOPLEVEL_PROJECT})
+option(CCD_WRAPPER_WITH_FPRP            "Enable floating-point root parity method"                                  OFF)
 mark_as_advanced(CCD_WRAPPER_WITH_FPRP) # This is a private method
-option(CCD_WRAPPER_WITH_RFRP            "Enable rational fixed root parity method"                     OFF)
+option(CCD_WRAPPER_WITH_RFRP            "Enable rational fixed root parity method"                                  OFF)
 mark_as_advanced(CCD_WRAPPER_WITH_RFRP) # This is a private method
-option(CCD_WRAPPER_WITH_BSC             "Enable Bernstein sign classification method"                   ON)
-option(CCD_WRAPPER_WITH_TIGHT_CCD       "Enable TightCCD method"                                        ON)
-option(CCD_WRAPPER_WITH_INTERVAL        "Enable interval-based methods"                                 ON)
-option(CCD_WRAPPER_WITH_TIGHT_INCLUSION "Enable Tight Inclusion method"                                 ON)
+option(CCD_WRAPPER_WITH_BSC             "Enable Bernstein sign classification method"   ${CCD_WRAPPER_TOPLEVEL_PROJECT})
+option(CCD_WRAPPER_WITH_TIGHT_CCD       "Enable TightCCD method"                        ${CCD_WRAPPER_TOPLEVEL_PROJECT})
+option(CCD_WRAPPER_WITH_INTERVAL        "Enable interval-based methods"                 ${CCD_WRAPPER_TOPLEVEL_PROJECT})
+option(CCD_WRAPPER_WITH_TIGHT_INCLUSION "Enable Tight Inclusion method"                 ${CCD_WRAPPER_TOPLEVEL_PROJECT})
+########################################################################################################################
 
 option(CCD_WRAPPER_IS_CI_BUILD "Is this being built on GitHub Actions" OFF)
 mark_as_advanced(CCD_WRAPPER_IS_CI_BUILD) # Do not change this value

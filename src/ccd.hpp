@@ -44,7 +44,7 @@ static const char* method_names[CCDMethod::NUM_CCD_METHODS] = {
     "RootParity",
     "RationalRootParity",
     "FloatingPointRootParity",
-    "RationalFloatingPointRootParity",
+    "RationalFixedRootParity",
     "BSC",
     "TightCCD",
     "SafeCCD",
@@ -259,67 +259,39 @@ inline bool is_method_enabled(const CCDMethod& method)
 {
     switch (method) {
     case FLOATING_POINT_ROOT_FINDER:
-#ifdef CCD_WRAPPER_WITH_FPRF
-        return true;
-#else
-        return false;
-#endif
+        return CCD_WRAPPER_WITH_FPRF;
+
     case MIN_SEPARATION_ROOT_FINDER:
-#ifdef CCD_WRAPPER_WITH_MSRF
-        return true;
-#else
-        return false;
-#endif
+        return CCD_WRAPPER_WITH_MSRF;
+
     case ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_RP
-        return true;
-#else
-        return false;
-#endif
+        return CCD_WRAPPER_WITH_RP;
+
     case RATIONAL_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_RRP
-        return true;
-#else
-        return false;
-#endif
+        return CCD_WRAPPER_WITH_RRP;
+
     case FLOATING_POINT_ROOT_PARITY:
+        return CCD_WRAPPER_WITH_FPRP;
+
     case RATIONAL_FIXED_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_FPRP
-        return true;
-#else
-        return false;
-#endif
+        return CCD_WRAPPER_WITH_RFRP;
+
     case BSC:
-#ifdef CCD_WRAPPER_WITH_BSC
-        return true;
-#else
-        return false;
-#endif
+        return CCD_WRAPPER_WITH_BSC;
+
     case TIGHT_CCD:
-#ifdef CCD_WRAPPER_WITH_TIGHT_CCD
-        return true;
-#else
-        return false;
-#endif
+        return CCD_WRAPPER_WITH_TIGHT_CCD;
+
     case SAFE_CCD:
-#ifdef CCD_WRAPPER_WITH_SAFE_CCD
-        return true;
-#else
-        return false;
-#endif
+        return CCD_WRAPPER_WITH_SAFE_CCD;
+
     case UNIVARIATE_INTERVAL_ROOT_FINDER:
     case MULTIVARIATE_INTERVAL_ROOT_FINDER:
-#ifdef CCD_WRAPPER_WITH_INTERVAL
-        return true;
-#else
-        return false;
-#endif
+        return CCD_WRAPPER_WITH_INTERVAL;
+
     case TIGHT_INCLUSION:
-#ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
-        return true;
-#else
-        return false;
-#endif
+        return CCD_WRAPPER_WITH_TIGHT_INCLUSION;
+
     default:
         return false;
     }

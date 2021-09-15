@@ -260,7 +260,7 @@ TEST_CASE("Bolun test case", "[ccd][point-triangle]")
     }
 }
 
-#if defined(CCD_WRAPPER_WITH_BSC) && defined(CCD_WRAPPER_WITH_RRP)
+#if CCD_WRAPPER_WITH_BSC && CCD_WRAPPER_WITH_RRP
 TEST_CASE("BSC False Negative", "[ccd][point-triangle][bsc][!shouldfail]")
 {
     Eigen::Vector3d v0_t0, v1_t0, v2_t0, v3_t0, v0_t1, v1_t1, v2_t1, v3_t1;

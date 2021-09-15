@@ -3,48 +3,55 @@
 
 #include <iostream>
 
+/* definition to expand macro then apply to pragma message */
+#define VALUE_TO_STRING(x) #x
+#define VALUE(x) VALUE_TO_STRING(x)
+#define VAR_NAME_VALUE(var) #var "=" VALUE(var)
+
 // Etienne Vouga's CCD using a root finder in floating points
-#ifdef CCD_WRAPPER_WITH_FPRF
+#if CCD_WRAPPER_WITH_FPRF
+#pragma message(VAR_NAME_VALUE(CCD_WRAPPER_WITH_FPRF))
 #include <CTCD.h>
 #endif
 // Root parity method of Brochu et al. [2012]
-#ifdef CCD_WRAPPER_WITH_RP
+#if CCD_WRAPPER_WITH_RP
 #include <rootparitycollisiontest.h>
 #endif
 // Teseo's reimplementation of Brochu et al. [2012] using rationals
-#ifdef CCD_WRAPPER_WITH_RRP
+#if CCD_WRAPPER_WITH_RRP
 #include <ECCD.hpp>
 #endif
 // Bernstein sign classification method of Tang et al. [2014]
-#ifdef CCD_WRAPPER_WITH_BSC
+#if CCD_WRAPPER_WITH_BSC
 #include <bsc.h>
 #endif
 // TightCCD method of Wang et al. [2015]
-#ifdef CCD_WRAPPER_WITH_TIGHT_CCD
+#if CCD_WRAPPER_WITH_TIGHT_CCD
 #include <bsc_tightbound.h>
 #endif
 // SafeCCD
-#ifdef ENABLE_SAFE_CCD
+#if ENABLE_SAFE_CCD
 #include <SAFE_CCD.h>
 #endif
-// floating-point root parity
-#ifdef CCD_WRAPPER_WITH_FPRP
 // Rational root parity with fixes
+#if CCD_WRAPPER_WITH_RFRP
 #include <CCD/ccd.hpp>
+#endif
 // Floating-point root parity with fixes
+#if CCD_WRAPPER_WITH_FPRP
 #include <doubleCCD/doubleccd.hpp>
 #endif
 // Minimum separation root finder of Harmon et al. [2011]
-#ifdef CCD_WRAPPER_WITH_MSRF
+#if CCD_WRAPPER_WITH_MSRF
 #include <minimum_separation_root_finder.hpp>
 #endif
 // Interval based CCD of [Redon et al. 2002]
 // Interval based CCD of [Redon et al. 2002] solved using [Snyder 1992]
-#ifdef CCD_WRAPPER_WITH_INTERVAL
+#if CCD_WRAPPER_WITH_INTERVAL
 #include <interval_ccd/interval_ccd.hpp>
 #endif
 // Custom inclusion based CCD of [Wang et al. 2020]
-#ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
+#if CCD_WRAPPER_WITH_TIGHT_INCLUSION
 #include <tight_inclusion/inclusion_ccd.hpp>
 #endif
 
@@ -69,7 +76,7 @@ bool vertexFaceCCD(
     try {
         switch (method) {
         case CCDMethod::FLOATING_POINT_ROOT_FINDER:
-#ifdef CCD_WRAPPER_WITH_FPRF
+#if CCD_WRAPPER_WITH_FPRF
             return CTCD::vertexFaceCTCD(
                 // Point at t=0
                 vertex_start,
@@ -84,7 +91,7 @@ bool vertexFaceCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::MIN_SEPARATION_ROOT_FINDER:
-#ifdef CCD_WRAPPER_WITH_MSRF
+#if CCD_WRAPPER_WITH_MSRF
             return vertexFaceMSCCD(
                 // Point at t=0
                 vertex_start,
@@ -100,7 +107,7 @@ bool vertexFaceCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_RP
+#if CCD_WRAPPER_WITH_RP
             return rootparity::RootParityCollisionTest(
                        // Point at t=0
                        Vec3d(vertex_start.data()),
@@ -120,7 +127,7 @@ bool vertexFaceCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::RATIONAL_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_RRP
+#if CCD_WRAPPER_WITH_RRP
             return eccd::vertexFaceCCD(
                 // Point at t=0
                 vertex_start,
@@ -134,7 +141,7 @@ bool vertexFaceCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::FLOATING_POINT_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_FPRP
+#if CCD_WRAPPER_WITH_FPRP
             return doubleccd::vertexFaceCCD(
                 // Point at t=0
                 vertex_start,
@@ -148,7 +155,7 @@ bool vertexFaceCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::RATIONAL_FIXED_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_FPRP
+#if CCD_WRAPPER_WITH_RFRP
             return ccd::vertexFaceCCD(
                 // Point at t=0
                 vertex_start,
@@ -174,7 +181,7 @@ bool vertexFaceCCD(
                 face_vertex0_end, face_vertex1_end, face_vertex2_end,
                 /*minimum_distance=*/0, method, tolerance, max_iter, err);
         case CCDMethod::BSC:
-#ifdef CCD_WRAPPER_WITH_BSC
+#if CCD_WRAPPER_WITH_BSC
             return bsc::Intersect_VF_robust(
                 // Triangle at t = 0
                 Vec3d(face_vertex0_start.data()),
@@ -191,7 +198,7 @@ bool vertexFaceCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::TIGHT_CCD:
-#ifdef CCD_WRAPPER_WITH_TIGHT_CCD
+#if CCD_WRAPPER_WITH_TIGHT_CCD
             return bsc_tightbound::Intersect_VF_robust(
                 // Triangle at t = 0
                 Vec3d(face_vertex0_start.data()),
@@ -208,7 +215,7 @@ bool vertexFaceCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::SAFE_CCD:
-#ifdef CCD_WRAPPER_WITH_SAFE_CCD
+#if CCD_WRAPPER_WITH_SAFE_CCD
         {
             double b = safeccd::calculate_B(
                 vertex_start.data(), face_vertex0_start.data(),
@@ -236,7 +243,7 @@ bool vertexFaceCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::UNIVARIATE_INTERVAL_ROOT_FINDER:
-#ifdef CCD_WRAPPER_WITH_INTERVAL
+#if CCD_WRAPPER_WITH_INTERVAL
             return intervalccd::vertexFaceCCD_Redon(
                 // Point at t=0
                 vertex_start,
@@ -252,7 +259,7 @@ bool vertexFaceCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::MULTIVARIATE_INTERVAL_ROOT_FINDER:
-#ifdef CCD_WRAPPER_WITH_INTERVAL
+#if CCD_WRAPPER_WITH_INTERVAL
             return intervalccd::vertexFaceCCD_Interval(
                 // Point at t=0
                 vertex_start,
@@ -303,7 +310,7 @@ bool edgeEdgeCCD(
     try {
         switch (method) {
         case CCDMethod::FLOATING_POINT_ROOT_FINDER:
-#ifdef CCD_WRAPPER_WITH_FPRF
+#if CCD_WRAPPER_WITH_FPRF
             return CTCD::edgeEdgeCTCD(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
@@ -318,7 +325,7 @@ bool edgeEdgeCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::MIN_SEPARATION_ROOT_FINDER:
-#ifdef CCD_WRAPPER_WITH_MSRF
+#if CCD_WRAPPER_WITH_MSRF
             return edgeEdgeMSCCD(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
@@ -334,7 +341,7 @@ bool edgeEdgeCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_RP
+#if CCD_WRAPPER_WITH_RP
             return rootparity::RootParityCollisionTest(
                        // Edge 1 at t=0
                        Vec3d(edge0_vertex0_start.data()),
@@ -354,7 +361,7 @@ bool edgeEdgeCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::RATIONAL_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_RRP
+#if CCD_WRAPPER_WITH_RRP
             return eccd::edgeEdgeCCD(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
@@ -368,7 +375,7 @@ bool edgeEdgeCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::FLOATING_POINT_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_FPRP
+#if CCD_WRAPPER_WITH_FPRP
             return doubleccd::edgeEdgeCCD(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
@@ -382,7 +389,7 @@ bool edgeEdgeCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::RATIONAL_FIXED_ROOT_PARITY:
-#ifdef CCD_WRAPPER_WITH_FPRP
+#if CCD_WRAPPER_WITH_RFRP
             return ccd::edgeEdgeCCD(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
@@ -408,7 +415,7 @@ bool edgeEdgeCCD(
                 edge1_vertex0_end, edge1_vertex1_end,
                 /*minimum_distance=*/0, method, tolerance, max_iter, err);
         case CCDMethod::BSC:
-#ifdef CCD_WRAPPER_WITH_BSC
+#if CCD_WRAPPER_WITH_BSC
             return bsc::Intersect_EE_robust(
                 // Edge 1 at t=0
                 Vec3d(edge0_vertex0_start.data()),
@@ -426,7 +433,7 @@ bool edgeEdgeCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::TIGHT_CCD:
-#ifdef CCD_WRAPPER_WITH_TIGHT_CCD
+#if CCD_WRAPPER_WITH_TIGHT_CCD
             return bsc_tightbound::Intersect_EE_robust(
                 // Edge 1 at t=0
                 Vec3d(edge0_vertex0_start.data()),
@@ -444,7 +451,7 @@ bool edgeEdgeCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::SAFE_CCD:
-#ifdef CCD_WRAPPER_WITH_SAFE_CCD
+#if CCD_WRAPPER_WITH_SAFE_CCD
         {
             double b = safeccd::calculate_B(
                 edge0_vertex0_start.data(), edge0_vertex1_start.data(),
@@ -472,7 +479,7 @@ bool edgeEdgeCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::UNIVARIATE_INTERVAL_ROOT_FINDER:
-#ifdef CCD_WRAPPER_WITH_INTERVAL
+#if CCD_WRAPPER_WITH_INTERVAL
             return intervalccd::edgeEdgeCCD_Redon(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
@@ -488,7 +495,7 @@ bool edgeEdgeCCD(
             throw "CCD method is not enabled";
 #endif
         case CCDMethod::MULTIVARIATE_INTERVAL_ROOT_FINDER:
-#ifdef CCD_WRAPPER_WITH_INTERVAL
+#if CCD_WRAPPER_WITH_INTERVAL
             return intervalccd::edgeEdgeCCD_Interval(
                 // Edge 1 at t=0
                 edge0_vertex0_start, edge0_vertex1_start,
@@ -540,7 +547,7 @@ bool vertexFaceMSCCD(
     try {
         switch (method) {
         case CCDMethod::MIN_SEPARATION_ROOT_FINDER:
-#ifdef CCD_WRAPPER_WITH_MSRF
+#if CCD_WRAPPER_WITH_MSRF
         {
             bool hit = msccd::root_finder::vertexFaceMSCCD(
                 // Point at t=0
@@ -563,7 +570,7 @@ bool vertexFaceMSCCD(
 #endif
 
         case CCDMethod::TIGHT_INCLUSION:
-#ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
+#if CCD_WRAPPER_WITH_TIGHT_INCLUSION
         {
             double output_tolerance;
             const double t_max = 1.0;
@@ -627,7 +634,7 @@ bool edgeEdgeMSCCD(
     try {
         switch (method) {
         case CCDMethod::MIN_SEPARATION_ROOT_FINDER:
-#ifdef CCD_WRAPPER_WITH_MSRF
+#if CCD_WRAPPER_WITH_MSRF
         {
             bool hit = msccd::root_finder::edgeEdgeMSCCD(
                 // Edge 1 at t=0
@@ -649,7 +656,7 @@ bool edgeEdgeMSCCD(
 #endif
 
         case CCDMethod::TIGHT_INCLUSION:
-#ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
+#if CCD_WRAPPER_WITH_TIGHT_INCLUSION
         {
             double output_tolerance;
             const double t_max = 1.0;

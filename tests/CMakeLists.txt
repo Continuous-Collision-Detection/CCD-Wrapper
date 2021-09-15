@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.1)
+################################################################################
+# Tests
 ################################################################################
 
-add_executable(${PROJECT_NAME}_tests
+add_executable(ccd_wrapper_tests
     main.cpp
     test_ccd.cpp
 )
@@ -10,12 +11,18 @@ add_executable(${PROJECT_NAME}_tests
 # Required Libraries
 ################################################################################
 
-target_link_libraries(${PROJECT_NAME}_tests PUBLIC ${PROJECT_NAME})
-target_link_libraries(${PROJECT_NAME}_tests PUBLIC Catch2::Catch2 warnings::all)
+target_link_libraries(ccd_wrapper_tests PUBLIC ccd_wrapper::ccd_wrapper)
+
+include(ccd_wrapper_warnings)
+target_link_libraries(ccd_wrapper_tests PRIVATE ccd_wrapper::warnings)
+
+include(catch2)
+target_link_libraries(ccd_wrapper_tests PUBLIC Catch2::Catch2)
 
 if(CCD_WRAPPER_WITH_BENCHMARK)
-  target_link_libraries(${PROJECT_NAME}_tests PUBLIC fmt::fmt)
-  # target_compile_definitions(${PROJECT_NAME}_tests PRIVATE EXPORT_CCD_QUERIES)
+    include(fmt)
+    target_link_libraries(ccd_wrapper_tests PUBLIC fmt::fmt)
+    # target_compile_definitions(ccd_wrapper_tests PRIVATE EXPORT_CCD_QUERIES)
 endif()
 
 ################################################################################
@@ -28,5 +35,5 @@ endforeach()
 
 # Register tests
 set(PARSE_CATCH_TESTS_ADD_TO_CONFIGURE_DEPENDS ON)
-include(Catch)
-catch_discover_tests(${PROJECT_NAME}_tests)
+# include(Catch)
+catch_discover_tests(ccd_wrapper_tests)

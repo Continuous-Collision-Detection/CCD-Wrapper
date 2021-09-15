@@ -1,21 +1,10 @@
 // Time the different CCD methods
 
-#if __has_include(<filesystem>)
-#include <filesystem>
-namespace fs = std::filesystem;
-#elif __has_include(<experimental/filesystem>)
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#else
-// clang-format off
-#error "C++17 filesystem not supported (neither <filesystem> nor <experimental/filesystem> found)!"
-// clang-format on
-#endif
-
 #include <CLI/CLI.hpp>
 #include <Eigen/Core>
 #include <fmt/color.h>
 #include <fmt/format.h>
+#include <ghc/fs_std.hpp> // filesystem
 #include <nlohmann/json.hpp>
 
 #include <ccd.hpp>
@@ -56,9 +45,9 @@ Args parse_args(int argc, char* argv[])
 
     CLI::App app { "CCD Benchmark" };
 
-    std::string data_dir_str;
     app.add_option("--data,--queries", args.data_dir, "/path/to/data/")
-        ->check(CLI::ExistingDirectory);
+        ->check(CLI::ExistingDirectory)
+        ->default_val(args.data_dir);
 
     // std::string col_type;
     // app.add_set(
@@ -71,7 +60,8 @@ Args parse_args(int argc, char* argv[])
         method_options << i << ": " << method_names[i] << std::endl;
     }
     app.add_option("-m,--methods", args.methods, method_options.str())
-        ->check(CLI::Range(0, NUM_CCD_METHODS - 1));
+        ->check(CLI::Range(0, NUM_CCD_METHODS - 1))
+        ->required();
 
     app.add_option(
         "-d,--minimum-separation", args.minimum_separation,
@@ -85,17 +75,16 @@ Args parse_args(int argc, char* argv[])
         "--mi,--ti-max-iter", args.tight_inclusion_max_iter,
         "Tight Inclusion maximum iterations (mᵢ)");
 
-    bool no_ee = false;
-    app.add_flag("--no-ee", no_ee, "do not run the edge-edge dataset");
-    bool no_vf = false;
-    app.add_flag("--no-vf", no_vf, "do not run the vertex-face dataset");
+    app.add_flag(
+        "!--no-ee", args.run_ee_dataset, "do not run the edge-edge dataset");
+    app.add_flag(
+        "!--no-vf", args.run_vf_dataset, "do not run the vertex-face dataset");
 
-    bool no_simulation = false;
     app.add_flag(
-        "--no-simulation", no_simulation, "do not run the simulation dataset");
-    bool no_handcrafted = false;
+        "!--no-simulation", args.run_simulation_dataset,
+        "do not run the simulation dataset");
     app.add_flag(
-        "--no-handcrafted", no_handcrafted,
+        "!--no-handcrafted", args.run_handcrafted_dataset,
         "do not run the handcrafted dataset");
 
     try {
@@ -103,13 +92,6 @@ Args parse_args(int argc, char* argv[])
     } catch (const CLI::ParseError& e) {
         exit(app.exit(e));
     }
-
-    // args.data_dir = fs::path(data_dir_str);
-
-    args.run_ee_dataset = !no_ee;
-    args.run_vf_dataset = !no_vf;
-    args.run_simulation_dataset = !no_simulation;
-    args.run_handcrafted_dataset = !no_handcrafted;
 
     return args;
 }
@@ -251,13 +233,13 @@ void run_rational_data_single_method(
     int num_false_positives = 0;
     int num_false_negatives = 0;
 
-    std::string sub_folder = is_edge_edge ? "/edge-edge/" : "/vertex-face/";
+    std::string sub_folder = is_edge_edge ? "edge-edge" : "vertex-face";
 
     const std::vector<std::string>& scene_names
         = is_simulation_data ? simulation_folders : handcrafted_folders;
 
     for (const auto& scene_name : scene_names) {
-        fs::path scene_path(args.data_dir / scene_name / sub_folder);
+        fs::path scene_path = args.data_dir / scene_name / sub_folder;
         if (!fs::exists(scene_path)) {
             std::cout << "Missing: " << scene_path.string() << std::endl;
             continue;

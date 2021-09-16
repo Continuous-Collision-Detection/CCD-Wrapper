@@ -220,9 +220,6 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
     include(fmt)
     target_link_libraries(ccd_benchmark PUBLIC fmt::fmt)
 
-    include(json)
-    target_link_libraries(ccd_benchmark PUBLIC nlohmann::json)
-
     include(cli11)
     target_link_libraries(ccd_benchmark PUBLIC CLI11::CLI11)
 

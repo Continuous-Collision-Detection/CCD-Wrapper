@@ -12,8 +12,9 @@ if(CCD_WRAPPER_WITH_RFRP)
     message(STATUS "Third-party: creating target 'ccd_wrapper::rational_fixed_root_parity'")
 endif()
 
-# WARNING: Turn this off if you are doing manual rounding
-option(CCD_ROUND_INPUTS "Round the inputs before collision detection" ON)
+# WARNING: Queries should be rounded manually
+message(STATUS "Make sure to round queries to Floating-Point Root Parity CCD")
+option(CCD_ROUND_INPUTS "Round the inputs before collision detection" OFF)
 
 set(CCD_BUILD_RATIONAL ${CCD_WRAPPER_WITH_RFRP} CACHE BOOL "Build Rational Version" FORCE)
 

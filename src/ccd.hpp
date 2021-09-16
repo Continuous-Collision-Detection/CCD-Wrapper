@@ -40,7 +40,7 @@ enum CCDMethod {
 
 static const char* method_names[CCDMethod::NUM_CCD_METHODS] = {
     "FloatingPointRootFinder",
-    "MinSeperationRootFinder",
+    "MinSeparationRootFinder",
     "RootParity",
     "RationalRootParity",
     "FloatingPointRootParity",
@@ -228,7 +228,7 @@ inline bool is_minimum_separation_method(const CCDMethod& method)
 inline bool is_conservative_method(const CCDMethod& method)
 {
     switch (method) {
-    // MIN_SEPARATION_ROOT_FINDER is conservative because minimum seperation
+    // MIN_SEPARATION_ROOT_FINDER is conservative because minimum separation
     // distance of zero does not work well.
     case CCDMethod::MIN_SEPARATION_ROOT_FINDER:
     case CCDMethod::TIGHT_CCD:

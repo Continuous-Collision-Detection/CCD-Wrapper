@@ -59,11 +59,11 @@ read_rational_csv(const std::string& inputFileName, std::vector<bool>& results)
             v[1] = y;
             v[2] = z;
             vs.push_back(v);
-            if (record[6] != "1" && record[6] != "0") {
-                std::cout
-                    << "ERROR:result position should be 1 or 0, but it is "
-                    << record[6] << std::endl;
-            }
+            // if (record[6] != "1" && record[6] != "0") {
+            //     std::cout
+            //         << "ERROR:result position should be 1 or 0, but it is "
+            //         << record[6] << std::endl;
+            // }
             results.push_back(std::stoi(record[6]));
         }
     }

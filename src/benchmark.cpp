@@ -12,6 +12,7 @@
 #include <utils/timer.hpp>
 #include <utils/rational.hpp>
 #include <tight_inclusion/inclusion_ccd.hpp>
+#include <iomanip>
 // #include <tight_inclusion/interval_ccd.hpp>
 #include <CTCD.h>
 using namespace ccd;
@@ -294,47 +295,49 @@ void write_iteration_info(
 
     fout.close();
 }
-void write_csv(const std::string& file, const std::vector<std::string> titles,const std::vector<double> data) {
-	std::ofstream fout;
-	fout.open(file);
-	for (int i = 0; i < titles.size()-1; i++) {
-	fout << titles[i] << ",";
-		}
-	fout << titles.back() << std::endl;
-        for (int i = 0; i < data.size() - 1; i++) {
-		fout << data[i] << ",";
-			}
-	fout << data.back() << std::endl;
-	fout.close();
-}
-void write_csv(const std::string& file, const std::vector<std::string> titles,const std::vector<long> data) {
+// void write_csv(const std::string& file, const std::vector<std::string> titles,const std::vector<double> data) {
+// 	std::ofstream fout;
+// 	fout.open(file);
+// 	for (int i = 0; i < titles.size()-1; i++) {
+// 	fout << titles[i] << ",";
+// 		}
+// 	fout << titles.back() << std::endl;
+//         for (int i = 0; i < data.size() - 1; i++) {
+// 		fout << data[i] << ",";
+// 			}
+// 	fout << data.back() << std::endl;
+// 	fout.close();
+// }
+
+// TODO
+template<typename T>
+void write_csv(const std::string& file, const std::vector<std::string> titles,const std::vector<T> data, bool large_info) {
 	std::cout<<"inside write"<<std::endl;
     std::ofstream fout;
 	fout.open(file);
-	for (int i = 0; i < titles.size()-1; i++) {
-	fout << titles[i] << ",";
+	
+    if(large_info){
+        fout<<"data"<<std::endl;
+        for(int i=0;i<data.size();i++){
+            fout<<data[i]<<std::endl;
+        }
+        
+    }
+    else{
+        for (int i = 0; i < titles.size()-1; i++) {
+	        fout << titles[i] << ",";
 		}
-	fout << titles.back() << std::endl;
-    std::cout<<"finish writting titles"<<std::endl;
+	    fout << titles.back() << std::endl;
         for (int i = 0; i < data.size() - 1; i++) {
-		fout << data[i] << ",";
+		    fout << data[i] << ",";
 			}
-	fout << data.back() << std::endl;
-	fout.close();
-}
-void write_queue_sizes(
-    const std::string file,
-    const std::vector<long>& sizes)
-{
-    std::ofstream fout;
-    fout.open(file);
-    fout << "queue_size" << std::endl;
-    for(int i=0;i<sizes.size();i++){
-        fout<<sizes[i]<<std::endl;
+	    fout << data.back() << std::endl;
     }
 
-    fout.close();
+        
+	fout.close();
 }
+
 //#############################
 // this is a value used to control if write info for per query
 bool WRITE_QUERY_INFO=false;
@@ -344,6 +347,7 @@ bool WRITE_ITERATION_INFO=false;
 bool WRITE_ALL_TIMING=false;
 bool WRITE_STATISTIC=true;
 bool DEBUG_FLAG=false;
+bool WRITE_PROBLEMATIC=true;
 std::ofstream pout;
 //#############################
 void run_rational_data_single_method(
@@ -373,6 +377,9 @@ void run_rational_data_single_method(
     long  queue_size_max=0;
     long  current_queue_size=0;
     std::vector<long> queue_sizes;
+    std::vector<double> tois;
+    int fpcounter=0;
+    
     long long queue_size_total=0;
     const std::vector<std::string>& scene_names
         = is_simulation_data ? simulation_folders : handcrafted_folders;
@@ -380,7 +387,9 @@ void run_rational_data_single_method(
         pout.open(folder+"edge_"+std::to_string(is_edge_edge)+"simu_"+std::to_string(is_simulation_data)+tail+"_all_info.csv");
         pout<<"result,timing\n";
     }
-    
+    std::ofstream fout;
+    fout.open("/home/bolun1/ee"+std::to_string(is_edge_edge)+"simu"+std::to_string(is_simulation_data)+".csv");
+    fout<<"v,v,v,nbr,toi"<<std::endl;
     for (const auto& scene_name : scene_names) {
         boost::filesystem::path scene_path(
             args.data_dir / scene_name / sub_folder);
@@ -420,12 +429,13 @@ void run_rational_data_single_method(
                 bool result;
                 timer.start();
                 long round_nbr=0;
+                double toi;
                 for(int ri=0;ri<1;ri++){
 
                     round_nbr+=1;
-                    if (method==CCDMethod::TIGHT_INCLUSION && WRITE_ITERATION_INFO){
+                    if (method==CCDMethod::TIGHT_INCLUSION ){
                     const std::array<double, 3> err = { { -1, -1, -1 } };
-                    double toi;
+                    
                     const double t_max = 1;
 
                     double output_tolerance = args.tight_inclusion_tolerance;
@@ -544,6 +554,7 @@ void run_rational_data_single_method(
                     queue_size_max=current_queue_size;
                 }
                 queue_sizes.push_back(current_queue_size);
+                
                 //queue_size_total+=current_queue_size;
                 if(DEBUG_FLAG){
                     std::cout<<"result, "<<result<<std::endl;
@@ -558,6 +569,19 @@ void run_rational_data_single_method(
                 if (result != expected_result) {
                     if (result) {
                         num_false_positives++;
+                        tois.push_back(toi);// we care about FPs' toi 
+                        for(int row=0;row<8;row++){
+                            fout<<std::setprecision(17)<<V(row,0)<<","<<V(row,1)<<","<<V(row,2)<<","<<tois.size()-1<<","<<toi<<std::endl;
+                        }
+                        
+                        // if(fpcounter==681){
+                        //     for(int row=0;row<8;row++){
+                        //     std::cout<<V(row,0)<<","<<V(row,1)<<","<<V(row,2)<<","<<tois.size()-1<<","<<toi<<std::endl;
+                        //     }
+                        //     std::cout<<"pro file "<<entry.path().string()<<"which query "<<i<<std::endl;
+
+                        // }    
+                        // fpcounter++;
                     } else {
                         num_false_negatives++;
                         if (method == CCDMethod::TIGHT_INCLUSION) {
@@ -587,6 +611,7 @@ void run_rational_data_single_method(
             }
         }
     }
+        fout.close();
         if(WRITE_ALL_TIMING){
             pout.close();
             std::string fff="file got wrote ";
@@ -627,16 +652,20 @@ void run_rational_data_single_method(
         std::cout<<"check pt"<<std::endl;
         //std::vector<std::string> titles={{"max","avg"}};
         std::cout<<"max avg "<<queue_size_max<<" "<<queue_size_avg<<std::endl;
-        write_queue_sizes(folder + "method" + std::to_string(method) + "_is_edge_edge_"
-                + std::to_string(is_edge_edge) + "_"
-                + std::to_string(total_number + 1) + "_queue_info" + tail
-                + ".csv",queue_sizes);
-        // std::vector<long> queue_info={{queue_size_max,queue_size_avg}};
-        
-        // write_csv(folder + "method" + std::to_string(method) + "_is_edge_edge_"
+        // write_queue_sizes(folder + "method" + std::to_string(method) + "_is_edge_edge_"
         //         + std::to_string(is_edge_edge) + "_"
         //         + std::to_string(total_number + 1) + "_queue_info" + tail
-        //         + ".csv",titles,queue_info);
+        //         + ".csv",queue_sizes);
+        std::vector<std::string> titles;
+        
+        write_csv(folder + "method" + std::to_string(method) + "_is_edge_edge_"
+                + std::to_string(is_edge_edge) + "_"
+                + std::to_string(total_number + 1) + "_queue_info" + tail
+                + ".csv",titles,queue_sizes,true);
+        write_csv(folder + "method" + std::to_string(method) + "_is_edge_edge_"
+                + std::to_string(is_edge_edge) + "_"
+                + std::to_string(total_number + 1) + "_tois" + tail
+                + ".csv",titles,tois,true);
     }
 
     
@@ -1257,14 +1286,14 @@ std::string outdir="/home/bolun1/interval/fixed_data/float_without_gt/";
     //compare_two_rational_csv(dir,1,0,outdir);
 }
 void run_ours_float_for_all_data(){
-    std::string folder = "/home/bolun1/interval/data0706/";// this is the output folder
+    std::string folder = "/home/bolun1/interval/data0817/";// this is the output folder
     std::string tail = "";
 
     
 
     // tolerance.push_back("1");
     Args arg;
-    arg.data_dir="/home/bolun1/interval/fixed_data/float_without_gt/";
+    arg.data_dir="/home/bolun1/interval/fixed_data/float_with_gt/";
     
     arg.methods.clear();
     arg.methods.push_back(CCDMethod::TIGHT_INCLUSION);// only run ours
@@ -1277,7 +1306,7 @@ void run_ours_float_for_all_data(){
     arg.run_simulation_dataset = true; // not running simulation
     arg.run_handcrafted_dataset = true;
 
-    WRITE_QUERY_INFO=false;// write query info
+    WRITE_QUERY_INFO=true;// write query info
 
     for (CCDMethod method : arg.methods) {
         if (is_method_enabled(method)) {
@@ -1294,14 +1323,51 @@ void run_ours_float_for_all_data(){
     }
     // run_one_method_over_all_data(arg, CCDMethod::TIGHT_INCLUSION,folder,tail);
 }
-
+void run_all_methods_for_rounded_queries(){
+    std::string folder = "/home/bolun1/interval/data0915/";// this is the output folder
+    std::string tail = "";
+    Args arg;
+    arg.data_dir="/home/bolun1/interval/fixed_data/rounded_ground_truth/";
+    arg.methods.clear();
+    arg.methods.push_back(CCDMethod::FLOATING_POINT_ROOT_FINDER);
+    arg.methods.push_back(CCDMethod::MIN_SEPARATION_ROOT_FINDER);
+    arg.methods.push_back(CCDMethod::ROOT_PARITY);
+    arg.methods.push_back(CCDMethod::RATIONAL_ROOT_PARITY);
+    arg.methods.push_back(CCDMethod::BSC);
+    arg.methods.push_back(CCDMethod::TIGHT_CCD);
+    arg.methods.push_back(CCDMethod::UNIVARIATE_INTERVAL_ROOT_FINDER);
+    arg.methods.push_back(CCDMethod::MULTIVARIATE_INTERVAL_ROOT_FINDER);
+    arg.methods.push_back(CCDMethod::TIGHT_INCLUSION);
+    arg.methods.push_back(CCDMethod::FIXED_ROOT_PARITY);
+    arg.minimum_separation=0;
+    arg.tight_inclusion_tolerance=1e-6;
+    arg.tight_inclusion_max_iter = 1e6;
+    arg.run_ee_dataset = true;
+    arg.run_vf_dataset = true;
+    arg.run_simulation_dataset = true; // not running simulation
+    arg.run_handcrafted_dataset = true;
+    for (CCDMethod method : arg.methods) {
+        if (is_method_enabled(method)) {
+            fmt::print(
+                fmt::emphasis::bold | fmt::emphasis::underline,
+                "Benchmarking {}\n", method_names[method]);
+            run_one_method_over_all_data(arg, method,folder,tail);
+            fmt::print("finished {}\n", method_names[method]);
+        } else {
+            std::cerr << "CCD method " << method_names[method]
+                      << " requested, but it is disabled" << std::endl;
+        }
+        std::cout << std::endl;
+    }
+    // run_one_method_over_all_data(arg, CCDMethod::TIGHT_INCLUSION,folder,tail);
+}
 
 int main(int argc, char* argv[])
 {
-
+    run_all_methods_for_rounded_queries();
     //round_all_the_csv_to_float();
     //std::cout<<"round all data to float"<<std::endl;
-    run_ours_float_for_all_data();
+    // run_ours_float_for_all_data();
     exit(0);
 
     std::string func_name=argv[1];

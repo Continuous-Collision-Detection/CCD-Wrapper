@@ -3,14 +3,8 @@
 
 #include <iostream>
 
-/* definition to expand macro then apply to pragma message */
-#define VALUE_TO_STRING(x) #x
-#define VALUE(x) VALUE_TO_STRING(x)
-#define VAR_NAME_VALUE(var) #var "=" VALUE(var)
-
 // Etienne Vouga's CCD using a root finder in floating points
 #if CCD_WRAPPER_WITH_FPRF
-#pragma message(VAR_NAME_VALUE(CCD_WRAPPER_WITH_FPRF))
 #include <CTCD.h>
 #endif
 // Root parity method of Brochu et al. [2012]

@@ -18,6 +18,7 @@
 #include <tbb/mutex.h>
 #include <tbb/parallel_for.h>
 #include <tbb/blocked_range.h>
+#include <tbb/task_scheduler_init.h>
 #include <tbb/enumerable_thread_specific.h>
 using namespace ccd;
 
@@ -578,10 +579,10 @@ void run_tbb_for_all_data(){
     arg.minimum_separation=0;
     arg.tight_inclusion_tolerance=1e-6;
     arg.tight_inclusion_max_iter = 1e6;
-    arg.run_ee_dataset = true;
+    arg.run_ee_dataset = false;
     arg.run_vf_dataset = true;
     arg.run_simulation_dataset = true; // not running simulation
-    arg.run_handcrafted_dataset = true;
+    arg.run_handcrafted_dataset = false;
 
     for (CCDMethod method : arg.methods) {
         if (is_method_enabled(method)) {
@@ -596,9 +597,26 @@ void run_tbb_for_all_data(){
         }
         std::cout << std::endl;
     }
-    // run_one_method_over_all_data(arg, CCDMethod::TIGHT_INCLUSION,folder,tail);
 }
 int main(int argc, char* argv[])
 {
+    int parallel = 0;
+    if (argc == 1)
+    {
+        parallel = 1;
+    }
+    else
+    {
+        parallel = std::stoi(argv[1]);
+    }
+    if (parallel <= 0)
+    {
+        std::cout << "wrong parallel nbr = " << parallel << std::endl;
+        return 0;
+    }
+    std::cout<<"default threads "<<tbb::task_scheduler_init::default_num_threads()<<std::endl;
+    tbb::task_scheduler_init init(parallel);
+    //tbb::task_scheduler_init init;  // Automatic number of threads
+  //tbb::task_scheduler_init init(tbb::task_scheduler_init::default_num_threads());  // Explicit number of threads
     run_tbb_for_all_data();
 }

@@ -191,3 +191,25 @@ if(CCD_WRAPPER_WITH_BENCHMARK)
     target_link_libraries(round_queries PUBLIC CLI11::CLI11)
   endif()
 endif()
+
+
+add_executable(tbb_bin
+    src/check_ground_truth.cpp
+    src/utils/read_rational_csv.cpp
+  )
+
+  target_link_libraries(tbb_bin PUBLIC ${PROJECT_NAME})
+  target_link_libraries(tbb_bin PUBLIC Boost::filesystem)
+  target_link_libraries(tbb_bin PUBLIC fmt::fmt)
+  target_link_libraries(tbb_bin PUBLIC nlohmann_json::nlohmann_json)
+  target_link_libraries(tbb_bin PUBLIC CLI11::CLI11)
+  # TBB
+  include(tbb)
+  target_link_libraries(tbb_bin PUBLIC TBB::tbb)
+  # GMP for reading rational query csv files
+  target_include_directories(tbb_bin PUBLIC ${GMP_INCLUDE_DIRS} src)
+  target_link_libraries(tbb_bin PUBLIC ${GMP_LIBRARIES})
+
+  target_compile_features(tbb_bin PUBLIC cxx_std_14)
+
+

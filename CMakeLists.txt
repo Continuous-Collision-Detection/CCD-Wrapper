@@ -196,6 +196,7 @@ endif()
 add_executable(tbb_bin
     src/check_ground_truth.cpp
     src/utils/read_rational_csv.cpp
+    src/utils/io.cpp
   )
 
   target_link_libraries(tbb_bin PUBLIC ${PROJECT_NAME})

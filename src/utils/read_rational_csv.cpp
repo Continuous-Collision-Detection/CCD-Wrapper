@@ -23,7 +23,7 @@ read_rational_csv(const std::string& inputFileName, std::vector<bool>& results)
     if (!infile.is_open()) {
         std::cout << "Path Wrong!!!!" << std::endl;
         std::cout << "path, " << inputFileName << std::endl;
-        return Eigen::MatrixXd(1, 1);
+        return Eigen::MatrixXd(0, 0);
     }
 
     int l = 0;

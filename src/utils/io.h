@@ -6,6 +6,9 @@
 #include <fstream>
 #include <iterator>
 #include "read_rational_csv.hpp"
+#define DUPLICATE_ONE_QUERIE
+
+
 
 using namespace ccd;
 

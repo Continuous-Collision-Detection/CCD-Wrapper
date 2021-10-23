@@ -184,8 +184,19 @@ timer.stop();
 time_all=timer.getElapsedTimeInMicroSec();
 return;
 }
-
-
+/*
+positive id 119959
+positive id 219064
+positive id 220848
+positive id 359287
+positive id 361226
+positive id 375453
+positive id 377605
+positive id 668033
+positive id 672149
+positive id 960843
+positive id 963066
+*/
 //#############################
 // this is a value used to control if write info for per query
 bool WRITE_QUERY_INFO=false;
@@ -234,7 +245,7 @@ void run_rational_data_single_method(
     long long queue_size_total=0;
     const std::vector<std::string>& scene_names
         = is_simulation_data ? simulation_folders : handcrafted_folders;
-
+    int tmp_count=0;
 
     for (const auto& scene_name : scene_names) {
         std::string scene_path = args.data_dir + scene_name + sub_folder;
@@ -279,6 +290,14 @@ void run_rational_data_single_method(
                 total_number += 1;
                 Eigen::Matrix<double, 8, 3> V = substract_ccd(all_V_vec, i);
                 bool expected_result = results[i * 8];
+                
+                // if(expected_result){// to find slow ones
+                //     tmp_count+=1;
+                //     std::cout<<"positive id "<<total_number<<std::endl;
+                //     if(tmp_count>10){
+                //         exit(0);
+                //     }
+                // }
                 all_queries.push_back(V);
                 all_expects.push_back(expected_result);
             }
@@ -293,7 +312,16 @@ void run_rational_data_single_method(
             exit(1);
         }
         std::cout<<"data loaded"<<std::endl;
-        
+#ifdef DUPLICATE_ONE_QUERIE
+        Eigen::Matrix<double, 8, 3> duplicated_V=all_queries[219064];
+        int duplicate_size=10000;
+        all_queries.resize(duplicate_size);
+        for(int i=0;i<duplicate_size;i++){
+            all_queries[i]=duplicated_V;
+        }
+        std::cout<<"duplicating testing "<<std::endl;
+
+#endif
         run_CPU_parallel_TICCD(all_queries,is_edge_edge,all_results,total_time);
         for(int i=0;i<all_queries.size();i++){
             if (all_expects[i]) {
@@ -314,10 +342,10 @@ void run_rational_data_single_method(
         write_summary(
             folder + "method_tbb"   + "_is_edge_edge_"
             + std::to_string(is_edge_edge) + "_"
-            + std::to_string(total_number + 1) + tail + ".csv",
-        1024, total_number + 1, total_positives, is_edge_edge,
+            + std::to_string(all_queries.size()) + tail + ".csv",
+        1024, all_queries.size(), total_positives, is_edge_edge,
         num_false_positives, num_false_negatives,
-        total_time / double(total_number + 1),0,0);
+        total_time / double(all_queries.size()),0,0);
         }
         
     
@@ -351,8 +379,8 @@ void run_rational_data_single_method(
         "# of false positives: {:d}\n"
         "# of false negatives: {:d}\n"
         "average time: {:g}μs\n\n",
-        total_number + 1, total_positives, is_edge_edge, num_false_positives,
-        num_false_negatives, total_time / double(total_number + 1));
+        all_queries.size(), total_positives, is_edge_edge, num_false_positives,
+        num_false_negatives, total_time / double(all_queries.size()));
 }
 
 void run_one_method_over_all_data(const Args& args,
@@ -391,7 +419,7 @@ void run_tbb_for_all_data(){
     std::string folder = "/home/bolun1/interval/data0915/";// this is the output folder
     std::string tail = "";
     Args arg;
-    arg.data_dir="/home/bolun1/interval/fixed_data/float_with_gt/";
+    arg.data_dir="/home/bolun1/interval/fixed_data/polluted/float_with_gt/";
     arg.minimum_separation=0;
     arg.tight_inclusion_tolerance=1e-6;
     arg.tight_inclusion_max_iter = 1e6;

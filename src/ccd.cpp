@@ -47,7 +47,7 @@
 #ifdef CCD_WRAPPER_WITH_TIGHT_INCLUSION
 #include <tight_inclusion/inclusion_ccd.hpp>
 #endif
-
+#include <unistd.h>
 namespace ccd {
 
 // Detect collisions between a vertex and a triangular face.
@@ -735,6 +735,7 @@ bool vertexFaceCCD_OURS(
     double& output_tolerance,
     const int CCD_TYPE)
 {
+    
     return inclusion_ccd::vertexFaceCCD_double(
         edge0_vertex0_start, edge0_vertex1_start, edge1_vertex0_start,
         edge1_vertex1_start, edge0_vertex0_end, edge0_vertex1_end,

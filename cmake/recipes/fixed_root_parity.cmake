@@ -21,8 +21,8 @@ set(CCD_BUILD_RATIONAL ${CCD_WRAPPER_WITH_RFRP} CACHE BOOL "Build Rational Versi
 include(FetchContent)
 FetchContent_Declare(
     fixed_root_parity
-    GIT_REPOSITORY git@github.com:geometryprocessing/CCD.git
-    GIT_TAG 7ad5b8c7c72dcba42e592b39a5083607580174fb
+    GIT_REPOSITORY git@github.com:Continuous-Collision-Detection/ExactRootParityCCD.git
+    GIT_TAG ded6440dd454c57042fd54ced2f805c4b4b64137
     GIT_SHALLOW FALSE
 )
 
